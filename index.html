@@ -2129,7 +2129,8 @@
             if (!overlaps2) {
               window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar2 });
               window.redrawBeat2();
-            dropped = true;
+              dropped = true;
+            }
           }
 
           if (dropped) {
