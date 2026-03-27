@@ -1661,10 +1661,11 @@
 
           var len = data.length;
           var barW = 4 * dpr;
-          var gap = 2 * dpr;
+          var gap = 4 * dpr;
           var totalBars = Math.floor(w / (barW + gap));
           var step = Math.ceil(len / totalBars);
           var mid = h / 2;
+          var barRadius = 2 * dpr;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -1682,7 +1683,18 @@
             grad.addColorStop(0, '#00e5ff');
             grad.addColorStop(1, '#007aad');
             wfCtx.fillStyle = grad;
-            wfCtx.fillRect(x, y, barW, barH);
+            wfCtx.beginPath();
+            wfCtx.moveTo(x + barRadius, y);
+            wfCtx.lineTo(x + barW - barRadius, y);
+            wfCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            wfCtx.lineTo(x + barW, y + barH - barRadius);
+            wfCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            wfCtx.lineTo(x + barRadius, y + barH);
+            wfCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            wfCtx.lineTo(x, y + barRadius);
+            wfCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            wfCtx.closePath();
+            wfCtx.fill();
           }
 
           if (wfDuration > 0) {
@@ -1738,10 +1750,11 @@
           var sampleRange = endSample - startSample;
 
           var totalBars = 30;
-          var gap = 2 * dpr;
+          var gap = 5 * dpr;
           var barW = (zw - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = zh / 2;
+          var barRadius = 3 * dpr;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -1762,7 +1775,18 @@
             grad.addColorStop(0, '#00e5ff');
             grad.addColorStop(1, '#007aad');
             zmCtx.fillStyle = grad;
-            zmCtx.fillRect(x, y, barW, barH);
+            zmCtx.beginPath();
+            zmCtx.moveTo(x + barRadius, y);
+            zmCtx.lineTo(x + barW - barRadius, y);
+            zmCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            zmCtx.lineTo(x + barW, y + barH - barRadius);
+            zmCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            zmCtx.lineTo(x + barRadius, y + barH);
+            zmCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            zmCtx.lineTo(x, y + barRadius);
+            zmCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
           }
 
           if (window.beat1Placements) {
@@ -1779,12 +1803,14 @@
               var px = visStart * zw;
               var pw = (visEnd - visStart) * zw;
               var pr = 6 * dpr;
+              var blockH = zh * 0.6;
+              var blockY = (zh - blockH) / 2;
               zmCtx.fillStyle = typeColors[p.type];
-              roundRect(zmCtx, px, 0, pw, zh, pr);
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
               zmCtx.fill();
               zmCtx.strokeStyle = typeBorders[p.type];
               zmCtx.lineWidth = 2 * dpr;
-              roundRect(zmCtx, px, 0, pw, zh, pr);
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
               zmCtx.stroke();
 
               zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -1799,6 +1825,8 @@
             var dpx = dp.bar * zw;
             var dpw = (dp.time / 30) * zw;
             var dpr2 = 6 * dpr;
+            var dpH = zh * 0.6;
+            var dpY = (zh - dpH) / 2;
             if (dp.overlap) {
               zmCtx.fillStyle = 'rgba(220, 40, 40, 0.35)';
               zmCtx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
@@ -1807,11 +1835,11 @@
               zmCtx.fillStyle = colors[dp.type];
               zmCtx.strokeStyle = 'rgba(255,255,255,0.5)';
             }
-            window.roundRect(zmCtx, dpx, 0, dpw, zh, dpr2);
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
             zmCtx.fill();
             zmCtx.setLineDash([4 * dpr, 4 * dpr]);
             zmCtx.lineWidth = 2 * dpr;
-            window.roundRect(zmCtx, dpx, 0, dpw, zh, dpr2);
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
             zmCtx.stroke();
             zmCtx.setLineDash([]);
           }
@@ -1898,10 +1926,11 @@
           var endSample = Math.min(startSample + sampleRange, len);
 
           var totalBars = 30;
-          var gap = 2 * dpr;
+          var gap = 5 * dpr;
           var barW = (w - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = h / 2;
+          var barRadius = 3 * dpr;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -1922,7 +1951,18 @@
             grad.addColorStop(0, '#fc6c85');
             grad.addColorStop(1, '#7a1a3a');
             b2Ctx.fillStyle = grad;
-            b2Ctx.fillRect(x, y, barW, barH);
+            b2Ctx.beginPath();
+            b2Ctx.moveTo(x + barRadius, y);
+            b2Ctx.lineTo(x + barW - barRadius, y);
+            b2Ctx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            b2Ctx.lineTo(x + barW, y + barH - barRadius);
+            b2Ctx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            b2Ctx.lineTo(x + barRadius, y + barH);
+            b2Ctx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            b2Ctx.lineTo(x, y + barRadius);
+            b2Ctx.arcTo(x, y, x + barRadius, y, barRadius);
+            b2Ctx.closePath();
+            b2Ctx.fill();
           }
 
           if (window.beat2Placements) {
@@ -1938,12 +1978,14 @@
               var px = visStart * w;
               var pw = (visEnd - visStart) * w;
               var pr = 6 * dpr;
+              var blockH = h * 0.6;
+              var blockY = (h - blockH) / 2;
               b2Ctx.fillStyle = typeColors[p.type];
-              window.roundRect(b2Ctx, px, 0, pw, h, pr);
+              window.roundRect(b2Ctx, px, blockY, pw, blockH, pr);
               b2Ctx.fill();
               b2Ctx.strokeStyle = typeBorders[p.type];
               b2Ctx.lineWidth = 2 * dpr;
-              window.roundRect(b2Ctx, px, 0, pw, h, pr);
+              window.roundRect(b2Ctx, px, blockY, pw, blockH, pr);
               b2Ctx.stroke();
 
               b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -1958,6 +2000,8 @@
             var dpx = dp.bar * w;
             var dpw = (dp.time / 30) * w;
             var dpr2 = 6 * dpr;
+            var dpH = h * 0.6;
+            var dpY = (h - dpH) / 2;
             if (dp.overlap) {
               b2Ctx.fillStyle = 'rgba(220, 40, 40, 0.35)';
               b2Ctx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
@@ -1966,11 +2010,11 @@
               b2Ctx.fillStyle = colors[dp.type];
               b2Ctx.strokeStyle = 'rgba(255,255,255,0.5)';
             }
-            window.roundRect(b2Ctx, dpx, 0, dpw, h, dpr2);
+            window.roundRect(b2Ctx, dpx, dpY, dpw, dpH, dpr2);
             b2Ctx.fill();
             b2Ctx.setLineDash([4 * dpr, 4 * dpr]);
             b2Ctx.lineWidth = 2 * dpr;
-            window.roundRect(b2Ctx, dpx, 0, dpw, h, dpr2);
+            window.roundRect(b2Ctx, dpx, dpY, dpw, dpH, dpr2);
             b2Ctx.stroke();
             b2Ctx.setLineDash([]);
           }
