@@ -775,6 +775,14 @@
       letter-spacing: 0.05em;
     }
 
+    #drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.85;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+
     #waveform-beat2 {
       position: relative;
       z-index: 1;
@@ -1023,6 +1031,7 @@
   </style>
 </head>
 <body>
+  <div id="drag-ghost" style="display:none"></div>
   <div id="start-screen">
     <img id="picker-hammer" class="picker-slide" src="resources/picker_hammer.webp" alt="">
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
@@ -1641,6 +1650,7 @@
           ctx.arcTo(x, y, x + r, y, r);
           ctx.closePath();
         }
+        window.roundRect = roundRect;
 
         function drawWaveform(data) {
           if (!data) return;
@@ -1690,6 +1700,28 @@
             wfCtx.stroke();
           }
 
+          if (window.beat1Placements) {
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat1Placements.forEach(function(p) {
+              var px = p.pos * w;
+              var pw = (p.time / wfDuration) * w;
+              var pr = 6 * dpr;
+              wfCtx.fillStyle = typeColors[p.type];
+              roundRect(wfCtx, px, 0, pw, h, pr);
+              wfCtx.fill();
+              wfCtx.strokeStyle = typeBorders[p.type];
+              wfCtx.lineWidth = 2 * dpr;
+              roundRect(wfCtx, px, 0, pw, h, pr);
+              wfCtx.stroke();
+
+              wfCtx.fillStyle = 'rgba(255,255,255,0.9)';
+              wfCtx.font = 'bold ' + (10 * dpr) + 'px "Exo 2", sans-serif';
+              wfCtx.textAlign = 'center';
+              wfCtx.fillText(p.name, px + pw / 2, h / 2 + 4 * dpr);
+            });
+          }
+
           drawZoom(data);
         }
 
@@ -1731,6 +1763,35 @@
             grad.addColorStop(1, '#007aad');
             zmCtx.fillStyle = grad;
             zmCtx.fillRect(x, y, barW, barH);
+          }
+
+          if (window.beat1Placements) {
+            var zWindowStart = windowPos * (wfDuration - 30);
+            var zWindowEnd = zWindowStart + 30;
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat1Placements.forEach(function(p) {
+              var pStartSec = p.pos * wfDuration;
+              var pEndSec = pStartSec + p.time;
+              if (pEndSec < zWindowStart || pStartSec > zWindowEnd) return;
+              var visStart = Math.max(0, (pStartSec - zWindowStart) / 30);
+              var visEnd = Math.min(1, (pEndSec - zWindowStart) / 30);
+              var px = visStart * zw;
+              var pw = (visEnd - visStart) * zw;
+              var pr = 6 * dpr;
+              zmCtx.fillStyle = typeColors[p.type];
+              roundRect(zmCtx, px, 0, pw, zh, pr);
+              zmCtx.fill();
+              zmCtx.strokeStyle = typeBorders[p.type];
+              zmCtx.lineWidth = 2 * dpr;
+              roundRect(zmCtx, px, 0, pw, zh, pr);
+              zmCtx.stroke();
+
+              zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
+              zmCtx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
+              zmCtx.textAlign = 'center';
+              zmCtx.fillText(p.name, px + pw / 2, zh / 2 + 5 * dpr);
+            });
           }
         }
 
@@ -1776,6 +1837,9 @@
           drawWaveform(wfData);
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
+
+        window.beat1Placements = [];
+        window.redrawWaveforms = function() { drawWaveform(wfData); };
       })();
 
       (function() {
@@ -1831,7 +1895,34 @@
             b2Ctx.fillStyle = grad;
             b2Ctx.fillRect(x, y, barW, barH);
           }
-        }
+
+          if (window.beat2Placements) {
+            var b2WindowStart = b2Start / len * b2Duration;
+            var b2WindowEnd = b2WindowStart + 30;
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat2Placements.forEach(function(p) {
+              var pStartSec = p.pos * 30 + b2WindowStart;
+              var pEndSec = pStartSec + p.time;
+              var visStart = Math.max(0, (pStartSec - b2WindowStart) / 30);
+              var visEnd = Math.min(1, (pEndSec - b2WindowStart) / 30);
+              var px = visStart * w;
+              var pw = (visEnd - visStart) * w;
+              var pr = 6 * dpr;
+              b2Ctx.fillStyle = typeColors[p.type];
+              roundRect(b2Ctx, px, 0, pw, h, pr);
+              b2Ctx.fill();
+              b2Ctx.strokeStyle = typeBorders[p.type];
+              b2Ctx.lineWidth = 2 * dpr;
+              roundRect(b2Ctx, px, 0, pw, h, pr);
+              b2Ctx.stroke();
+
+              b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
+              b2Ctx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
+              b2Ctx.textAlign = 'center';
+              b2Ctx.fillText(p.name, px + pw / 2, h / 2 + 5 * dpr);
+            });
+          }
 
         var b2Duration = 0;
 
@@ -1845,6 +1936,9 @@
             b2Start = Math.floor(Math.random() * maxStart);
             drawBeat2(b2Data, b2Start);
           });
+
+        window.beat2Placements = [];
+        window.redrawBeat2 = function() { drawBeat2(b2Data, b2Start); };
       })();
 
       (function() {
@@ -1862,7 +1956,13 @@
         ];
 
         var box = document.getElementById('info-box');
-        cards.forEach(function(c) {
+        var wfCanvas = document.getElementById('waveform-canvas');
+        var b2Canvas = document.getElementById('waveform-beat2');
+        var ghost = document.getElementById('drag-ghost');
+        var dragCard = null;
+        var dragEl = null;
+
+        function createCardEl(c) {
           var el = document.createElement('div');
           el.className = 'card type-' + c.type;
           el.innerHTML =
@@ -1871,7 +1971,68 @@
             '<div class="card-type">' + c.type + '</div>' +
             '<div class="card-time">' + c.time + 's</div>' +
             '<div class="card-moves">' + c.moves.map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
-          box.appendChild(el);
+          el.addEventListener('pointerdown', function(e) {
+            e.preventDefault();
+            dragCard = c;
+            dragEl = el;
+            ghost.innerHTML = el.outerHTML;
+            ghost.style.display = 'block';
+            ghost.style.width = el.offsetWidth + 'px';
+            ghost.style.left = e.clientX + 'px';
+            ghost.style.top = e.clientY + 'px';
+            el.style.opacity = '0.3';
+          });
+          return el;
+        }
+
+        cards.forEach(function(c) {
+          box.appendChild(createCardEl(c));
+        });
+
+        window.addEventListener('pointermove', function(e) {
+          if (!dragCard) return;
+          ghost.style.left = e.clientX + 'px';
+          ghost.style.top = e.clientY + 'px';
+        });
+
+        window.addEventListener('pointerup', function(e) {
+          if (!dragCard) return;
+
+          var ghostCard = ghost.querySelector('.card');
+          if (ghostCard) ghostCard.style.transform = '';
+
+          ghost.style.display = 'none';
+
+          var wfRect = wfCanvas.getBoundingClientRect();
+          var b2Rect = b2Canvas.getBoundingClientRect();
+
+          var dropped = false;
+
+          if (e.clientX >= wfRect.left && e.clientX <= wfRect.right &&
+              e.clientY >= wfRect.top && e.clientY <= wfRect.bottom) {
+            var pos = (e.clientX - wfRect.left) / wfRect.width;
+            window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos });
+            window.redrawWaveforms();
+            dropped = true;
+          }
+
+          if (!dropped &&
+              e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
+              e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
+            var pos2 = (e.clientX - b2Rect.left) / b2Rect.width;
+            window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos2 });
+            window.redrawBeat2();
+            dropped = true;
+          }
+
+          if (dropped) {
+            dragEl.remove();
+          } else {
+            dragEl.style.opacity = '1';
+          }
+
+          dragCard = null;
+          dragEl = null;
         });
       })();
 
