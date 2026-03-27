@@ -1737,9 +1737,9 @@
           var endSample = Math.floor(((windowPos * (wfDuration - 30)) + 30) / wfDuration * len);
           var sampleRange = endSample - startSample;
 
-          var barW = 6 * dpr;
+          var totalBars = 30;
           var gap = 2 * dpr;
-          var totalBars = Math.floor(zw / (barW + gap));
+          var barW = (zw - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = zh / 2;
 
@@ -1875,9 +1875,9 @@
           var sampleRange = Math.floor(30 / b2Duration * len);
           var endSample = Math.min(startSample + sampleRange, len);
 
-          var barW = 6 * dpr;
+          var totalBars = 30;
           var gap = 2 * dpr;
-          var totalBars = Math.floor(w / (barW + gap));
+          var barW = (w - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = h / 2;
 
