@@ -2046,6 +2046,47 @@
           dragCard = null;
           dragEl = null;
         });
+
+        function addCardToBox(c) {
+          box.appendChild(createCardEl(c));
+        }
+
+        zmCanvas.addEventListener('click', function(e) {
+          if (window.beat1Placements.length === 0) return;
+          var rect = zmCanvas.getBoundingClientRect();
+          var localPos = (e.clientX - rect.left) / rect.width;
+          var dur = window.getBeat1Duration();
+          var winPos = window.getBeat1WindowPos();
+          var clickPos = winPos * (1 - 30 / dur) + localPos * (30 / dur);
+
+          for (var i = window.beat1Placements.length - 1; i >= 0; i--) {
+            var p = window.beat1Placements[i];
+            var pEnd = p.pos + p.time / dur;
+            if (clickPos >= p.pos && clickPos <= pEnd) {
+              window.beat1Placements.splice(i, 1);
+              window.redrawWaveforms();
+              addCardToBox({ name: p.name, type: p.type, time: p.time, moves: cards.find(function(c) { return c.name === p.name; }).moves });
+              break;
+            }
+          }
+        });
+
+        b2Canvas.addEventListener('click', function(e) {
+          if (window.beat2Placements.length === 0) return;
+          var rect = b2Canvas.getBoundingClientRect();
+          var clickPos = (e.clientX - rect.left) / rect.width;
+
+          for (var i = window.beat2Placements.length - 1; i >= 0; i--) {
+            var p = window.beat2Placements[i];
+            var pWidth = p.time / 30;
+            if (clickPos >= p.pos && clickPos <= p.pos + pWidth) {
+              window.beat2Placements.splice(i, 1);
+              window.redrawBeat2();
+              addCardToBox({ name: p.name, type: p.type, time: p.time, moves: cards.find(function(c) { return c.name === p.name; }).moves });
+              break;
+            }
+          }
+        });
       })();
 
       init();
