@@ -1498,11 +1498,15 @@
           wfCtx.clearRect(0, 0, w, h);
 
           var len = data.length;
-          var step = Math.ceil(len / w);
+          var barW = 4 * dpr;
+          var gap = 2 * dpr;
+          var totalBars = Math.floor(w / (barW + gap));
+          var step = Math.ceil(len / totalBars);
           var mid = h / 2;
 
-          for (var x = 0; x < w; x++) {
-            var start = Math.floor(x * len / w);
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var start = i * step;
             var end = Math.min(start + step, len);
             var min = 1, max = -1;
             for (var j = start; j < end; j++) {
@@ -1518,7 +1522,7 @@
             grad.addColorStop(0.5, '#ffffff');
             grad.addColorStop(1, '#00e5ff');
             wfCtx.fillStyle = grad;
-            wfCtx.fillRect(x, y, 1, barH);
+            wfCtx.fillRect(x, y, barW, barH);
           }
         }
 
