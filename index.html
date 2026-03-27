@@ -679,6 +679,15 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
+    #waveform-beat2 {
+      position: relative;
+      z-index: 1;
+      width: 60vw;
+      max-width: 700px;
+      height: 300px;
+      margin-top: 10px;
+    }
+
     .picker-slide {
       position: absolute;
       top: 0;
@@ -925,6 +934,7 @@
     <canvas id="waveform-canvas"></canvas>
     <canvas id="waveform-zoom"></canvas>
     <div id="info-box"></div>
+    <canvas id="waveform-beat2"></canvas>
     <button id="start-btn" style="display:none">Start Battle</button>
   </div>
   <div id="flash"></div>
@@ -1672,6 +1682,76 @@
           drawWaveform(wfData);
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
+      })();
+
+      (function() {
+        var b2Canvas = document.getElementById('waveform-beat2');
+        var b2Ctx = b2Canvas.getContext('2d');
+        var b2AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function resizeB2() {
+          b2Canvas.width = b2Canvas.offsetWidth * (window.devicePixelRatio || 1);
+          b2Canvas.height = b2Canvas.offsetHeight * (window.devicePixelRatio || 1);
+        }
+        resizeB2();
+        window.addEventListener('resize', function() { resizeB2(); drawBeat2(b2Data, b2Start); });
+
+        var b2Data = null;
+        var b2Start = 0;
+
+        function drawBeat2(data, startSample) {
+          if (!data) return;
+          var w = b2Canvas.width;
+          var h = b2Canvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          b2Ctx.clearRect(0, 0, w, h);
+
+          var len = data.length;
+          var sampleRange = Math.floor(30 / b2Duration * len);
+          var endSample = Math.min(startSample + sampleRange, len);
+
+          var barW = 6 * dpr;
+          var gap = 2 * dpr;
+          var totalBars = Math.floor(w / (barW + gap));
+          var step = Math.ceil(sampleRange / totalBars);
+          var mid = h / 2;
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var s = startSample + i * step;
+            var e = Math.min(s + step, endSample, len);
+            if (s >= len) break;
+            var sum = 0;
+            var count = 0;
+            for (var j = s; j < e; j++) {
+              sum += data[j] * data[j];
+              count++;
+            }
+            var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
+            var y = mid - barH / 2;
+
+            var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
+            grad.addColorStop(0, '#c84cff');
+            grad.addColorStop(0.5, '#ffffff');
+            grad.addColorStop(1, '#4cb8ff');
+            b2Ctx.fillStyle = grad;
+            b2Ctx.fillRect(x, y, barW, barH);
+          }
+        }
+
+        var b2Duration = 0;
+
+        fetch('resources/Beat2.mp3')
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) { return b2AudioCtx.decodeAudioData(buf); })
+          .then(function(audioBuffer) {
+            b2Data = audioBuffer.getChannelData(0);
+            b2Duration = audioBuffer.duration;
+            var maxStart = b2Data.length - Math.floor(30 / b2Duration * b2Data.length);
+            b2Start = Math.floor(Math.random() * maxStart);
+            drawBeat2(b2Data, b2Start);
+          });
       })();
 
       init();
