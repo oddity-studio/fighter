@@ -1793,6 +1793,23 @@
               zmCtx.fillText(p.name, px + pw / 2, zh / 2 + 5 * dpr);
             });
           }
+
+          if (window.dragPreview && window.dragPreview.canvas === 'zoom') {
+            var dp = window.dragPreview;
+            var dpx = dp.bar * zw;
+            var dpw = (dp.time / 30) * zw;
+            var dpr2 = 6 * dpr;
+            var colors = { ATTACK: 'rgba(140, 50, 200, 0.35)', DEFENSE: 'rgba(120, 120, 120, 0.35)', SKILL: 'rgba(200, 170, 50, 0.35)' };
+            zmCtx.fillStyle = colors[dp.type];
+            window.roundRect(zmCtx, dpx, 0, dpw, zh, dpr2);
+            zmCtx.fill();
+            zmCtx.setLineDash([4 * dpr, 4 * dpr]);
+            zmCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+            zmCtx.lineWidth = 2 * dpr;
+            window.roundRect(zmCtx, dpx, 0, dpw, zh, dpr2);
+            zmCtx.stroke();
+            zmCtx.setLineDash([]);
+          }
         }
 
         fetch('resources/Beat1.mp3')
@@ -1930,6 +1947,23 @@
               b2Ctx.fillText(p.name, px + pw / 2, h / 2 + 5 * dpr);
             });
           }
+
+          if (window.dragPreview && window.dragPreview.canvas === 'beat2') {
+            var dp = window.dragPreview;
+            var dpx = dp.bar * w;
+            var dpw = (dp.time / 30) * w;
+            var dpr2 = 6 * dpr;
+            var colors = { ATTACK: 'rgba(140, 50, 200, 0.35)', DEFENSE: 'rgba(120, 120, 120, 0.35)', SKILL: 'rgba(200, 170, 50, 0.35)' };
+            b2Ctx.fillStyle = colors[dp.type];
+            window.roundRect(b2Ctx, dpx, 0, dpw, h, dpr2);
+            b2Ctx.fill();
+            b2Ctx.setLineDash([4 * dpr, 4 * dpr]);
+            b2Ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            b2Ctx.lineWidth = 2 * dpr;
+            window.roundRect(b2Ctx, dpx, 0, dpw, h, dpr2);
+            b2Ctx.stroke();
+            b2Ctx.setLineDash([]);
+          }
         }
 
         fetch('resources/Beat2.mp3')
@@ -2000,6 +2034,29 @@
           if (!dragCard) return;
           ghost.style.left = e.clientX + 'px';
           ghost.style.top = e.clientY + 'px';
+
+          var zmRect = zmCanvas.getBoundingClientRect();
+          var b2Rect = b2Canvas.getBoundingClientRect();
+          window.dragPreview = null;
+
+          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
+              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
+            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+            var snappedBar = Math.round(localPos * 30) / 30;
+            var dur = window.getBeat1Duration();
+            var winPos = window.getBeat1WindowPos();
+            window.dragPreview = { canvas: 'zoom', bar: snappedBar, time: dragCard.time, type: dragCard.type, name: dragCard.name };
+            window.redrawWaveforms();
+          } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
+                     e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
+            var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
+            var snappedBar2 = Math.round(localPos2 * 30) / 30;
+            window.dragPreview = { canvas: 'beat2', bar: snappedBar2, time: dragCard.time, type: dragCard.type, name: dragCard.name };
+            window.redrawBeat2();
+          } else {
+            window.redrawWaveforms();
+            window.redrawBeat2();
+          }
         });
 
         window.addEventListener('pointerup', function(e) {
@@ -2009,6 +2066,7 @@
           if (ghostCard) ghostCard.style.transform = '';
 
           ghost.style.display = 'none';
+          window.dragPreview = null;
 
           var zmRect = zmCanvas.getBoundingClientRect();
           var b2Rect = b2Canvas.getBoundingClientRect();
@@ -2018,9 +2076,10 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
+            var snappedBar = Math.round(localPos * 30) / 30;
             var dur = window.getBeat1Duration();
             var winPos = window.getBeat1WindowPos();
-            var pos = winPos * (1 - 30 / dur) + localPos * (30 / dur);
+            var pos = winPos * (1 - 30 / dur) + snappedBar * (30 / dur);
             var isFirst = window.beat1Placements.length === 0;
             window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos });
             window.redrawWaveforms();
@@ -2031,8 +2090,9 @@
           if (!dropped &&
               e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
               e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
-            var pos2 = (e.clientX - b2Rect.left) / b2Rect.width;
-            window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos2 });
+            var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
+            var snappedBar2 = Math.round(localPos2 * 30) / 30;
+            window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar2 });
             window.redrawBeat2();
             dropped = true;
           }
