@@ -650,9 +650,9 @@
     #waveform-zoom {
       position: relative;
       z-index: 1;
-      width: 80vw;
-      max-width: 900px;
-      height: 200px;
+      width: 60vw;
+      max-width: 700px;
+      height: 300px;
       margin-top: -60px;
     }
 
@@ -1585,7 +1585,7 @@
           var endSample = Math.floor(((windowPos * (wfDuration - 30)) + 30) / wfDuration * len);
           var sampleRange = endSample - startSample;
 
-          var barW = 4 * dpr;
+          var barW = 6 * dpr;
           var gap = 2 * dpr;
           var totalBars = Math.floor(zw / (barW + gap));
           var step = Math.ceil(sampleRange / totalBars);
