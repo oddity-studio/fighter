@@ -661,7 +661,7 @@
       z-index: 1;
       width: 80vw;
       max-width: 900px;
-      height: 150px;
+      height: 60px;
       margin-top: 10px;
     }
 
@@ -1572,11 +1572,7 @@
             var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
             var y = mid - barH / 2;
 
-            var grad = wfCtx.createLinearGradient(0, y, 0, y + barH);
-            grad.addColorStop(0, '#fc6c85');
-            grad.addColorStop(0.5, '#ffffff');
-            grad.addColorStop(1, '#00e5ff');
-            wfCtx.fillStyle = grad;
+            wfCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
             wfCtx.fillRect(x, y, barW, barH);
           }
 
