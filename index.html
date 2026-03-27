@@ -1856,6 +1856,7 @@
 
         var b2Data = null;
         var b2Start = 0;
+        var b2Duration = 0;
 
         function drawBeat2(data, startSample) {
           if (!data) return;
@@ -1923,8 +1924,7 @@
               b2Ctx.fillText(p.name, px + pw / 2, h / 2 + 5 * dpr);
             });
           }
-
-        var b2Duration = 0;
+        }
 
         fetch('resources/Beat2.mp3')
           .then(function(r) { return r.arrayBuffer(); })
