@@ -1840,6 +1840,8 @@
 
         window.beat1Placements = [];
         window.redrawWaveforms = function() { drawWaveform(wfData); };
+        window.getBeat1WindowPos = function() { return windowPos; };
+        window.getBeat1Duration = function() { return wfDuration; };
       })();
 
       (function() {
@@ -1957,6 +1959,7 @@
 
         var box = document.getElementById('info-box');
         var wfCanvas = document.getElementById('waveform-canvas');
+        var zmCanvas = document.getElementById('waveform-zoom');
         var b2Canvas = document.getElementById('waveform-beat2');
         var ghost = document.getElementById('drag-ghost');
         var dragCard = null;
@@ -2003,14 +2006,17 @@
 
           ghost.style.display = 'none';
 
-          var wfRect = wfCanvas.getBoundingClientRect();
+          var zmRect = zmCanvas.getBoundingClientRect();
           var b2Rect = b2Canvas.getBoundingClientRect();
 
           var dropped = false;
 
-          if (e.clientX >= wfRect.left && e.clientX <= wfRect.right &&
-              e.clientY >= wfRect.top && e.clientY <= wfRect.bottom) {
-            var pos = (e.clientX - wfRect.left) / wfRect.width;
+          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
+              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
+            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+            var dur = window.getBeat1Duration();
+            var winPos = window.getBeat1WindowPos();
+            var pos = winPos * (1 - 30 / dur) + localPos * (30 / dur);
             window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos });
             window.redrawWaveforms();
             dropped = true;
