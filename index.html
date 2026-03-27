@@ -1813,26 +1813,29 @@
         }
 
         wfCanvas.style.cursor = 'pointer';
+        var snippetLocked = false;
 
         wfCanvas.addEventListener('mousedown', function(e) {
+          if (snippetLocked) return;
           dragging = true;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
         });
         window.addEventListener('mousemove', function(e) {
-          if (!dragging) return;
+          if (!dragging || snippetLocked) return;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
         });
         window.addEventListener('mouseup', function() { dragging = false; });
 
         wfCanvas.addEventListener('touchstart', function(e) {
+          if (snippetLocked) return;
           dragging = true;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
         }, { passive: true });
         window.addEventListener('touchmove', function(e) {
-          if (!dragging) return;
+          if (!dragging || snippetLocked) return;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
         }, { passive: true });
@@ -1842,6 +1845,7 @@
         window.redrawWaveforms = function() { drawWaveform(wfData); };
         window.getBeat1WindowPos = function() { return windowPos; };
         window.getBeat1Duration = function() { return wfDuration; };
+        window.lockSnippet = function() { snippetLocked = true; wfCanvas.style.cursor = 'default'; };
       })();
 
       (function() {
@@ -2017,8 +2021,10 @@
             var dur = window.getBeat1Duration();
             var winPos = window.getBeat1WindowPos();
             var pos = winPos * (1 - 30 / dur) + localPos * (30 / dur);
+            var isFirst = window.beat1Placements.length === 0;
             window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos });
             window.redrawWaveforms();
+            if (isFirst) window.lockSnippet();
             dropped = true;
           }
 
