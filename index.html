@@ -677,6 +677,102 @@
       -webkit-backdrop-filter: blur(20px);
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      box-sizing: border-box;
+    }
+
+    #info-box::-webkit-scrollbar {
+      height: 6px;
+    }
+    #info-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #info-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+    }
+
+    .card {
+      flex-shrink: 0;
+      width: 120px;
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .card.type-ATTACK {
+      background: linear-gradient(135deg, rgba(140, 50, 200, 0.5), rgba(80, 20, 140, 0.6));
+    }
+    .card.type-DEFENSE {
+      background: linear-gradient(135deg, rgba(120, 120, 120, 0.5), rgba(60, 60, 60, 0.6));
+    }
+    .card.type-SKILL {
+      background: linear-gradient(135deg, rgba(200, 170, 50, 0.5), rgba(140, 110, 20, 0.6));
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+    }
+
+    .card-name {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .card-type {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .card.type-ATTACK .card-type { color: #d8a0ff; }
+    .card.type-DEFENSE .card-type { color: #aaa; }
+    .card.type-SKILL .card-type { color: #ffd700; }
+
+    .card-time {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .card-moves {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .move-tag {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.05em;
     }
 
     #waveform-beat2 {
@@ -1749,6 +1845,34 @@
             b2Start = Math.floor(Math.random() * maxStart);
             drawBeat2(b2Data, b2Start);
           });
+      })();
+
+      (function() {
+        var cards = [
+          { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH'] },
+          { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
+          { name: 'Sucker Punch',   type: 'ATTACK',  time: 4, moves: ['BLOCK', 'PUNCH'] },
+          { name: 'Power Glove',    type: 'ATTACK',  time: 6, moves: ['SUPER'] },
+          { name: 'Doom',           type: 'ATTACK',  time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
+          { name: 'Deflect',        type: 'DEFENSE', time: 2, moves: ['BLOCK'] },
+          { name: 'Turtle',         type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
+          { name: 'Smartass',       type: 'DEFENSE', time: 4, moves: ['TAUNT', 'BLOCK'] },
+          { name: 'Wait Your Moment', type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
+          { name: 'Boost Morale',   type: 'SKILL',   time: 2, moves: ['TAUNT'] }
+        ];
+
+        var box = document.getElementById('info-box');
+        cards.forEach(function(c) {
+          var el = document.createElement('div');
+          el.className = 'card type-' + c.type;
+          el.innerHTML =
+            '<div class="card-img"></div>' +
+            '<div class="card-name">' + c.name + '</div>' +
+            '<div class="card-type">' + c.type + '</div>' +
+            '<div class="card-time">' + c.time + 's</div>' +
+            '<div class="card-moves">' + c.moves.map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
+          box.appendChild(el);
+        });
       })();
 
       init();
