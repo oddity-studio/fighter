@@ -1910,11 +1910,11 @@
               var pw = (visEnd - visStart) * w;
               var pr = 6 * dpr;
               b2Ctx.fillStyle = typeColors[p.type];
-              roundRect(b2Ctx, px, 0, pw, h, pr);
+              window.roundRect(b2Ctx, px, 0, pw, h, pr);
               b2Ctx.fill();
               b2Ctx.strokeStyle = typeBorders[p.type];
               b2Ctx.lineWidth = 2 * dpr;
-              roundRect(b2Ctx, px, 0, pw, h, pr);
+              window.roundRect(b2Ctx, px, 0, pw, h, pr);
               b2Ctx.stroke();
 
               b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
