@@ -2089,6 +2089,8 @@
 
           ghost.style.display = 'none';
           window.dragPreview = null;
+          window.redrawWaveforms();
+          window.redrawBeat2();
 
           var zmRect = zmCanvas.getBoundingClientRect();
           var b2Rect = b2Canvas.getBoundingClientRect();
