@@ -621,6 +621,7 @@
       align-items: center;
       justify-content: flex-end;
       padding-bottom: 10vh;
+      gap: 10px;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%);
       overflow: hidden;
     }
@@ -694,7 +695,6 @@
       width: 60vw;
       max-width: 700px;
       height: 300px;
-      margin-top: -10px;
     }
 
     #waveform-canvas {
@@ -703,7 +703,6 @@
       width: 80vw;
       max-width: 900px;
       height: 60px;
-      margin-top: 10px;
     }
 
     #info-box {
@@ -712,7 +711,6 @@
       width: 80vw;
       max-width: 900px;
       height: 300px;
-      margin-top: 10px;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -830,7 +828,6 @@
       width: 60vw;
       max-width: 700px;
       height: 300px;
-      margin-top: 10px;
     }
 
     .picker-slide {
@@ -2369,31 +2366,20 @@
 
       var currentSource = null;
 
+      var audio1 = new Audio('resources/Beat1.mp3');
+      var audio2 = new Audio('resources/Beat2.mp3');
+
       document.getElementById('play-btn-1').addEventListener('click', function() {
-        if (!window.beat1Buffer) return;
-        var ctx = window.sharedAudioCtx;
-        ctx.resume();
-        if (currentSource) { try { currentSource.stop(); } catch(e) {} }
-        var dur = window.getBeat1Duration();
-        var startTime = window.getBeat1WindowPos() * (dur - 30);
-        var source = ctx.createBufferSource();
-        source.buffer = window.beat1Buffer;
-        source.connect(ctx.destination);
-        source.start(0, startTime, 30);
-        currentSource = source;
+        audio2.pause();
+        audio1.currentTime = window.getBeat1WindowPos() * (window.getBeat1Duration() - 30);
+        audio1.play();
       });
 
       document.getElementById('play-btn-2').addEventListener('click', function() {
-        if (!window.beat2Buffer) return;
-        var ctx = window.sharedAudioCtx;
-        ctx.resume();
-        if (currentSource) { try { currentSource.stop(); } catch(e) {} }
+        audio1.pause();
         var startTime = window.getBeat2Start() / window.beat2Buffer.sampleRate;
-        var source = ctx.createBufferSource();
-        source.buffer = window.beat2Buffer;
-        source.connect(ctx.destination);
-        source.start(0, startTime, 30);
-        currentSource = source;
+        audio2.currentTime = startTime;
+        audio2.play();
       });
 
       init();
