@@ -2371,6 +2371,7 @@
 
       document.getElementById('play-btn-1').addEventListener('click', function() {
         if (!window.beat1Buffer) return;
+        playCtx.resume();
         if (currentSource) { try { currentSource.stop(); } catch(e) {} }
         var dur = window.getBeat1Duration();
         var startTime = window.getBeat1WindowPos() * (dur - 30);
@@ -2383,6 +2384,7 @@
 
       document.getElementById('play-btn-2').addEventListener('click', function() {
         if (!window.beat2Buffer) return;
+        playCtx.resume();
         if (currentSource) { try { currentSource.stop(); } catch(e) {} }
         var startTime = window.getBeat2Start() / window.beat2Buffer.sampleRate;
         var source = playCtx.createBufferSource();
