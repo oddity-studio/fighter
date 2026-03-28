@@ -658,35 +658,34 @@
     .play-btn {
       width: 50px;
       height: 50px;
-      border-radius: 50%;
-      border: 2px solid;
+      border: none;
       background: transparent;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background 0.2s, box-shadow 0.2s;
+      padding: 0;
     }
     .play-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 50px;
+      height: 50px;
     }
     .play-btn-cyan {
-      border-color: #00e5ff;
       color: #00e5ff;
+      filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
     }
     .play-btn-cyan:hover {
-      background: rgba(0, 229, 255, 0.2);
-      box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+      color: #80f0ff;
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.8));
     }
     .play-btn-pink {
-      border-color: #fc6c85;
       color: #fc6c85;
+      filter: drop-shadow(0 0 8px rgba(252, 108, 133, 0.6));
     }
     .play-btn-pink:hover {
-      background: rgba(252, 108, 133, 0.2);
-      box-shadow: 0 0 16px rgba(252, 108, 133, 0.5);
+      color: #ff8da4;
+      filter: drop-shadow(0 0 16px rgba(252, 108, 133, 0.8));
     }
 
     #waveform-zoom {
