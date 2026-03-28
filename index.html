@@ -1756,6 +1756,8 @@
           var mid = zh / 2;
           var barRadius = barW / 2;
 
+          var barHeights = [];
+
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
             var s = startSample + i * step;
@@ -1770,6 +1772,7 @@
             var rms = count > 0 ? Math.sqrt(sum / count) : 0;
             var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
             var y = mid - barH / 2;
+            barHeights.push({ i: i, h: barH, x: x, y: y });
 
             var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
             if (i < 10) {
@@ -1793,6 +1796,36 @@
             zmCtx.closePath();
             zmCtx.fill();
           }
+
+          var colored = barHeights.filter(function(b) { return b.i >= 10; });
+          colored.sort(function(a, b) { return b.h - a.h; });
+          var spikes = [];
+          for (var si = 0; si < colored.length && spikes.length < 3; si++) {
+            var candidate = colored[si];
+            var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
+            if (!tooClose) spikes.push(candidate);
+          }
+          zmCtx.shadowColor = '#00ffff';
+          zmCtx.shadowBlur = 14 * dpr;
+          spikes.forEach(function(sp) {
+            var grad2 = zmCtx.createLinearGradient(0, sp.y, 0, sp.y + sp.h);
+            grad2.addColorStop(0, '#80ffff');
+            grad2.addColorStop(1, '#33d6ff');
+            zmCtx.fillStyle = grad2;
+            zmCtx.beginPath();
+            zmCtx.moveTo(sp.x + barRadius, sp.y);
+            zmCtx.lineTo(sp.x + barW - barRadius, sp.y);
+            zmCtx.arcTo(sp.x + barW, sp.y, sp.x + barW, sp.y + barRadius, barRadius);
+            zmCtx.lineTo(sp.x + barW, sp.y + sp.h - barRadius);
+            zmCtx.arcTo(sp.x + barW, sp.y + sp.h, sp.x + barW - barRadius, sp.y + sp.h, barRadius);
+            zmCtx.lineTo(sp.x + barRadius, sp.y + sp.h);
+            zmCtx.arcTo(sp.x, sp.y + sp.h, sp.x, sp.y + sp.h - barRadius, barRadius);
+            zmCtx.lineTo(sp.x, sp.y + barRadius);
+            zmCtx.arcTo(sp.x, sp.y, sp.x + barRadius, sp.y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
+          });
+          zmCtx.shadowBlur = 0;
 
           if (window.beat1Placements) {
             var zWindowStart = windowPos * (wfDuration - 30);
@@ -1937,6 +1970,8 @@
           var mid = h / 2;
           var barRadius = barW / 2;
 
+          var barHeights = [];
+
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
             var s = startSample + i * step;
@@ -1951,6 +1986,7 @@
             var rms = count > 0 ? Math.sqrt(sum / count) : 0;
             var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
             var y = mid - barH / 2;
+            barHeights.push({ i: i, h: barH, x: x, y: y });
 
             var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
             if (i < 10) {
@@ -1974,6 +2010,36 @@
             b2Ctx.closePath();
             b2Ctx.fill();
           }
+
+          var colored = barHeights.filter(function(b) { return b.i >= 10; });
+          colored.sort(function(a, b) { return b.h - a.h; });
+          var spikes = [];
+          for (var si = 0; si < colored.length && spikes.length < 3; si++) {
+            var candidate = colored[si];
+            var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
+            if (!tooClose) spikes.push(candidate);
+          }
+          b2Ctx.shadowColor = '#ff80a0';
+          b2Ctx.shadowBlur = 14 * dpr;
+          spikes.forEach(function(sp) {
+            var grad2 = b2Ctx.createLinearGradient(0, sp.y, 0, sp.y + sp.h);
+            grad2.addColorStop(0, '#ffa0b8');
+            grad2.addColorStop(1, '#d63366');
+            b2Ctx.fillStyle = grad2;
+            b2Ctx.beginPath();
+            b2Ctx.moveTo(sp.x + barRadius, sp.y);
+            b2Ctx.lineTo(sp.x + barW - barRadius, sp.y);
+            b2Ctx.arcTo(sp.x + barW, sp.y, sp.x + barW, sp.y + barRadius, barRadius);
+            b2Ctx.lineTo(sp.x + barW, sp.y + sp.h - barRadius);
+            b2Ctx.arcTo(sp.x + barW, sp.y + sp.h, sp.x + barW - barRadius, sp.y + sp.h, barRadius);
+            b2Ctx.lineTo(sp.x + barRadius, sp.y + sp.h);
+            b2Ctx.arcTo(sp.x, sp.y + sp.h, sp.x, sp.y + sp.h - barRadius, barRadius);
+            b2Ctx.lineTo(sp.x, sp.y + barRadius);
+            b2Ctx.arcTo(sp.x, sp.y, sp.x + barRadius, sp.y, barRadius);
+            b2Ctx.closePath();
+            b2Ctx.fill();
+          });
+          b2Ctx.shadowBlur = 0;
 
           if (window.beat2Placements) {
             var b2WindowStart = b2Start / len * b2Duration;
