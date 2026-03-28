@@ -1665,7 +1665,7 @@
           var totalBars = Math.floor(w / (barW + gap));
           var step = Math.ceil(len / totalBars);
           var mid = h / 2;
-          var barRadius = 2 * dpr;
+          var barRadius = barW / 2;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -1754,7 +1754,7 @@
           var barW = (zw - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = zh / 2;
-          var barRadius = 3 * dpr;
+          var barRadius = barW / 2;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -1930,7 +1930,7 @@
           var barW = (w - gap * (totalBars - 1)) / totalBars;
           var step = Math.ceil(sampleRange / totalBars);
           var mid = h / 2;
-          var barRadius = 3 * dpr;
+          var barRadius = barW / 2;
 
           for (var i = 0; i < totalBars; i++) {
             var x = i * (barW + gap);
@@ -2096,12 +2096,13 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.round(localPos * 30) / 30;
+            var snappedBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
+            var overflows = snappedBar + dragCard.time / 30 > 1;
             var dur = window.getBeat1Duration();
             var winPos = window.getBeat1WindowPos();
             var newStart = winPos * (1 - 30 / dur) + snappedBar * (30 / dur);
             var newEnd = newStart + dragCard.time / dur;
-            var overlaps = window.beat1Placements.some(function(p) {
+            var overlaps = overflows || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / dur;
               return newStart < pEnd && newEnd > p.pos;
             });
@@ -2110,12 +2111,11 @@
           } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
                      e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
-            var snappedBar2 = Math.round(localPos2 * 30) / 30;
-            var newStart2 = snappedBar2;
-            var newEnd2 = newStart2 + dragCard.time / 30;
-            var overlaps2 = window.beat2Placements.some(function(p) {
+            var snappedBar2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30))) / 30;
+            var overflows2 = snappedBar2 + dragCard.time / 30 > 1;
+            var overlaps2 = overflows2 || window.beat2Placements.some(function(p) {
               var pEnd2 = p.pos + p.time / 30;
-              return newStart2 < pEnd2 && newEnd2 > p.pos;
+              return snappedBar2 < pEnd2 && (snappedBar2 + dragCard.time / 30) > p.pos;
             });
             window.dragPreview = { canvas: 'beat2', bar: snappedBar2, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps2 };
             window.redrawBeat2();
@@ -2144,12 +2144,13 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.round(localPos * 30) / 30;
+            var snappedBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
             var dur = window.getBeat1Duration();
             var winPos = window.getBeat1WindowPos();
             var pos = winPos * (1 - 30 / dur) + snappedBar * (30 / dur);
             var newEnd = pos + dragCard.time / dur;
-            var overlaps = window.beat1Placements.some(function(p) {
+            var overflows = snappedBar + dragCard.time / 30 > 1;
+            var overlaps = overflows || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / dur;
               return pos < pEnd && newEnd > p.pos;
             });
@@ -2166,11 +2167,11 @@
               e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
               e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
-            var snappedBar2 = Math.round(localPos2 * 30) / 30;
-            var newEnd2 = snappedBar2 + dragCard.time / 30;
-            var overlaps2 = window.beat2Placements.some(function(p) {
+            var snappedBar2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30))) / 30;
+            var overflows2 = snappedBar2 + dragCard.time / 30 > 1;
+            var overlaps2 = overflows2 || window.beat2Placements.some(function(p) {
               var pEnd2 = p.pos + p.time / 30;
-              return snappedBar2 < pEnd2 && newEnd2 > p.pos;
+              return snappedBar2 < pEnd2 && (snappedBar2 + dragCard.time / 30) > p.pos;
             });
             if (!overlaps2) {
               window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar2 });
