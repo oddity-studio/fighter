@@ -1772,8 +1772,13 @@
             var y = mid - barH / 2;
 
             var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
-            grad.addColorStop(0, '#00e5ff');
-            grad.addColorStop(1, '#007aad');
+            if (i < 10) {
+              grad.addColorStop(0, '#5a9ea6');
+              grad.addColorStop(1, '#5a7c8e');
+            } else {
+              grad.addColorStop(0, '#00e5ff');
+              grad.addColorStop(1, '#007aad');
+            }
             zmCtx.fillStyle = grad;
             zmCtx.beginPath();
             zmCtx.moveTo(x + barRadius, y);
@@ -1948,8 +1953,13 @@
             var y = mid - barH / 2;
 
             var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
-            grad.addColorStop(0, '#fc6c85');
-            grad.addColorStop(1, '#7a1a3a');
+            if (i < 10) {
+              grad.addColorStop(0, '#c87d8a');
+              grad.addColorStop(1, '#6e4a54');
+            } else {
+              grad.addColorStop(0, '#fc6c85');
+              grad.addColorStop(1, '#7a1a3a');
+            }
             b2Ctx.fillStyle = grad;
             b2Ctx.beginPath();
             b2Ctx.moveTo(x + barRadius, y);
