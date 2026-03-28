@@ -1773,8 +1773,8 @@
 
             var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
             if (i < 10) {
-              grad.addColorStop(0, '#5a9ea6');
-              grad.addColorStop(1, '#5a7c8e');
+              grad.addColorStop(0, '#7a8f93');
+              grad.addColorStop(1, '#6a7b80');
             } else {
               grad.addColorStop(0, '#00e5ff');
               grad.addColorStop(1, '#007aad');
@@ -1954,8 +1954,8 @@
 
             var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
             if (i < 10) {
-              grad.addColorStop(0, '#c87d8a');
-              grad.addColorStop(1, '#6e4a54');
+              grad.addColorStop(0, '#8a7a7d');
+              grad.addColorStop(1, '#6e5f62');
             } else {
               grad.addColorStop(0, '#fc6c85');
               grad.addColorStop(1, '#7a1a3a');
@@ -2108,11 +2108,12 @@
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
             var snappedBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
             var overflows = snappedBar + dragCard.time / 30 > 1;
+            var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
             var dur = window.getBeat1Duration();
             var winPos = window.getBeat1WindowPos();
             var newStart = winPos * (1 - 30 / dur) + snappedBar * (30 / dur);
             var newEnd = newStart + dragCard.time / dur;
-            var overlaps = overflows || window.beat1Placements.some(function(p) {
+            var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / dur;
               return newStart < pEnd && newEnd > p.pos;
             });
@@ -2123,7 +2124,8 @@
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
             var snappedBar2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30))) / 30;
             var overflows2 = snappedBar2 + dragCard.time / 30 > 1;
-            var overlaps2 = overflows2 || window.beat2Placements.some(function(p) {
+            var restricted2 = snappedBar2 < 10 / 30 && dragCard.type !== 'SKILL';
+            var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
               var pEnd2 = p.pos + p.time / 30;
               return snappedBar2 < pEnd2 && (snappedBar2 + dragCard.time / 30) > p.pos;
             });
@@ -2160,7 +2162,8 @@
             var pos = winPos * (1 - 30 / dur) + snappedBar * (30 / dur);
             var newEnd = pos + dragCard.time / dur;
             var overflows = snappedBar + dragCard.time / 30 > 1;
-            var overlaps = overflows || window.beat1Placements.some(function(p) {
+            var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
+            var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / dur;
               return pos < pEnd && newEnd > p.pos;
             });
@@ -2179,7 +2182,8 @@
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
             var snappedBar2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30))) / 30;
             var overflows2 = snappedBar2 + dragCard.time / 30 > 1;
-            var overlaps2 = overflows2 || window.beat2Placements.some(function(p) {
+            var restricted2 = snappedBar2 < 10 / 30 && dragCard.type !== 'SKILL';
+            var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
               var pEnd2 = p.pos + p.time / 30;
               return snappedBar2 < pEnd2 && (snappedBar2 + dragCard.time / 30) > p.pos;
             });
