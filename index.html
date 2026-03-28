@@ -1674,6 +1674,7 @@
         var zmCanvas = document.getElementById('waveform-zoom');
         var zmCtx = zmCanvas.getContext('2d');
         var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        window.sharedAudioCtx = audioCtx;
 
         function resizeWf() {
           wfCanvas.width = wfCanvas.offsetWidth * (window.devicePixelRatio || 1);
@@ -2150,7 +2151,7 @@
 
         fetch('resources/Beat2.mp3')
           .then(function(r) { return r.arrayBuffer(); })
-          .then(function(buf) { return b2AudioCtx.decodeAudioData(buf); })
+          .then(function(buf) { return window.sharedAudioCtx.decodeAudioData(buf); })
           .then(function(audioBuffer) {
             b2Data = audioBuffer.getChannelData(0);
             b2Duration = audioBuffer.duration;
@@ -2366,30 +2367,31 @@
         });
       })();
 
-      var playCtx = new (window.AudioContext || window.webkitAudioContext)();
       var currentSource = null;
 
       document.getElementById('play-btn-1').addEventListener('click', function() {
         if (!window.beat1Buffer) return;
-        playCtx.resume();
+        var ctx = window.sharedAudioCtx;
+        ctx.resume();
         if (currentSource) { try { currentSource.stop(); } catch(e) {} }
         var dur = window.getBeat1Duration();
         var startTime = window.getBeat1WindowPos() * (dur - 30);
-        var source = playCtx.createBufferSource();
+        var source = ctx.createBufferSource();
         source.buffer = window.beat1Buffer;
-        source.connect(playCtx.destination);
+        source.connect(ctx.destination);
         source.start(0, startTime, 30);
         currentSource = source;
       });
 
       document.getElementById('play-btn-2').addEventListener('click', function() {
         if (!window.beat2Buffer) return;
-        playCtx.resume();
+        var ctx = window.sharedAudioCtx;
+        ctx.resume();
         if (currentSource) { try { currentSource.stop(); } catch(e) {} }
         var startTime = window.getBeat2Start() / window.beat2Buffer.sampleRate;
-        var source = playCtx.createBufferSource();
+        var source = ctx.createBufferSource();
         source.buffer = window.beat2Buffer;
-        source.connect(playCtx.destination);
+        source.connect(ctx.destination);
         source.start(0, startTime, 30);
         currentSource = source;
       });
