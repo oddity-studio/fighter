@@ -647,6 +647,48 @@
         0 0 100px #ff3d00;
     }
 
+    .waveform-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .play-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .play-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+    .play-btn-cyan {
+      border-color: #00e5ff;
+      color: #00e5ff;
+    }
+    .play-btn-cyan:hover {
+      background: rgba(0, 229, 255, 0.2);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+    }
+    .play-btn-pink {
+      border-color: #fc6c85;
+      color: #fc6c85;
+    }
+    .play-btn-pink:hover {
+      background: rgba(252, 108, 133, 0.2);
+      box-shadow: 0 0 16px rgba(252, 108, 133, 0.5);
+    }
+
     #waveform-zoom {
       position: relative;
       z-index: 1;
@@ -1037,9 +1079,19 @@
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
-    <canvas id="waveform-zoom"></canvas>
+    <div class="waveform-row">
+      <button class="play-btn play-btn-cyan" id="play-btn-1">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+      </button>
+      <canvas id="waveform-zoom"></canvas>
+    </div>
     <div id="info-box"></div>
-    <canvas id="waveform-beat2"></canvas>
+    <div class="waveform-row">
+      <button class="play-btn play-btn-pink" id="play-btn-2">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+      </button>
+      <canvas id="waveform-beat2"></canvas>
+    </div>
     <button id="start-btn" style="display:none">Start Battle</button>
   </div>
   <div id="flash"></div>
@@ -1889,6 +1941,7 @@
           .then(function(audioBuffer) {
             wfData = audioBuffer.getChannelData(0);
             wfDuration = audioBuffer.duration;
+            window.beat1Buffer = audioBuffer;
             drawWaveform(wfData);
           });
 
@@ -2102,6 +2155,7 @@
           .then(function(audioBuffer) {
             b2Data = audioBuffer.getChannelData(0);
             b2Duration = audioBuffer.duration;
+            window.beat2Buffer = audioBuffer;
             var maxStart = b2Data.length - Math.floor(30 / b2Duration * b2Data.length);
             b2Start = Math.floor(Math.random() * maxStart);
             drawBeat2(b2Data, b2Start);
@@ -2109,6 +2163,7 @@
 
         window.beat2Placements = [];
         window.redrawBeat2 = function() { drawBeat2(b2Data, b2Start); };
+        window.getBeat2Start = function() { return b2Start; };
       })();
 
       (function() {
@@ -2311,6 +2366,32 @@
           }
         });
       })();
+
+      var playCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var currentSource = null;
+
+      document.getElementById('play-btn-1').addEventListener('click', function() {
+        if (!window.beat1Buffer) return;
+        if (currentSource) { try { currentSource.stop(); } catch(e) {} }
+        var dur = window.getBeat1Duration();
+        var startTime = window.getBeat1WindowPos() * (dur - 30);
+        var source = playCtx.createBufferSource();
+        source.buffer = window.beat1Buffer;
+        source.connect(playCtx.destination);
+        source.start(0, startTime, 30);
+        currentSource = source;
+      });
+
+      document.getElementById('play-btn-2').addEventListener('click', function() {
+        if (!window.beat2Buffer) return;
+        if (currentSource) { try { currentSource.stop(); } catch(e) {} }
+        var startTime = window.getBeat2Start() / window.beat2Buffer.sampleRate;
+        var source = playCtx.createBufferSource();
+        source.buffer = window.beat2Buffer;
+        source.connect(playCtx.destination);
+        source.start(0, startTime, 30);
+        currentSource = source;
+      });
 
       init();
     })();
