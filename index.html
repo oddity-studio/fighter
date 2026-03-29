@@ -1759,6 +1759,10 @@
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
+            setTimeout(function() {
+              var defMoves = getSortedMoves(window.beat2Placements);
+              playSequence(maxx, defMoves, 0);
+            }, 2500);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
