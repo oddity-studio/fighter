@@ -1855,6 +1855,7 @@
             var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
             if (!tooClose) spikes.push(candidate);
           }
+          window.beat1Spikes = spikes.map(function(s) { return s.i; });
           zmCtx.shadowColor = '#00ffff';
           zmCtx.shadowBlur = 14 * dpr;
           spikes.forEach(function(sp) {
@@ -2070,6 +2071,7 @@
             var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
             if (!tooClose) spikes.push(candidate);
           }
+          window.beat2Spikes = spikes.map(function(s) { return s.i; });
           b2Ctx.shadowColor = '#ff80a0';
           b2Ctx.shadowBlur = 14 * dpr;
           spikes.forEach(function(sp) {
