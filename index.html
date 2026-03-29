@@ -654,6 +654,17 @@
       z-index: 1;
     }
 
+    .snippet-label {
+      position: relative;
+      z-index: 1;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
     .play-btn {
       position: absolute;
       left: -60px;
@@ -1104,6 +1115,7 @@
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
+    <span class="snippet-label">attacking</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -1112,6 +1124,7 @@
     </div>
     <div id="move-seq-1" class="move-sequence"></div>
     <div id="info-box"></div>
+    <span class="snippet-label">defending</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-pink" id="play-btn-2">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
