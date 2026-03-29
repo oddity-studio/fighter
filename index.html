@@ -1492,7 +1492,7 @@
               playAnimationOnce(maxx, "Lose");
             }
             clearInterval(countdownInterval);
-            fadeOutBeat(round === 1 ? beat1 : beat2, 1000);
+            (round === 1 ? audio1 : audio2).pause();
             setTimeout(function() {
               var flash = document.getElementById('flash');
               flash.style.transition = 'none';
@@ -1690,27 +1690,35 @@
         document.getElementById('hud').style.display = '';
 
         window.dispatchEvent(new Event('resize'));
-        beat1.play().catch(function() {});
+
+        var dur = window.getBeat1Duration();
+        audio1.currentTime = window.getBeat1WindowPos() * (dur - 30);
+        audio1.play();
+
         showRoundCaption('round1-overlay', 1000);
         countdownInterval = setInterval(function() {
         countdown--;
-        // Fade out current beat over remaining time in last 2 seconds
         if (countdown <= 2 && countdown > 0) {
           if (round === 1 && !beat1FadeStarted) {
             beat1FadeStarted = true;
-            fadeOutBeat(beat1, countdown * 1000);
-            beat2.volume = 1;
-            beat2.play().catch(function() {});
+            audio1.volume = 0.3;
+            var b2Start = window.getBeat2Start() / window.beat2Buffer.sampleRate;
+            audio2.currentTime = b2Start;
+            audio2.volume = 1;
+            audio2.play();
           } else if (round === 2 && !beat2FadeStarted) {
             beat2FadeStarted = true;
-            fadeOutBeat(beat2, countdown * 1000);
+            audio2.volume = 0.3;
           }
         }
         if (countdown <= 0) {
           if (round === 1) {
-            // Ensure clean handoff even if flush skipped the fade
-            if (!beat1FadeStarted) { beat1.pause(); beat1.volume = 1; }
-            if (!beat2FadeStarted) { beat2.volume = 1; beat2.play().catch(function() {}); }
+            audio1.pause();
+            audio1.volume = 1;
+            var b2Start2 = window.getBeat2Start() / window.beat2Buffer.sampleRate;
+            audio2.currentTime = b2Start2;
+            audio2.volume = 1;
+            audio2.play();
             round = 2;
             countdown = 30;
             countdownEl.textContent = String(countdown).padStart(2, '0');
@@ -1721,8 +1729,8 @@
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
             // Timer fully depleted — stop audio
-            beat2.pause();
-            beat2.volume = 1;
+            audio2.pause();
+            audio2.volume = 1;
             countdownEl.textContent = '00';
             clearInterval(countdownInterval);
             timersEnded = true;
