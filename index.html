@@ -2099,14 +2099,11 @@
           var moves = [];
           sorted.forEach(function(p) {
             if (p.moves) {
-              var firstPunch = true;
-              p.moves.forEach(function(m) {
-                if (m === 'PUNCH' && p.onSpike && firstPunch) {
+              p.moves.forEach(function(m, idx) {
+                if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
-                  firstPunch = false;
                 } else {
                   moves.push(m);
-                  if (m === 'PUNCH') firstPunch = false;
                 }
               });
             }
