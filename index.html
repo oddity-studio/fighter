@@ -1729,6 +1729,8 @@
         setTimeout(function() {
           var atkMoves = getSortedMoves(window.beat1Placements);
           playSequence(maxx, atkMoves, 0);
+          var aiDefMoves = processMoves(window.aiDefCards || aiDef);
+          playSequence(hammer, aiDefMoves, 0);
         }, 3000);
         countdownInterval = setInterval(function() {
         countdown--;
@@ -1762,6 +1764,8 @@
             setTimeout(function() {
               var defMoves = getSortedMoves(window.beat2Placements);
               playSequence(maxx, defMoves, 0);
+              var aiAtkMoves = processMoves(window.aiAtkCards || aiAtk);
+              playSequence(hammer, aiAtkMoves, 0);
             }, 2500);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
@@ -2654,6 +2658,8 @@
 
       var aiAtk = generateAttacking();
       var aiDef = generateDefending();
+      window.aiAtkCards = aiAtk;
+      window.aiDefCards = aiDef;
 
       document.getElementById('ai-popup-btn').addEventListener('click', function() {
         var atkMoves = processMoves(aiAtk);
