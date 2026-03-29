@@ -1210,7 +1210,7 @@
   <video id="bg-video-b" class="bg-video" muted playsinline style="z-index:-1"></video>
   <canvas id="game-canvas" style="display:none"></canvas>
 
-  <div id="hud">
+  <div id="hud" style="display:none">
     <div>
       <div id="maxx-health" class="health-bar">
         <div class="health-bar-fill"></div>
@@ -1687,6 +1687,7 @@
       function startBattle() {
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
+        document.getElementById('hud').style.display = '';
 
         window.dispatchEvent(new Event('resize'));
         beat1.play().catch(function() {});
