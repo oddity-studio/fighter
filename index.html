@@ -2019,7 +2019,18 @@
           var sorted = placements.slice().sort(function(a, b) { return a.pos - b.pos; });
           var moves = [];
           sorted.forEach(function(p) {
-            if (p.moves) p.moves.forEach(function(m) { moves.push(m); });
+            if (p.moves) {
+              var firstPunch = true;
+              p.moves.forEach(function(m) {
+                if (m === 'PUNCH' && p.onSpike && firstPunch) {
+                  moves.push('PUNCH+');
+                  firstPunch = false;
+                } else {
+                  moves.push(m);
+                  if (m === 'PUNCH') firstPunch = false;
+                }
+              });
+            }
           });
           for (var i = 1; i < moves.length; i++) {
             if (moves[i] === 'PUNCH' && moves[i - 1] === 'TAUNT') {
@@ -2337,8 +2348,10 @@
               return pos < pEnd && newEnd > p.pos;
             });
             if (!overlaps) {
+              var barIndex = Math.round(snappedBar * 30);
+              var onSpike = window.beat1Spikes && window.beat1Spikes.indexOf(barIndex) !== -1;
               var isFirst = window.beat1Placements.length === 0;
-              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos, moves: dragCard.moves });
+              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: pos, moves: dragCard.moves, onSpike: onSpike });
               window.redrawWaveforms();
               if (isFirst) window.lockSnippet();
               dropped = true;
@@ -2357,7 +2370,9 @@
               return snappedBar2 < pEnd2 && (snappedBar2 + dragCard.time / 30) > p.pos;
             });
             if (!overlaps2) {
-              window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar2, moves: dragCard.moves });
+              var barIndex2 = Math.round(snappedBar2 * 30);
+              var onSpike2 = window.beat2Spikes && window.beat2Spikes.indexOf(barIndex2) !== -1;
+              window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar2, moves: dragCard.moves, onSpike: onSpike2 });
               window.redrawBeat2();
               dropped = true;
             }
