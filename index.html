@@ -2119,6 +2119,12 @@
             var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';
             return '<span class="' + cls + '">' + m + '</span>';
           }).join('');
+
+          if (window.beat1Placements.length > 0 && window.beat2Placements.length > 0) {
+            document.getElementById('start-btn').style.display = '';
+          } else {
+            document.getElementById('start-btn').style.display = 'none';
+          }
         };
         window.getBeat1WindowPos = function() { return windowPos; };
         window.getBeat1Duration = function() { return wfDuration; };
