@@ -1399,6 +1399,36 @@
         character.state.addListener(listener);
       }
 
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch', BLOCK: 'Dodge', SUPER: 'Win', TAUNT: 'Taunt' };
+
+      function playSequence(character, moves, idx) {
+        if (idx >= moves.length) return;
+        var anim = moveAnimMap[moves[idx]] || 'Punch';
+        playAnimationThenIdle(character, anim, function() {
+          playSequence(character, moves, idx + 1);
+        });
+      }
+
+      function getSortedMoves(placements) {
+        var sorted = placements.slice().sort(function(a, b) { return a.pos - b.pos; });
+        var moves = [];
+        sorted.forEach(function(p) {
+          if (p.moves) {
+            p.moves.forEach(function(m, idx) {
+              if (m === 'PUNCH' && p.onSpike && idx === 0) {
+                moves.push('PUNCH+');
+              } else {
+                moves.push(m);
+              }
+            });
+          }
+        });
+        for (var i = 1; i < moves.length; i++) {
+          if (moves[i] === 'PUNCH' && moves[i - 1] === 'TAUNT') moves[i] = 'PUNCH+';
+        }
+        return moves;
+      }
+
       function fireAction(attacker, defender, attackAnim, defendAnim) {
         if (animating) return;
         animating = true;
@@ -1696,6 +1726,10 @@
         audio1.play();
 
         showRoundCaption('round1-overlay', 1000);
+        setTimeout(function() {
+          var atkMoves = getSortedMoves(window.beat1Placements);
+          playSequence(maxx, atkMoves, 0);
+        }, 3000);
         countdownInterval = setInterval(function() {
         countdown--;
         if (countdown <= 2 && countdown > 0) {
