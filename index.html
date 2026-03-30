@@ -843,6 +843,47 @@
       height: 200px;
     }
 
+    #debug-boxes {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 60px;
+    }
+    .debug-box {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-align: center;
+      min-width: 100px;
+    }
+    .debug-label {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+    .debug-move {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #00e5ff;
+      margin-bottom: 2px;
+    }
+    #debug-p2 .debug-move {
+      color: #fc6c85;
+    }
+    .debug-anim {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
     .move-sequence {
       position: relative;
       z-index: 1;
@@ -1248,6 +1289,19 @@
     </div>
   </div>
 
+  <div id="debug-boxes" style="display:none">
+    <div id="debug-p1" class="debug-box">
+      <div class="debug-label">P1</div>
+      <div class="debug-move" id="debug-p1-move">-</div>
+      <div class="debug-anim" id="debug-p1-anim">-</div>
+    </div>
+    <div id="debug-p2" class="debug-box">
+      <div class="debug-label">P2</div>
+      <div class="debug-move" id="debug-p2-move">-</div>
+      <div class="debug-anim" id="debug-p2-anim">-</div>
+    </div>
+  </div>
+
   <script src="lib/spine-webgl.js"></script>
   <script>
     (function() {
@@ -1582,12 +1636,27 @@
         var idx = 0;
         var lastAtkAnim = '';
         var lastDefAnim = '';
+        document.getElementById('debug-boxes').style.display = 'flex';
         var combatInterval = setInterval(function() {
           if (idx >= combatResults.length) {
             clearInterval(combatInterval);
+            document.getElementById('debug-boxes').style.display = 'none';
             return;
           }
           var r = combatResults[idx];
+
+          // Update debug boxes
+          if (roundNum === 1) {
+            document.getElementById('debug-p1-move').textContent = r.atkMove;
+            document.getElementById('debug-p1-anim').textContent = r.atkAnim;
+            document.getElementById('debug-p2-move').textContent = r.defMove;
+            document.getElementById('debug-p2-anim').textContent = r.defAnim;
+          } else {
+            document.getElementById('debug-p1-move').textContent = r.defMove;
+            document.getElementById('debug-p1-anim').textContent = r.defAnim;
+            document.getElementById('debug-p2-move').textContent = r.atkMove;
+            document.getElementById('debug-p2-anim').textContent = r.atkAnim;
+          }
           if (r.atkAnim !== lastAtkAnim) {
             atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
             lastAtkAnim = r.atkAnim;
