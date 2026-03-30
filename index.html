@@ -1528,14 +1528,22 @@
 
       function playCombat(atkChar, defChar, combatResults, roundNum) {
         var idx = 0;
+        var lastAtkAnim = '';
+        var lastDefAnim = '';
         var combatInterval = setInterval(function() {
           if (idx >= combatResults.length) {
             clearInterval(combatInterval);
             return;
           }
           var r = combatResults[idx];
-          atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
-          defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
+          if (r.atkAnim !== lastAtkAnim) {
+            atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
+            lastAtkAnim = r.atkAnim;
+          }
+          if (r.defAnim !== lastDefAnim) {
+            defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
+            lastDefAnim = r.defAnim;
+          }
 
           if (r.damage > 0) {
             var newHealth = Math.max(0, health[r.target] - r.damage);
@@ -1845,7 +1853,7 @@
           tauntInterval = setInterval(function() {
             maxx.state.setAnimation(0, 'Taunt', false);
             maxx.state.addAnimation(0, 'Taunt', false, 0);
-          }, 1200);
+          }, 2000);
         }, 3000);
 
         // After 10s intro, play sequences
@@ -1895,7 +1903,7 @@
               tauntInterval2 = setInterval(function() {
                 hammer.state.setAnimation(0, 'Taunt', false);
                 hammer.state.addAnimation(0, 'Taunt', false, 0);
-              }, 1200);
+              }, 2000);
             }, 3000);
 
             // After 10s intro, play sequences
