@@ -1908,7 +1908,7 @@
           clearInterval(tauntInterval);
           var atkCards = getSortedCards(window.beat1Placements);
           var atkTicks = generateTicks(atkCards);
-          var defTicks = generateTicks(window.aiDefCards || aiDef);
+          var defTicks = generateTicks(window.aiDefCards);
           var combat = processCombat(atkTicks, defTicks, 1);
           playCombat(maxx, hammer, combat, 1);
         }, 10000);
@@ -1956,7 +1956,7 @@
             // After 10s intro, play sequences
             setTimeout(function() {
               clearInterval(tauntInterval2);
-              var atkTicks = generateTicks(window.aiAtkCards || aiAtk);
+              var atkTicks = generateTicks(window.aiAtkCards);
               var defCards = getSortedCards(window.beat2Placements);
               var defTicks = generateTicks(defCards);
               var combat = processCombat(atkTicks, defTicks, 2);
@@ -2853,8 +2853,12 @@
 
       var aiAtk = generateAttacking();
       var aiDef = generateDefending();
-      window.aiAtkCards = aiAtk;
-      window.aiDefCards = aiDef;
+      window.aiAtkCards = [];
+      window.aiDefCards = [];
+      for (var i = 0; i < 15; i++) {
+        window.aiAtkCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
+        window.aiDefCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
+      }
 
       document.getElementById('ai-popup-btn').addEventListener('click', function() {
         var atkMoves = processMoves(aiAtk);
