@@ -1399,7 +1399,7 @@
         character.state.addListener(listener);
       }
 
-      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch', BLOCK: 'Dodge', SUPER: 'Win', TAUNT: 'Taunt' };
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt' };
 
       function playSequence(character, moves, idx) {
         if (idx >= moves.length) return;
