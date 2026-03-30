@@ -1666,46 +1666,50 @@
             lastDefAnim = r.defAnim;
           }
 
-          if (r.atkDamage > 0 || r.defDamage > 0) {
-            var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
-            var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
+          // Apply damage at end of second
+          var tickIdx = idx;
+          setTimeout(function() {
+            if (r.atkDamage > 0 || r.defDamage > 0) {
+              var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
+              var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
 
-            if (r.atkDamage > 0) {
-              var newH = Math.max(0, health[atkTarget] - r.atkDamage);
-              setHealth(atkTarget, newH);
-              if (newH <= 0) {
-                clearInterval(combatInterval);
-                clearInterval(countdownInterval);
-                timersEnded = true;
-                round = 0;
-                pendingVote = atkTarget === 'maxx' ? 'hammer' : 'maxx';
-                var loser = atkTarget === 'maxx' ? maxx : hammer;
-                var winner = atkTarget === 'maxx' ? hammer : maxx;
-                loser.state.setAnimation(0, 'Down', false);
-                winner.state.setAnimation(0, 'Idle', true);
-                setTimeout(function() { showVoteIfPending(); }, 1500);
-                return;
+              if (r.atkDamage > 0) {
+                var newH = Math.max(0, health[atkTarget] - r.atkDamage);
+                setHealth(atkTarget, newH);
+                if (newH <= 0) {
+                  clearInterval(combatInterval);
+                  clearInterval(countdownInterval);
+                  timersEnded = true;
+                  round = 0;
+                  pendingVote = atkTarget === 'maxx' ? 'hammer' : 'maxx';
+                  var loser = atkTarget === 'maxx' ? maxx : hammer;
+                  var winner = atkTarget === 'maxx' ? hammer : maxx;
+                  loser.state.setAnimation(0, 'Down', false);
+                  winner.state.setAnimation(0, 'Idle', true);
+                  setTimeout(function() { showVoteIfPending(); }, 1500);
+                  return;
+                }
+              }
+
+              if (r.defDamage > 0) {
+                var newH2 = Math.max(0, health[defTarget] - r.defDamage);
+                setHealth(defTarget, newH2);
+                if (newH2 <= 0) {
+                  clearInterval(combatInterval);
+                  clearInterval(countdownInterval);
+                  timersEnded = true;
+                  round = 0;
+                  pendingVote = defTarget === 'maxx' ? 'hammer' : 'maxx';
+                  var loser2 = defTarget === 'maxx' ? maxx : hammer;
+                  var winner2 = defTarget === 'maxx' ? hammer : maxx;
+                  loser2.state.setAnimation(0, 'Down', false);
+                  winner2.state.setAnimation(0, 'Idle', true);
+                  setTimeout(function() { showVoteIfPending(); }, 1500);
+                  return;
+                }
               }
             }
-
-            if (r.defDamage > 0) {
-              var newH2 = Math.max(0, health[defTarget] - r.defDamage);
-              setHealth(defTarget, newH2);
-              if (newH2 <= 0) {
-                clearInterval(combatInterval);
-                clearInterval(countdownInterval);
-                timersEnded = true;
-                round = 0;
-                pendingVote = defTarget === 'maxx' ? 'hammer' : 'maxx';
-                var loser2 = defTarget === 'maxx' ? maxx : hammer;
-                var winner2 = defTarget === 'maxx' ? hammer : maxx;
-                loser2.state.setAnimation(0, 'Down', false);
-                winner2.state.setAnimation(0, 'Idle', true);
-                setTimeout(function() { showVoteIfPending(); }, 1500);
-                return;
-              }
-            }
-          }
+          }, 900);
           idx++;
         }, 1000);
       }
@@ -2038,6 +2042,8 @@
             round = 2;
             countdown = 30;
             countdownEl.textContent = String(countdown).padStart(2, '0');
+            setHealth('maxx', 100);
+            setHealth('hammer', 100);
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
