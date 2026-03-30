@@ -1434,16 +1434,22 @@
         'TAUNT:Idle':    'TAUNT:IDLE'
       };
 
+      // Map from our names to actual Spine rig animation names
+      var rigAnimMap = {
+        PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
+        HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle'
+      };
+
       function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted) {
         var key = atkMove + ':' + defMove;
         if (animLookup[key]) {
           var parts = animLookup[key].split(':');
-          return { atk: parts[0], def: parts[1] };
+          return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
         }
         // Fallback
         return {
-          atk: atkInterrupted ? 'HIT' : (moveAnimMap[atkMove] || atkMove),
-          def: defInterrupted ? 'HIT' : (moveAnimMap[defMove] || defMove)
+          atk: atkInterrupted ? 'Hit' : (rigAnimMap[atkMove] || atkMove),
+          def: defInterrupted ? 'Hit' : (rigAnimMap[defMove] || defMove)
         };
       }
 
