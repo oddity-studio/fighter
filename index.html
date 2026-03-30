@@ -1409,24 +1409,35 @@
         });
       }
 
-      function getSortedMoves(placements) {
-        var sorted = placements.slice().sort(function(a, b) { return a.pos - b.pos; });
-        var moves = [];
-        sorted.forEach(function(p) {
-          if (p.moves) {
-            p.moves.forEach(function(m, idx) {
-              if (m === 'PUNCH' && p.onSpike && idx === 0) {
-                moves.push('PUNCH+');
-              } else {
-                moves.push(m);
-              }
-            });
-          }
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2 };
+
+      function buildTimedSequence(cards) {
+        var events = [];
+        cards.forEach(function(c) {
+          var moves = c.moves || [];
+          moves.forEach(function(m, idx) {
+            var move = m;
+            if (m === 'PUNCH' && c.onSpike && idx === 0) move = 'PUNCH+';
+            if (move === 'PUNCH' && events.length > 0 && events[events.length - 1].move === 'TAUNT') move = 'PUNCH+';
+            events.push({ move: move, duration: moveDurations[move] || 1 });
+          });
+          events.push({ move: 'Idle', duration: c.downtime || 1 });
         });
-        for (var i = 1; i < moves.length; i++) {
-          if (moves[i] === 'PUNCH' && moves[i - 1] === 'TAUNT') moves[i] = 'PUNCH+';
-        }
-        return moves;
+        return events;
+      }
+
+      function getSortedCards(placements) {
+        return placements.slice().sort(function(a, b) { return a.pos - b.pos; });
+      }
+
+      function playTimedSequence(character, events, idx) {
+        if (idx >= events.length) return;
+        var ev = events[idx];
+        var anim = moveAnimMap[ev.move] || ev.move;
+        character.state.setAnimation(0, anim, anim === 'Idle');
+        setTimeout(function() {
+          playTimedSequence(character, events, idx + 1);
+        }, ev.duration * 1000);
       }
 
       function fireAction(attacker, defender, attackAnim, defendAnim) {
@@ -1725,10 +1736,11 @@
         // After 10s intro, play sequences
         setTimeout(function() {
           clearInterval(tauntInterval);
-          var atkMoves = getSortedMoves(window.beat1Placements);
-          playSequence(maxx, atkMoves, 0);
-          var aiDefMoves = processMoves(window.aiDefCards || aiDef);
-          playSequence(hammer, aiDefMoves, 0);
+          var atkCards = getSortedCards(window.beat1Placements);
+          var atkEvents = buildTimedSequence(atkCards);
+          playTimedSequence(maxx, atkEvents, 0);
+          var aiDefEvents = buildTimedSequence(window.aiDefCards || aiDef);
+          playTimedSequence(hammer, aiDefEvents, 0);
         }, 10000);
         countdownInterval = setInterval(function() {
         countdown--;
@@ -1774,10 +1786,11 @@
             // After 10s intro, play sequences
             setTimeout(function() {
               clearInterval(tauntInterval2);
-              var defMoves = getSortedMoves(window.beat2Placements);
-              playSequence(maxx, defMoves, 0);
-              var aiAtkMoves = processMoves(window.aiAtkCards || aiAtk);
-              playSequence(hammer, aiAtkMoves, 0);
+              var defCards = getSortedCards(window.beat2Placements);
+              var defEvents = buildTimedSequence(defCards);
+              playTimedSequence(maxx, defEvents, 0);
+              var aiAtkEvents = buildTimedSequence(window.aiAtkCards || aiAtk);
+              playTimedSequence(hammer, aiAtkEvents, 0);
             }, 10000);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
