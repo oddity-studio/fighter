@@ -1555,7 +1555,9 @@
               round = 0;
               pendingVote = r.target === 'maxx' ? 'hammer' : 'maxx';
               var loser = r.target === 'maxx' ? maxx : hammer;
-              loser.state.setAnimation(0, 'Lose', false);
+              var winner = r.target === 'maxx' ? hammer : maxx;
+              loser.state.setAnimation(0, 'Down', false);
+              winner.state.setAnimation(0, 'Idle', true);
               setTimeout(function() {
                 showVoteIfPending();
               }, 1500);
