@@ -1440,6 +1440,121 @@
         }, ev.duration * 1000);
       }
 
+      // ===== COMBAT SYSTEM =====
+      var interruptMap = {
+        PUNCH:   ['PUNCH', 'BLOCK'],
+        'PUNCH+': ['BLOCK'],
+        SUPER:   ['PUNCH'],
+        BLOCK:   ['SUPER'],
+        TAUNT:   ['PUNCH', 'SUPER']
+      };
+
+      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
+
+      function generateTicks(cards) {
+        var events = buildTimedSequence(cards);
+        var ticks = [];
+        events.forEach(function(ev) {
+          for (var i = 0; i < ev.duration; i++) {
+            ticks.push(ev.move);
+          }
+        });
+        return ticks;
+      }
+
+      function processCombat(atkTicks, defTicks, roundNum) {
+        var maxLen = Math.max(atkTicks.length, defTicks.length);
+        var results = [];
+        var atkTauntNext = false;
+
+        for (var t = 0; t < maxLen; t++) {
+          var atkMove = atkTicks[t] || 'Idle';
+          var defMove = defTicks[t] || 'Idle';
+
+          // Check TAUNT upgrade for attacker's next PUNCH
+          if (atkTauntNext && atkMove === 'PUNCH') {
+            atkMove = 'PUNCH+';
+            atkTauntNext = false;
+          }
+
+          // Check if defender's previous move was TAUNT for their PUNCH+
+          if (t > 0 && defTicks[t - 1] === 'TAUNT' && defMove === 'PUNCH') {
+            defMove = 'PUNCH+';
+          }
+
+          var atkInterrupted = false;
+          var defInterrupted = false;
+          var damage = 0;
+          var target = '';
+
+          // Check if attacker gets interrupted by defender
+          if (atkMove !== 'Idle' && interruptMap[atkMove]) {
+            atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
+          }
+
+          // Check if defender gets interrupted by attacker
+          if (defMove !== 'Idle' && interruptMap[defMove]) {
+            defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
+          }
+
+          // Determine outcome
+          var atkAnim = atkInterrupted ? 'Hit' : (moveAnimMap[atkMove] || atkMove);
+          var defAnim = defInterrupted ? 'Hit' : (moveAnimMap[defMove] || defMove);
+
+          if (!atkInterrupted && damageMap[atkMove]) {
+            damage = damageMap[atkMove];
+            target = roundNum === 1 ? 'hammer' : 'maxx';
+          }
+
+          // Set TAUNT flag if attacker does uninterrupted TAUNT
+          if (!atkInterrupted && atkMove === 'TAUNT') {
+            atkTauntNext = true;
+          }
+
+          results.push({
+            second: t,
+            atkMove: atkMove,
+            defMove: defMove,
+            atkInterrupted: atkInterrupted,
+            defInterrupted: defInterrupted,
+            damage: damage,
+            target: target,
+            atkAnim: atkAnim,
+            defAnim: defAnim
+          });
+        }
+        return results;
+      }
+
+      function playCombat(atkChar, defChar, combatResults, roundNum) {
+        var idx = 0;
+        var combatInterval = setInterval(function() {
+          if (idx >= combatResults.length) {
+            clearInterval(combatInterval);
+            return;
+          }
+          var r = combatResults[idx];
+          atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
+          defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
+
+          if (r.damage > 0) {
+            var newHealth = Math.max(0, health[r.target] - r.damage);
+            setHealth(r.target, newHealth);
+            if (newHealth <= 0) {
+              clearInterval(combatInterval);
+              clearInterval(countdownInterval);
+              timersEnded = true;
+              round = 0;
+              pendingVote = r.target === 'maxx' ? 'hammer' : 'maxx';
+              setTimeout(function() {
+                showVoteIfPending();
+              }, 1500);
+            }
+          }
+          idx++;
+        }, 1000);
+      }
+
       function fireAction(attacker, defender, attackAnim, defendAnim) {
         if (animating) return;
         animating = true;
@@ -1737,10 +1852,10 @@
         setTimeout(function() {
           clearInterval(tauntInterval);
           var atkCards = getSortedCards(window.beat1Placements);
-          var atkEvents = buildTimedSequence(atkCards);
-          playTimedSequence(maxx, atkEvents, 0);
-          var aiDefEvents = buildTimedSequence(window.aiDefCards || aiDef);
-          playTimedSequence(hammer, aiDefEvents, 0);
+          var atkTicks = generateTicks(atkCards);
+          var defTicks = generateTicks(window.aiDefCards || aiDef);
+          var combat = processCombat(atkTicks, defTicks, 1);
+          playCombat(maxx, hammer, combat, 1);
         }, 10000);
         countdownInterval = setInterval(function() {
         countdown--;
@@ -1786,11 +1901,11 @@
             // After 10s intro, play sequences
             setTimeout(function() {
               clearInterval(tauntInterval2);
+              var atkTicks = generateTicks(window.aiAtkCards || aiAtk);
               var defCards = getSortedCards(window.beat2Placements);
-              var defEvents = buildTimedSequence(defCards);
-              playTimedSequence(maxx, defEvents, 0);
-              var aiAtkEvents = buildTimedSequence(window.aiAtkCards || aiAtk);
-              playTimedSequence(hammer, aiAtkEvents, 0);
+              var defTicks = generateTicks(defCards);
+              var combat = processCombat(atkTicks, defTicks, 2);
+              playCombat(hammer, maxx, combat, 2);
             }, 10000);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
