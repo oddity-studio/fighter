@@ -1508,6 +1508,7 @@
         var maxLen = Math.max(atkTicks.length, defTicks.length);
         var results = [];
         var atkTauntNext = false;
+        var defTauntNext = false;
 
         for (var t = 0; t < maxLen; t++) {
           var atkMove = atkTicks[t] || 'Idle';
@@ -1519,6 +1520,12 @@
             atkTauntNext = false;
           }
 
+          // Check TAUNT upgrade for defender's next PUNCH
+          if (defTauntNext && defMove === 'PUNCH') {
+            defMove = 'PUNCH+';
+            defTauntNext = false;
+          }
+
           // Check if defender's previous move was TAUNT for their PUNCH+
           if (t > 0 && defTicks[t - 1] === 'TAUNT' && defMove === 'PUNCH') {
             defMove = 'PUNCH+';
@@ -1526,8 +1533,6 @@
 
           var atkInterrupted = false;
           var defInterrupted = false;
-          var damage = 0;
-          var target = '';
 
           // Check if attacker gets interrupted by defender
           if (atkMove !== 'Idle' && interruptMap[atkMove]) {
@@ -1544,14 +1549,18 @@
           var atkAnim = anims.atk;
           var defAnim = anims.def;
 
-          if (!atkInterrupted && damageMap[atkMove]) {
-            damage = damageMap[atkMove];
-            target = roundNum === 1 ? 'hammer' : 'maxx';
-          }
+          // Determine damage for both directions
+          var atkDamage = (!atkInterrupted && damageMap[atkMove]) ? damageMap[atkMove] : 0;
+          var defDamage = (!defInterrupted && damageMap[defMove]) ? damageMap[defMove] : 0;
 
-          // Set TAUNT flag if attacker does uninterrupted TAUNT
+          // TAUNT upgrade for attacker
           if (!atkInterrupted && atkMove === 'TAUNT') {
             atkTauntNext = true;
+          }
+
+          // TAUNT upgrade for defender too
+          if (!defInterrupted && defMove === 'TAUNT') {
+            defTauntNext = true;
           }
 
           results.push({
@@ -1560,8 +1569,8 @@
             defMove: defMove,
             atkInterrupted: atkInterrupted,
             defInterrupted: defInterrupted,
-            damage: damage,
-            target: target,
+            atkDamage: atkDamage,
+            defDamage: defDamage,
             atkAnim: atkAnim,
             defAnim: defAnim
           });
@@ -1588,22 +1597,44 @@
             lastDefAnim = r.defAnim;
           }
 
-          if (r.damage > 0) {
-            var newHealth = Math.max(0, health[r.target] - r.damage);
-            setHealth(r.target, newHealth);
-            if (newHealth <= 0) {
-              clearInterval(combatInterval);
-              clearInterval(countdownInterval);
-              timersEnded = true;
-              round = 0;
-              pendingVote = r.target === 'maxx' ? 'hammer' : 'maxx';
-              var loser = r.target === 'maxx' ? maxx : hammer;
-              var winner = r.target === 'maxx' ? hammer : maxx;
-              loser.state.setAnimation(0, 'Down', false);
-              winner.state.setAnimation(0, 'Idle', true);
-              setTimeout(function() {
-                showVoteIfPending();
-              }, 1500);
+          if (r.atkDamage > 0 || r.defDamage > 0) {
+            var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
+            var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
+
+            if (r.atkDamage > 0) {
+              var newH = Math.max(0, health[atkTarget] - r.atkDamage);
+              setHealth(atkTarget, newH);
+              if (newH <= 0) {
+                clearInterval(combatInterval);
+                clearInterval(countdownInterval);
+                timersEnded = true;
+                round = 0;
+                pendingVote = atkTarget === 'maxx' ? 'hammer' : 'maxx';
+                var loser = atkTarget === 'maxx' ? maxx : hammer;
+                var winner = atkTarget === 'maxx' ? hammer : maxx;
+                loser.state.setAnimation(0, 'Down', false);
+                winner.state.setAnimation(0, 'Idle', true);
+                setTimeout(function() { showVoteIfPending(); }, 1500);
+                return;
+              }
+            }
+
+            if (r.defDamage > 0) {
+              var newH2 = Math.max(0, health[defTarget] - r.defDamage);
+              setHealth(defTarget, newH2);
+              if (newH2 <= 0) {
+                clearInterval(combatInterval);
+                clearInterval(countdownInterval);
+                timersEnded = true;
+                round = 0;
+                pendingVote = defTarget === 'maxx' ? 'hammer' : 'maxx';
+                var loser2 = defTarget === 'maxx' ? maxx : hammer;
+                var winner2 = defTarget === 'maxx' ? hammer : maxx;
+                loser2.state.setAnimation(0, 'Down', false);
+                winner2.state.setAnimation(0, 'Idle', true);
+                setTimeout(function() { showVoteIfPending(); }, 1500);
+                return;
+              }
             }
           }
           idx++;
