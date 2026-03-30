@@ -1657,6 +1657,7 @@
             document.getElementById('debug-p2-move').textContent = r.atkMove;
             document.getElementById('debug-p2-anim').textContent = r.atkAnim;
           }
+
           if (r.atkAnim !== lastAtkAnim) {
             atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
             lastAtkAnim = r.atkAnim;
@@ -1667,7 +1668,6 @@
           }
 
           // Apply damage at end of second
-          var tickIdx = idx;
           setTimeout(function() {
             if (r.atkDamage > 0 || r.defDamage > 0) {
               var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
@@ -1702,6 +1702,7 @@
           }, 900);
           idx++;
         }, 1000);
+        window.currentCombatInterval = combatInterval;
       }
 
       function fireAction(attacker, defender, attackAnim, defendAnim) {
@@ -2009,20 +2010,14 @@
         countdownInterval = setInterval(function() {
         countdown--;
         if (countdown <= 2 && countdown > 0) {
-          if (round === 1 && !beat1FadeStarted) {
-            beat1FadeStarted = true;
-            audio1.volume = 0.3;
-            var b2Start = window.getBeat2Start() / window.beat2Buffer.sampleRate;
-            audio2.currentTime = b2Start;
-            audio2.volume = 1;
-            audio2.play();
-          } else if (round === 2 && !beat2FadeStarted) {
+          if (round === 2 && !beat2FadeStarted) {
             beat2FadeStarted = true;
             audio2.volume = 0.3;
           }
         }
         if (countdown <= 0) {
           if (round === 1) {
+            if (window.currentCombatInterval) clearInterval(window.currentCombatInterval);
             audio1.pause();
             audio1.volume = 1;
             var b2Start2 = window.getBeat2Start() / window.beat2Buffer.sampleRate;
