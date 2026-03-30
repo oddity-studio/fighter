@@ -1678,15 +1678,10 @@
                 setHealth(atkTarget, newH);
                 if (newH <= 0) {
                   clearInterval(combatInterval);
-                  clearInterval(countdownInterval);
-                  timersEnded = true;
-                  round = 0;
-                  pendingVote = atkTarget === 'maxx' ? 'hammer' : 'maxx';
                   var loser = atkTarget === 'maxx' ? maxx : hammer;
                   var winner = atkTarget === 'maxx' ? hammer : maxx;
                   loser.state.setAnimation(0, 'Down', false);
                   winner.state.setAnimation(0, 'Idle', true);
-                  setTimeout(function() { showVoteIfPending(); }, 1500);
                   return;
                 }
               }
@@ -1696,15 +1691,10 @@
                 setHealth(defTarget, newH2);
                 if (newH2 <= 0) {
                   clearInterval(combatInterval);
-                  clearInterval(countdownInterval);
-                  timersEnded = true;
-                  round = 0;
-                  pendingVote = defTarget === 'maxx' ? 'hammer' : 'maxx';
                   var loser2 = defTarget === 'maxx' ? maxx : hammer;
                   var winner2 = defTarget === 'maxx' ? hammer : maxx;
                   loser2.state.setAnimation(0, 'Down', false);
                   winner2.state.setAnimation(0, 'Idle', true);
-                  setTimeout(function() { showVoteIfPending(); }, 1500);
                   return;
                 }
               }
