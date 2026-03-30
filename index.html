@@ -1446,21 +1446,11 @@
       function setupButtons() {
         document.querySelectorAll('.action-btn[data-action="fyre"]').forEach(function(btn) {
           btn.addEventListener("click", function() {
-            if (btn.getAttribute("data-player") === "maxx") {
-              setHealth("hammer", health.hammer - 25);
-            } else {
-              setHealth("maxx", health.maxx - 25);
-            }
           });
         });
 
         document.querySelectorAll('.action-btn[data-action="mid"]').forEach(function(btn) {
           btn.addEventListener("click", function() {
-            if (btn.getAttribute("data-player") === "maxx") {
-              setHealth("maxx", health.maxx - 10);
-            } else {
-              setHealth("hammer", health.hammer - 10);
-            }
           });
         });
 
