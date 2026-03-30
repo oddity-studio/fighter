@@ -1710,12 +1710,25 @@
         audio1.play();
 
         showRoundCaption('round1-overlay', 1000);
+
+        // 10s intro: attacker taunts, defender idles
+        var tauntInterval;
         setTimeout(function() {
+          tauntInterval = setInterval(function() {
+            maxx.state.setAnimation(0, 'Taunt', false);
+            maxx.state.addAnimation(0, 'Taunt', false, 0);
+          }, 1200);
+          hammer.state.setAnimation(0, 'Idle', true);
+        }, 2500);
+
+        // After 10s intro, play sequences
+        setTimeout(function() {
+          clearInterval(tauntInterval);
           var atkMoves = getSortedMoves(window.beat1Placements);
           playSequence(maxx, atkMoves, 0);
           var aiDefMoves = processMoves(window.aiDefCards || aiDef);
           playSequence(hammer, aiDefMoves, 0);
-        }, 3000);
+        }, 12500);
         countdownInterval = setInterval(function() {
         countdown--;
         if (countdown <= 2 && countdown > 0) {
@@ -1745,12 +1758,25 @@
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
+
+            // 10s intro: attacker taunts, defender idles
+            var tauntInterval2;
             setTimeout(function() {
+              tauntInterval2 = setInterval(function() {
+                hammer.state.setAnimation(0, 'Taunt', false);
+                hammer.state.addAnimation(0, 'Taunt', false, 0);
+              }, 1200);
+              maxx.state.setAnimation(0, 'Idle', true);
+            }, 1500);
+
+            // After 10s intro, play sequences
+            setTimeout(function() {
+              clearInterval(tauntInterval2);
               var defMoves = getSortedMoves(window.beat2Placements);
               playSequence(maxx, defMoves, 0);
               var aiAtkMoves = processMoves(window.aiAtkCards || aiAtk);
               playSequence(hammer, aiAtkMoves, 0);
-            }, 2500);
+            }, 11500);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
