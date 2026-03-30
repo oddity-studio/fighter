@@ -1711,15 +1711,12 @@
 
         showRoundCaption('round1-overlay', 1000);
 
-        // 10s intro: attacker taunts, defender idles
-        var tauntInterval;
-        setTimeout(function() {
-          tauntInterval = setInterval(function() {
-            maxx.state.setAnimation(0, 'Taunt', false);
-            maxx.state.addAnimation(0, 'Taunt', false, 0);
-          }, 1200);
-          hammer.state.setAnimation(0, 'Idle', true);
-        }, 2500);
+        // 10s intro: attacker taunts, defender idles - starts with timer
+        var tauntInterval = setInterval(function() {
+          maxx.state.setAnimation(0, 'Taunt', false);
+          maxx.state.addAnimation(0, 'Taunt', false, 0);
+        }, 1200);
+        hammer.state.setAnimation(0, 'Idle', true);
 
         // After 10s intro, play sequences
         setTimeout(function() {
@@ -1728,7 +1725,7 @@
           playSequence(maxx, atkMoves, 0);
           var aiDefMoves = processMoves(window.aiDefCards || aiDef);
           playSequence(hammer, aiDefMoves, 0);
-        }, 12500);
+        }, 10000);
         countdownInterval = setInterval(function() {
         countdown--;
         if (countdown <= 2 && countdown > 0) {
@@ -1759,15 +1756,12 @@
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
 
-            // 10s intro: attacker taunts, defender idles
-            var tauntInterval2;
-            setTimeout(function() {
-              tauntInterval2 = setInterval(function() {
-                hammer.state.setAnimation(0, 'Taunt', false);
-                hammer.state.addAnimation(0, 'Taunt', false, 0);
-              }, 1200);
-              maxx.state.setAnimation(0, 'Idle', true);
-            }, 1500);
+            // 10s intro: attacker taunts, defender idles - starts with timer
+            var tauntInterval2 = setInterval(function() {
+              hammer.state.setAnimation(0, 'Taunt', false);
+              hammer.state.addAnimation(0, 'Taunt', false, 0);
+            }, 1200);
+            maxx.state.setAnimation(0, 'Idle', true);
 
             // After 10s intro, play sequences
             setTimeout(function() {
@@ -1776,7 +1770,7 @@
               playSequence(maxx, defMoves, 0);
               var aiAtkMoves = processMoves(window.aiAtkCards || aiAtk);
               playSequence(hammer, aiAtkMoves, 0);
-            }, 11500);
+            }, 10000);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
