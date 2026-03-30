@@ -1411,6 +1411,42 @@
 
       var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2 };
 
+      // Animation lookup: atkMove:defMove → atkAnim:defAnim
+      var animLookup = {
+        'PUNCH:Idle':    'PUNCH:HIT',
+        'PUNCH:TAUNT':   'PUNCH:HIT',
+        'PUNCH:SUPER':   'PUNCH:HIT',
+        'PUNCH:PUNCH':   'PARRY:PARRY',
+        'PUNCH+:Idle':   'PUNCH+:HIT',
+        'PUNCH+:Block':  'PUNCH+:HIT',
+        'PUNCH+:PUNCH':  'PUNCH+:HIT',
+        'PUNCH+:TAUNT':  'PUNCH+:HIT',
+        'PUNCH+:SUPER':  'PUNCH+:HIT',
+        'PUNCH+:PUNCH+': 'PARRY:PARRY',
+        'BLOCK:Idle':    'BLOCK:IDLE',
+        'BLOCK:TAUNT':   'BLOCK:TAUNT',
+        'BLOCK:PUNCH':   'BLOCK:DEFLECT',
+        'BLOCK:PUNCH+':  'HIT:PUNCH+',
+        'BLOCK:SUPER':   'DOWN:SUPER',
+        'SUPER:Idle':    'SUPER:HIT',
+        'SUPER:Block':   'SUPER:DOWN',
+        'SUPER:TAUNT':   'SUPER:DOWN',
+        'TAUNT:Idle':    'TAUNT:IDLE'
+      };
+
+      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted) {
+        var key = atkMove + ':' + defMove;
+        if (animLookup[key]) {
+          var parts = animLookup[key].split(':');
+          return { atk: parts[0], def: parts[1] };
+        }
+        // Fallback
+        return {
+          atk: atkInterrupted ? 'HIT' : (moveAnimMap[atkMove] || atkMove),
+          def: defInterrupted ? 'HIT' : (moveAnimMap[defMove] || defMove)
+        };
+      }
+
       function buildTimedSequence(cards) {
         var events = [];
         cards.forEach(function(c) {
@@ -1497,9 +1533,10 @@
             defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
           }
 
-          // Determine outcome
-          var atkAnim = atkInterrupted ? 'Hit' : (moveAnimMap[atkMove] || atkMove);
-          var defAnim = defInterrupted ? 'Hit' : (moveAnimMap[defMove] || defMove);
+          // Determine animations
+          var anims = getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted);
+          var atkAnim = anims.atk;
+          var defAnim = anims.def;
 
           if (!atkInterrupted && damageMap[atkMove]) {
             damage = damageMap[atkMove];
