@@ -2371,16 +2371,16 @@
 
       (function() {
         var cards = [
-          { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH'] },
-          { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
-          { name: 'Sucker Punch',   type: 'ATTACK',  time: 4, moves: ['BLOCK', 'PUNCH'] },
-          { name: 'Power Glove',    type: 'ATTACK',  time: 6, moves: ['SUPER'] },
-          { name: 'Doom',           type: 'ATTACK',  time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
-          { name: 'Deflect',        type: 'DEFENSE', time: 2, moves: ['BLOCK'] },
-          { name: 'Turtle',         type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
-          { name: 'Smartass',       type: 'DEFENSE', time: 4, moves: ['BLOCK', 'TAUNT'] },
-          { name: 'Wait Your Moment', type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
-          { name: 'Boost Morale',   type: 'SKILL',   time: 2, moves: ['TAUNT'] }
+          { name: 'Hit',            type: 'ATTACK',  time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] },
+          { name: 'Triple Hit',     type: 'ATTACK',  time: 6, uptime: 3, downtime: 3, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
+          { name: 'Sucker Punch',   type: 'ATTACK',  time: 4, uptime: 2, downtime: 2, moves: ['BLOCK', 'PUNCH'] },
+          { name: 'Power Glove',    type: 'ATTACK',  time: 5, uptime: 3, downtime: 2, moves: ['SUPER'] },
+          { name: 'Doom',           type: 'ATTACK',  time: 9, uptime: 5, downtime: 4, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
+          { name: 'Deflect',        type: 'DEFENSE', time: 2, uptime: 1, downtime: 1, moves: ['BLOCK'] },
+          { name: 'Turtle',         type: 'DEFENSE', time: 6, uptime: 3, downtime: 3, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
+          { name: 'Smartass',       type: 'DEFENSE', time: 7, uptime: 4, downtime: 3, moves: ['BLOCK', 'TAUNT'] },
+          { name: 'Wait Your Moment', type: 'DEFENSE', time: 9, uptime: 5, downtime: 4, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
+          { name: 'Boost Morale',   type: 'SKILL',   time: 5, uptime: 3, downtime: 2, moves: ['TAUNT'] }
         ];
 
         var box = document.getElementById('info-box');
@@ -2594,16 +2594,16 @@
 
       // AI opponent
       var allCards = [
-        { name: 'Hit', type: 'ATTACK', time: 2, moves: ['PUNCH'] },
-        { name: 'Triple Hit', type: 'ATTACK', time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
-        { name: 'Sucker Punch', type: 'ATTACK', time: 4, moves: ['BLOCK', 'PUNCH'] },
-        { name: 'Power Glove', type: 'ATTACK', time: 6, moves: ['SUPER'] },
-        { name: 'Doom', type: 'ATTACK', time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
-        { name: 'Deflect', type: 'DEFENSE', time: 2, moves: ['BLOCK'] },
-        { name: 'Turtle', type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
-        { name: 'Smartass', type: 'DEFENSE', time: 4, moves: ['BLOCK', 'TAUNT'] },
-        { name: 'Wait Your Moment', type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
-        { name: 'Boost Morale', type: 'SKILL', time: 2, moves: ['TAUNT'] }
+        { name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] },
+        { name: 'Triple Hit', type: 'ATTACK', time: 6, uptime: 3, downtime: 3, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
+        { name: 'Sucker Punch', type: 'ATTACK', time: 4, uptime: 2, downtime: 2, moves: ['BLOCK', 'PUNCH'] },
+        { name: 'Power Glove', type: 'ATTACK', time: 5, uptime: 3, downtime: 2, moves: ['SUPER'] },
+        { name: 'Doom', type: 'ATTACK', time: 9, uptime: 5, downtime: 4, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
+        { name: 'Deflect', type: 'DEFENSE', time: 2, uptime: 1, downtime: 1, moves: ['BLOCK'] },
+        { name: 'Turtle', type: 'DEFENSE', time: 6, uptime: 3, downtime: 3, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
+        { name: 'Smartass', type: 'DEFENSE', time: 7, uptime: 4, downtime: 3, moves: ['BLOCK', 'TAUNT'] },
+        { name: 'Wait Your Moment', type: 'DEFENSE', time: 9, uptime: 5, downtime: 4, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
+        { name: 'Boost Morale', type: 'SKILL', time: 5, uptime: 3, downtime: 2, moves: ['TAUNT'] }
       ];
 
       function scoreAttackSequence(cards) {
