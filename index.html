@@ -1448,10 +1448,8 @@
           btn.addEventListener("click", function() {
             if (btn.getAttribute("data-player") === "maxx") {
               setHealth("hammer", health.hammer - 25);
-              fireAction(maxx, hammer, "Punch", "Hit");
             } else {
               setHealth("maxx", health.maxx - 25);
-              fireAction(hammer, maxx, "Punch", "Hit");
             }
           });
         });
@@ -1460,10 +1458,8 @@
           btn.addEventListener("click", function() {
             if (btn.getAttribute("data-player") === "maxx") {
               setHealth("maxx", health.maxx - 10);
-              fireAction(hammer, maxx, "Punch", "Dodge");
             } else {
               setHealth("hammer", health.hammer - 10);
-              fireAction(maxx, hammer, "Punch", "Dodge");
             }
           });
         });
@@ -1492,7 +1488,6 @@
         document.querySelectorAll('.action-btn[data-action="flush"]').forEach(function(btn) {
           btn.addEventListener("click", function() {
             if (btn.getAttribute("data-player") === "maxx") {
-              fireAction(hammer, maxx, "Taunt", "Flush");
               if (round === 1) {
                 countdown = Math.max(0, countdown - 1);
                 countdownEl.textContent = String(countdown).padStart(2, '0');
@@ -1500,7 +1495,6 @@
                 spawnFlushToast('maxx');
               }
             } else {
-              fireAction(maxx, hammer, "Taunt", "Flush");
               if (round === 2) {
                 countdown = Math.max(0, countdown - 1);
                 countdownEl.textContent = String(countdown).padStart(2, '0');
