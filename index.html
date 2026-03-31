@@ -1552,10 +1552,12 @@
       function generateTicks(cards) {
         var events = buildTimedSequence(cards);
         var ticks = [];
-        events.forEach(function(ev) {
+        var cardIdx = 0;
+        events.forEach(function(ev, eIdx) {
           for (var i = 0; i < ev.duration; i++) {
-            ticks.push(ev.move);
+            ticks.push({ move: ev.move, cardStart: i === 0 && ev.move !== 'Idle', cardIdx: cardIdx });
           }
+          if (ev.move === 'Idle') cardIdx++;
         });
         return ticks;
       }
@@ -1567,14 +1569,36 @@
         var defTauntNext = false;
         var atkCancelled = false;
         var defCancelled = false;
+        var atkBlocked = false;
+        var defBlocked = false;
+        var lastAtkCardIdx = -1;
+        var lastDefCardIdx = -1;
 
         for (var t = 0; t < maxLen; t++) {
-          var atkMove = atkTicks[t] || 'Idle';
-          var defMove = defTicks[t] || 'Idle';
+          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1 };
+          var defTick = defTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1 };
+          var atkMove = atkTick.move;
+          var defMove = defTick.move;
 
-          // Reset cancelled flag when move changes
-          if (t > 0 && atkMove !== atkTicks[t - 1]) atkCancelled = false;
-          if (t > 0 && defMove !== defTicks[t - 1]) defCancelled = false;
+          // Reset blocked/cancelled when new card starts
+          if (atkTick.cardStart && atkTick.cardIdx !== lastAtkCardIdx) {
+            atkBlocked = false;
+            atkCancelled = false;
+            lastAtkCardIdx = atkTick.cardIdx;
+          }
+          if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
+            defBlocked = false;
+            defCancelled = false;
+            lastDefCardIdx = defTick.cardIdx;
+          }
+
+          // If blocked, entire rest of card is idle
+          if (atkBlocked) atkMove = 'Idle';
+          if (defBlocked) defMove = 'Idle';
+
+          // Reset cancelled flag when move changes (within same card)
+          if (t > 0 && atkMove !== (atkTicks[t - 1] || { move: 'Idle' }).move) atkCancelled = false;
+          if (t > 0 && defMove !== (defTicks[t - 1] || { move: 'Idle' }).move) defCancelled = false;
 
           // Check TAUNT upgrade for attacker's next PUNCH
           if (atkTauntNext && atkMove === 'PUNCH') {
@@ -1588,11 +1612,6 @@
             defTauntNext = false;
           }
 
-          // Check if defender's previous move was TAUNT for their PUNCH+
-          if (t > 0 && defTicks[t - 1] === 'TAUNT' && defMove === 'PUNCH') {
-            defMove = 'PUNCH+';
-          }
-
           var atkInterrupted = atkCancelled;
           var defInterrupted = defCancelled;
 
@@ -1600,12 +1619,20 @@
           if (!atkInterrupted && atkMove !== 'Idle' && interruptMap[atkMove]) {
             atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
             if (atkInterrupted && moveDurations[atkMove] > 1) atkCancelled = true;
+            // If PUNCH is blocked, cancel rest of card
+            if (atkInterrupted && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
+              atkBlocked = true;
+            }
           }
 
           // Check if defender gets interrupted by attacker
           if (!defInterrupted && defMove !== 'Idle' && interruptMap[defMove]) {
             defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
             if (defInterrupted && moveDurations[defMove] > 1) defCancelled = true;
+            // If PUNCH is blocked, cancel rest of card
+            if (defInterrupted && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
+              defBlocked = true;
+            }
           }
 
           // Determine animations
