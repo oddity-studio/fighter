@@ -1448,6 +1448,38 @@
 
       var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super' };
 
+      var animLookup = {
+        'PUNCH:Idle':    'PUNCH:HIT',
+        'PUNCH:TAUNT':   'PUNCH:HIT',
+        'PUNCH:SUPER':   'PUNCH:HIT',
+        'PUNCH:PUNCH':   'PARRY:PARRY',
+        'PUNCH+:Idle':   'PUNCH+:HIT',
+        'PUNCH+:Block':  'PUNCH+:HIT',
+        'PUNCH+:PUNCH':  'PUNCH+:HIT',
+        'PUNCH+:TAUNT':  'PUNCH+:HIT',
+        'PUNCH+:SUPER':  'PUNCH+:HIT',
+        'PUNCH+:PUNCH+': 'PARRY:PARRY',
+        'BLOCK:Idle':    'BLOCK:IDLE',
+        'BLOCK:TAUNT':   'BLOCK:TAUNT',
+        'BLOCK:PUNCH':   'DEFLECT:PUNCH',
+        'BLOCK:PUNCH+':  'HIT:PUNCH+',
+        'BLOCK:SUPER':   'DOWN:SUPER',
+        'SUPER:Idle':    'SUPER:HIT',
+        'SUPER:Block':   'SUPER:DOWN',
+        'SUPER:TAUNT':   'SUPER:DOWN',
+        'TAUNT:Idle':    'TAUNT:IDLE',
+        'Idle:PUNCH':    'HIT:PUNCH',
+        'Idle:PUNCH+':   'HIT:PUNCH+'
+      };
+
+      var rigAnimMap = {
+        PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
+        HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
+        SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
+      };
+
+      var superInterruptAnims = ['Parry', 'SuperInt', 'SuperInt2'];
+
       function playSequence(character, moves, idx) {
         if (idx >= moves.length) return;
         var anim = moveAnimMap[moves[idx]] || 'Punch';
@@ -2312,7 +2344,7 @@
         window.roundRect = roundRect;
 
         function drawWaveform(data) {
-          if (!data) return;
+          if (!data || !wfDuration) return;
           var w = wfCanvas.width;
           var h = wfCanvas.height;
           var dpr = window.devicePixelRatio || 1;
@@ -2628,7 +2660,7 @@
         var b2Duration = 0;
 
         function drawBeat2(data, startSample) {
-          if (!data) return;
+          if (!data || !b2Duration) return;
           var w = b2Canvas.width;
           var h = b2Canvas.height;
           var dpr = window.devicePixelRatio || 1;
