@@ -1641,6 +1641,10 @@
             if (atkInterrupted && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
               atkBlocked = true;
             }
+            // If SUPER is interrupted, cancel rest of card
+            if (atkInterrupted && atkMove === 'SUPER') {
+              atkBlocked = true;
+            }
           }
 
           // Check if defender gets interrupted by attacker
@@ -1649,6 +1653,10 @@
             if (defInterrupted && moveDurations[defMove] > 1) defCancelled = true;
             // If PUNCH is blocked, cancel rest of card
             if (defInterrupted && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
+              defBlocked = true;
+            }
+            // If SUPER is interrupted, cancel rest of card
+            if (defInterrupted && defMove === 'SUPER') {
               defBlocked = true;
             }
           }
