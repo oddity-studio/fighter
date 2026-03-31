@@ -2611,7 +2611,7 @@
               p.moves.forEach(function(m) {
                 if (m === 'PUNCH' && p.onSpike) {
                   moves.push('PUNCH+');
-                } else {
+                } else if (m !== 'IDLE' && m !== 'CONT') {
                   moves.push(m);
                 }
               });
