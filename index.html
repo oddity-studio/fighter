@@ -1639,20 +1639,14 @@
         var results = [];
         var atkTauntNext = false;
         var defTauntNext = false;
-        var atkCancelled = false;
-        var defCancelled = false;
         var atkBlocked = false;
         var defBlocked = false;
         var lastAtkCardIdx = -1;
         var lastDefCardIdx = -1;
-        var atkTickInMove = 0;
-        var defTickInMove = 0;
-        var lastAtkMove = '';
-        var lastDefMove = '';
-        var atkSuperInterruptedTick = 0;
-        var defSuperInterruptedTick = 0;
-        var atkSuperInterrupted = false;
-        var defSuperInterrupted = false;
+
+        // Track SUPER state for both players
+        var atkSuperState = { active: false, startTick: -1, interrupted: false, interruptTick: 0 };
+        var defSuperState = { active: false, startTick: -1, interrupted: false, interruptTick: 0 };
 
         for (var t = 0; t < maxLen; t++) {
           var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
@@ -1660,13 +1654,148 @@
           var atkMove = atkTick.move;
           var defMove = defTick.move;
 
-          // Reset blocked/cancelled when new card starts
+          // Reset when new card starts
           if (atkTick.cardStart && atkTick.cardIdx !== lastAtkCardIdx) {
             atkBlocked = false;
-            atkCancelled = false;
-            atkSuperInterruptedTick = 0;
+            atkSuperState = { active: false, startTick: -1, interrupted: false, interruptTick: 0 };
             lastAtkCardIdx = atkTick.cardIdx;
           }
+          if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
+            defBlocked = false;
+            defSuperState = { active: false, startTick: -1, interrupted: false, interruptTick: 0 };
+            lastDefCardIdx = defTick.cardIdx;
+          }
+
+          // If blocked, entire rest of card is idle
+          if (atkBlocked) atkMove = 'Idle';
+          if (defBlocked) defMove = 'Idle';
+
+          // Determine if moves are SUPER and if they get interrupted
+          var atkIsSuper = atkMove.match(/^SUPER[123]$/);
+          var defIsSuper = defMove.match(/^SUPER[123]$/);
+          var atkInterruptBy = (defMove === 'PUNCH' || defMove === 'PUNCH+' || defMove === 'SUPER');
+          var defInterruptBy = (atkMove === 'PUNCH' || atkMove === 'PUNCH+' || atkMove === 'SUPER');
+
+          // Track SUPER start
+          if (atkIsSuper && !atkSuperState.active) {
+            atkSuperState.active = true;
+            atkSuperState.startTick = t;
+          }
+          if (defIsSuper && !defSuperState.active) {
+            defSuperState.active = true;
+            defSuperState.startTick = t;
+          }
+
+          // Determine tick within SUPER (0, 1, 2 for SUPER1, 2, 3)
+          var atkSuperTick = atkIsSuper ? parseInt(atkMove.slice(5)) - 1 : -1;
+          var defSuperTick = defIsSuper ? parseInt(defMove.slice(5)) - 1 : -1;
+
+          // Check for interruption at current tick
+          if (atkIsSuper && atkInterruptBy && !atkSuperState.interrupted) {
+            atkSuperState.interrupted = true;
+            atkSuperState.interruptTick = atkSuperTick;
+          }
+          if (defIsSuper && defInterruptBy && !defSuperState.interrupted) {
+            defSuperState.interrupted = true;
+            defSuperState.interruptTick = defSuperTick;
+          }
+
+          // Calculate effective moves and animations
+          var atkAnim, defAnim, atkDamage, defDamage;
+          var atkFinalMove = atkMove;
+          var defFinalMove = defMove;
+
+          // Attacker's SUPER logic
+          if (atkIsSuper) {
+            if (atkSuperState.interrupted) {
+              // Interrupted at specific tick
+              if (atkSuperTick === atkSuperState.interruptTick) {
+                // This tick was interrupted - show Hit/SuperInt/SuperInt2
+                atkAnim = ['Hit', 'SuperInt', 'SuperInt2'][atkSuperState.interruptTick];
+                atkFinalMove = 'Idle';
+                atkDamage = 0;
+              } else if (atkSuperTick > atkSuperState.interruptTick) {
+                // After interruption - idle
+                atkAnim = 'Down';
+                atkFinalMove = 'Idle';
+                atkDamage = 0;
+              } else {
+                // Before interruption - show Super/continue
+                atkAnim = (atkSuperTick === 0) ? 'Super' : 'SuperInt';
+                atkDamage = 0;
+              }
+            } else {
+              // Not interrupted - normal Super animation
+              atkAnim = (atkSuperTick === 0) ? 'Super' : 'SuperInt';
+              atkDamage = 50;
+            }
+          } else {
+            // Non-SUPER move - use standard logic
+            var atkKey = atkMove + ':' + defMove;
+            if (animLookup[atkKey]) {
+              var parts = animLookup[atkKey].split(':');
+              atkAnim = rigAnimMap[parts[0]] || parts[0];
+            } else {
+              atkAnim = rigAnimMap[atkMove] || atkMove;
+            }
+            atkDamage = damageMap[atkMove] || 0;
+            if (atkInterruptBy) atkDamage = 0;
+          }
+
+          // Defender's SUPER logic
+          if (defIsSuper) {
+            if (defSuperState.interrupted) {
+              if (defSuperTick === defSuperState.interruptTick) {
+                defAnim = ['Hit', 'SuperInt', 'SuperInt2'][defSuperState.interruptTick];
+                defFinalMove = 'Idle';
+                defDamage = 0;
+              } else if (defSuperTick > defSuperState.interruptTick) {
+                defAnim = 'Down';
+                defFinalMove = 'Idle';
+                defDamage = 0;
+              } else {
+                defAnim = (defSuperTick === 0) ? 'Super' : 'SuperInt';
+                defDamage = 0;
+              }
+            } else {
+              defAnim = (defSuperTick === 0) ? 'Super' : 'SuperInt';
+              defDamage = 50;
+            }
+          } else {
+            var defKey = atkMove + ':' + defMove;
+            if (animLookup[defKey]) {
+              var parts = animLookup[defKey].split(':');
+              defAnim = rigAnimMap[parts[1]] || parts[1];
+            } else {
+              defAnim = rigAnimMap[defMove] || defMove;
+            }
+            defDamage = damageMap[defMove] || 0;
+            if (defInterruptBy) defDamage = 0;
+          }
+
+          // If PUNCH is blocked, cancel rest of card
+          if (atkInterruptBy && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
+            atkBlocked = true;
+          }
+          if (defInterruptBy && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
+            defBlocked = true;
+          }
+
+          // Check spike upgrade
+          if (atkTick.onSpike && atkMove === 'PUNCH') { atkMove = 'PUNCH+'; atkAnim = 'Punch+'; atkDamage = 25; }
+          if (defTick.onSpike && defMove === 'PUNCH') { defMove = 'PUNCH+'; defAnim = 'Punch+'; defDamage = 25; }
+
+          // Check TAUNT upgrade
+          if (atkTauntNext && atkMove === 'PUNCH') { atkMove = 'PUNCH+'; atkAnim = 'Punch+'; atkDamage = 25; atkTauntNext = false; }
+          if (defTauntNext && defMove === 'PUNCH') { defMove = 'PUNCH+'; defAnim = 'Punch+'; defDamage = 25; defTauntNext = false; }
+          if (atkMove === 'TAUNT') atkTauntNext = true;
+          if (defMove === 'TAUNT') defTauntNext = true;
+
+          results.push({ atkMove: atkFinalMove, defMove: defFinalMove, atkAnim: atkAnim, defAnim: defAnim, atkDamage: atkDamage, defDamage: defDamage });
+        }
+
+        return results;
+      }
           if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
             defBlocked = false;
             defCancelled = false;
