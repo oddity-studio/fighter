@@ -1758,21 +1758,44 @@
 
           // SUPER interrupted: remaining SUPER ticks (same card) become idle
           // If SUPER1 was interrupted, both SUPER2 and SUPER3 become idle
+          // If SUPER2 was interrupted, SUPER3 continues (shows SuperInt animation)
+          // If SUPER3 was interrupted, just show SuperInt2 animation
+          var atkSuperAnim = null;
+          var defSuperAnim = null;
           if (atkSuperInterruptedTick > 0 && atkTick.cardIdx === lastAtkCardIdx) {
             if (atkMove.match(/^SUPER[123]$/)) {
-              atkMove = 'Idle';
+              if (atkSuperInterruptedTick === 1) {
+                // SUPER1 interrupted - turn everything to idle
+                atkSuperAnim = 'Hit';
+                atkMove = 'Idle';
+              } else if (atkSuperInterruptedTick === 2 && atkMove === 'SUPER2') {
+                atkSuperAnim = 'SuperInt';
+                atkMove = 'Idle';
+              } else if (atkSuperInterruptedTick === 3 && atkMove === 'SUPER3') {
+                atkSuperAnim = 'SuperInt2';
+                atkMove = 'Idle';
+              }
             }
           }
           if (defSuperInterruptedTick > 0 && defTick.cardIdx === lastDefCardIdx) {
             if (defMove.match(/^SUPER[123]$/)) {
-              defMove = 'Idle';
+              if (defSuperInterruptedTick === 1) {
+                defSuperAnim = 'Hit';
+                defMove = 'Idle';
+              } else if (defSuperInterruptedTick === 2 && defMove === 'SUPER2') {
+                defSuperAnim = 'SuperInt';
+                defMove = 'Idle';
+              } else if (defSuperInterruptedTick === 3 && defMove === 'SUPER3') {
+                defSuperAnim = 'SuperInt2';
+                defMove = 'Idle';
+              }
             }
           }
 
           // Determine animations
           var anims = getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove);
-          var atkAnim = anims.atk;
-          var defAnim = anims.def;
+          var atkAnim = atkSuperAnim || anims.atk;
+          var defAnim = defSuperAnim || anims.def;
 
           // Determine damage for both directions
           var atkDamage = (!atkInterrupted && damageMap[atkMove]) ? damageMap[atkMove] : 0;
