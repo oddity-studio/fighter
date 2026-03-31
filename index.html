@@ -1231,6 +1231,7 @@
     <div id="mode-controls" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
       <button id="ai-mode-btn" class="ai-btn" style="position:static">HIT</button>
       <button id="ai-popup-btn" class="ai-btn" style="position:static">AI</button>
+      <button id="idle-mode-btn" class="ai-btn" style="position:static">IDLE</button>
       <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
     </div>
   </div>
@@ -3100,16 +3101,28 @@
       window.aiAtkCards = hitCards.slice();
       window.aiDefCards = hitCards.slice();
 
+      var idleCards = [];
+      for (var j = 0; j < 30; j++) {
+        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: j + 1 });
+      }
+      window.idleAtkCards = idleCards.slice();
+      window.idleDefCards = idleCards.slice();
+
       var hitBtn = document.getElementById('ai-mode-btn');
       var aiBtn = document.getElementById('ai-popup-btn');
-      var aiMode = false;
+      var idleBtn = document.getElementById('idle-mode-btn');
+      var aiMode = 0; // 0 = HIT, 1 = AI, 2 = IDLE
 
       function updateMode() {
-        hitBtn.classList.toggle('mode-on', !aiMode);
-        aiBtn.classList.toggle('mode-on', aiMode);
-        if (aiMode) {
+        hitBtn.classList.toggle('mode-on', aiMode === 0);
+        aiBtn.classList.toggle('mode-on', aiMode === 1);
+        idleBtn.classList.toggle('mode-on', aiMode === 2);
+        if (aiMode === 1) {
           window.aiAtkCards = aiAtk.slice();
           window.aiDefCards = aiDef.slice();
+        } else if (aiMode === 2) {
+          window.aiAtkCards = idleAtkCards.slice();
+          window.aiDefCards = idleDefCards.slice();
         } else {
           window.aiAtkCards = hitCards.slice();
           window.aiDefCards = hitCards.slice();
@@ -3117,11 +3130,15 @@
       }
 
       hitBtn.addEventListener('click', function() {
-        aiMode = false;
+        aiMode = 0;
         updateMode();
       });
       aiBtn.addEventListener('click', function() {
-        aiMode = true;
+        aiMode = 1;
+        updateMode();
+      });
+      idleBtn.addEventListener('click', function() {
+        aiMode = 2;
         updateMode();
       });
       updateMode();
