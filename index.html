@@ -3163,9 +3163,16 @@
 
       var aiAtk = generateAttacking();
       var aiDef = generateDefending();
+
+      // Add pos values to AI cards
+      var aiAtkPos = 0;
+      aiAtk.forEach(function(c) { c.pos = aiAtkPos / 30; aiAtkPos += c.time; });
+      var aiDefPos = 0;
+      aiDef.forEach(function(c) { c.pos = aiDefPos / 30; aiDefPos += c.time; });
+
       var hitCards = [];
       for (var i = 0; i < 14; i++) {
-        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
+        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], pos: (i * 2) / 30 });
       }
       window.aiAtkCards = hitCards.slice();
       window.aiDefCards = hitCards.slice();
