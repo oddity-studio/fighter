@@ -1751,30 +1751,10 @@
               if (p1Move !== 'Idle') p1Move = 'CONT';
               if (p2Move !== 'Idle') p2Move = 'CONT';
             }
-            // fromTick is the tick where this CONT started
-            var p1FromTick = null;
-            var p2FromTick = null;
-            if (t > 0 && r.atkMove !== 'Idle') {
-              // Find where this move started by looking backwards
-              for (var back = t - 1; back >= 0; back--) {
-                if (timeline[back].atkMove !== 'Idle') {
-                  p1FromTick = back + 1;
-                  break;
-                }
-              }
-            }
-            if (t > 0 && r.defMove !== 'Idle') {
-              for (var back = t - 1; back >= 0; back--) {
-                if (timeline[back].defMove !== 'Idle') {
-                  p2FromTick = back + 1;
-                  break;
-                }
-              }
-            }
             return {
               tick: t + 1,
-              p1: { move: p1Move, anim: r.atkAnim, fromTick: p1FromTick },
-              p2: { move: p2Move, anim: r.defAnim, fromTick: p2FromTick }
+              p1: { move: p1Move, anim: r.atkAnim, fromTick: t > 0 && r.atkMove !== 'Idle' ? t : null },
+              p2: { move: p2Move, anim: r.defAnim, fromTick: t > 0 && r.defMove !== 'Idle' ? t : null }
             };
           });
           processedTimeline = applyCombatRules(normalized);
