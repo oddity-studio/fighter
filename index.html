@@ -845,44 +845,61 @@
 
     #debug-boxes {
       position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       z-index: 10;
       display: flex;
-      gap: 60px;
+      justify-content: space-between;
+      pointer-events: none;
     }
-    .debug-box {
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 8px 16px;
-      text-align: center;
-      min-width: 100px;
+    .debug-panel {
+      width: 180px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+      padding: 10px 0;
     }
-    .debug-label {
-      font-family: 'Exo 2', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.4);
-      letter-spacing: 0.1em;
-      margin-bottom: 4px;
-    }
-    .debug-move {
-      font-family: 'Exo 2', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: #00e5ff;
-      margin-bottom: 2px;
-    }
-    #debug-p2 .debug-move {
-      color: #fc6c85;
-    }
-    .debug-anim {
+    .debug-panel::-webkit-scrollbar { width: 4px; }
+    .debug-panel::-webkit-scrollbar-track { background: transparent; }
+    .debug-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+    .debug-panel-title {
       font-family: 'Exo 2', sans-serif;
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
+      font-weight: 700;
+      text-align: center;
+      padding: 4px 0 8px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.4);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1;
     }
+    .debug-panel-list {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+    }
+    .debug-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 10px;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.2s;
+    }
+    .debug-row.active {
+      background: rgba(255,255,255,0.1);
+    }
+    .debug-row .dm { font-weight: 700; color: rgba(255,255,255,0.6); }
+    .debug-row .da { color: rgba(255,255,255,0.35); }
+    .debug-row.active .dm { color: #fff; }
+    .debug-row.active .da { color: rgba(255,255,255,0.7); }
+    #debug-p1 .debug-row.active { background: rgba(0, 229, 255, 0.15); }
+    #debug-p1 .debug-row.active .dm { color: #00e5ff; }
+    #debug-p2 .debug-row.active { background: rgba(252, 108, 133, 0.15); }
+    #debug-p2 .debug-row.active .dm { color: #fc6c85; }
 
     .move-sequence {
       position: relative;
@@ -1290,15 +1307,13 @@
   </div>
 
   <div id="debug-boxes" style="display:none">
-    <div id="debug-p1" class="debug-box">
-      <div class="debug-label">P1</div>
-      <div class="debug-move" id="debug-p1-move">-</div>
-      <div class="debug-anim" id="debug-p1-anim">-</div>
+    <div id="debug-p1" class="debug-panel">
+      <div class="debug-panel-title">P1</div>
+      <div class="debug-panel-list" id="debug-p1-list"></div>
     </div>
-    <div id="debug-p2" class="debug-box">
-      <div class="debug-label">P2</div>
-      <div class="debug-move" id="debug-p2-move">-</div>
-      <div class="debug-anim" id="debug-p2-anim">-</div>
+    <div id="debug-p2" class="debug-panel">
+      <div class="debug-panel-title">P2</div>
+      <div class="debug-panel-list" id="debug-p2-list"></div>
     </div>
   </div>
 
@@ -1698,6 +1713,34 @@
         var lastAtkAnim = '';
         var lastDefAnim = '';
         document.getElementById('debug-boxes').style.display = 'flex';
+
+        // Build full debug lists
+        var p1List = document.getElementById('debug-p1-list');
+        var p2List = document.getElementById('debug-p2-list');
+        p1List.innerHTML = '';
+        p2List.innerHTML = '';
+        combatResults.forEach(function(r, i) {
+          var p1m, p1a, p2m, p2a;
+          if (roundNum === 1) {
+            p1m = r.atkMove; p1a = r.atkAnim;
+            p2m = r.defMove; p2a = r.defAnim;
+          } else {
+            p1m = r.defMove; p1a = r.defAnim;
+            p2m = r.atkMove; p2a = r.atkAnim;
+          }
+          var row1 = document.createElement('div');
+          row1.className = 'debug-row';
+          row1.id = 'p1-' + i;
+          row1.innerHTML = '<span class="dm">' + p1m + '</span><span class="da">' + p1a + '</span>';
+          p1List.appendChild(row1);
+
+          var row2 = document.createElement('div');
+          row2.className = 'debug-row';
+          row2.id = 'p2-' + i;
+          row2.innerHTML = '<span class="dm">' + p2m + '</span><span class="da">' + p2a + '</span>';
+          p2List.appendChild(row2);
+        });
+
         var combatInterval = setInterval(function() {
           if (idx >= combatResults.length) {
             clearInterval(combatInterval);
@@ -1706,18 +1749,18 @@
           }
           var r = combatResults[idx];
 
-          // Update debug boxes
-          if (roundNum === 1) {
-            document.getElementById('debug-p1-move').textContent = r.atkMove;
-            document.getElementById('debug-p1-anim').textContent = r.atkAnim;
-            document.getElementById('debug-p2-move').textContent = r.defMove;
-            document.getElementById('debug-p2-anim').textContent = r.defAnim;
-          } else {
-            document.getElementById('debug-p1-move').textContent = r.defMove;
-            document.getElementById('debug-p1-anim').textContent = r.defAnim;
-            document.getElementById('debug-p2-move').textContent = r.atkMove;
-            document.getElementById('debug-p2-anim').textContent = r.atkAnim;
+          // Highlight current row and scroll to it
+          var prevIdx = idx - 1;
+          if (prevIdx >= 0) {
+            var prev1 = document.getElementById('p1-' + prevIdx);
+            var prev2 = document.getElementById('p2-' + prevIdx);
+            if (prev1) prev1.classList.remove('active');
+            if (prev2) prev2.classList.remove('active');
           }
+          var cur1 = document.getElementById('p1-' + idx);
+          var cur2 = document.getElementById('p2-' + idx);
+          if (cur1) { cur1.classList.add('active'); cur1.scrollIntoView({ block: 'nearest' }); }
+          if (cur2) { cur2.classList.add('active'); cur2.scrollIntoView({ block: 'nearest' }); }
 
           if (r.atkAnim !== lastAtkAnim) {
             atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
