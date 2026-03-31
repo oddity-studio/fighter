@@ -2120,7 +2120,7 @@
         combat.forEach(function(r) { fullTimeline.push(r); });
 
         // Show debug panels immediately
-        showDebugTimeline(fullTimeline, 1);
+        showDebugTimeline(fullTimeline.slice(0, 30), 1);
 
         // 10s intro: attacker idles 3s then taunts 7s, defender idles
         maxx.state.setAnimation(0, 'Idle', true);
@@ -2181,7 +2181,7 @@
               fullTimeline2.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
             }
             combat2.forEach(function(r) { fullTimeline2.push(r); });
-            showDebugTimeline(fullTimeline2, 2);
+            showDebugTimeline(fullTimeline2.slice(0, 30), 2);
 
             // 10s intro: attacker idles 3s then taunts 7s, defender idles
             hammer.state.setAnimation(0, 'Idle', true);
