@@ -1598,12 +1598,12 @@
         }
         var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
         sorted.forEach(function(c, cIdx) {
-          var startTick = c.tick;
+          var startIdx = c.tick - 1;
           var moves = c.moves || [];
           moves.forEach(function(m, mIdx) {
-            var tick = startTick + mIdx;
-            if (tick >= 0 && tick < 30) {
-              ticks[tick] = { move: m, cardStart: mIdx === 0, cardIdx: cIdx, onSpike: c.onSpike && mIdx === 0 };
+            var idx = startIdx + mIdx;
+            if (idx >= 0 && idx < 30) {
+              ticks[idx] = { move: m, cardStart: mIdx === 0, cardIdx: cIdx, onSpike: c.onSpike && mIdx === 0 };
             }
           });
         });
@@ -2416,7 +2416,7 @@
             var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
             var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
             window.beat1Placements.forEach(function(p) {
-              var px = (p.tick / 30) * w;
+              var px = ((p.tick - 1) / 30) * w;
               var pw = (p.time / 30) * w;
               var pr = 6 * dpr;
               wfCtx.fillStyle = typeColors[p.type];
@@ -2534,7 +2534,7 @@
             var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
             var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
             window.beat1Placements.forEach(function(p) {
-              var px = (p.tick / 30) * zw;
+              var px = ((p.tick - 1) / 30) * zw;
               var pw = (p.time / 30) * zw;
               var pr = 6 * dpr;
               var blockH = zh * 0.6;
@@ -2777,7 +2777,7 @@
             var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
             var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
             window.beat2Placements.forEach(function(p) {
-              var px = (p.tick / 30) * w;
+              var px = ((p.tick - 1) / 30) * w;
               var pw = (p.time / 30) * w;
               var pr = 6 * dpr;
               var blockH = h * 0.6;
@@ -2914,20 +2914,20 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var visualBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
-            var placedTick = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10));
-            var overflows = placedTick + dragCard.time > 30;
-            var restricted = placedTick < 10 && dragCard.type !== 'SKILL';
+            var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
+            var visualBar = (snappedTick - 1) / 30;
+            var restricted = snappedTick < 11 && dragCard.type !== 'SKILL';
+            var overflows = snappedTick + dragCard.time > 30;
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.tick + p.time;
-              return placedTick < pEnd && placedTick + dragCard.time > p.tick;
+              return snappedTick < pEnd && snappedTick + dragCard.time > p.tick;
             });
             window.dragPreview = { canvas: 'zoom', bar: visualBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
             window.redrawWaveforms();
           } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
                      e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
-            var snappedTick2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30)));
+            var snappedTick2 = Math.max(1, Math.min(30, Math.round(localPos2 * 30) + 1));
             var snappedBar2 = snappedTick2 / 30;
             var overflows2 = snappedTick2 + dragCard.time > 30;
             var restricted2 = snappedTick2 < 10 && dragCard.type !== 'SKILL';
@@ -2962,17 +2962,17 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var placedTick = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10));
-            var overflows = placedTick + dragCard.time > 30;
-            var restricted = placedTick < 10 && dragCard.type !== 'SKILL';
+            var snappedTick = Math.max(0, Math.min(29, Math.round(localPos * 30)));
+            var restricted = snappedTick < 10 && dragCard.type !== 'SKILL';
+            var overflows = snappedTick + dragCard.time > 30;
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.tick + p.time;
-              return placedTick < pEnd && placedTick + dragCard.time > p.tick;
+              return snappedTick < pEnd && snappedTick + dragCard.time > p.tick;
             });
             if (!overlaps) {
-              var onSpike = window.beat1Spikes && window.beat1Spikes.indexOf(placedTick) !== -1;
+              var onSpike = window.beat1Spikes && window.beat1Spikes.indexOf(snappedTick - 1) !== -1;
               var isFirst = window.beat1Placements.length === 0;
-              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, tick: placedTick, moves: dragCard.moves, onSpike: onSpike });
+              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, tick: snappedTick, moves: dragCard.moves, onSpike: onSpike });
               window.redrawWaveforms();
               if (isFirst) window.lockSnippet();
               dropped = true;
@@ -2983,7 +2983,7 @@
               e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
               e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
             var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
-            var snappedTick2 = Math.max(0, Math.min(29, Math.round(localPos2 * 30)));
+            var snappedTick2 = Math.max(1, Math.min(30, Math.round(localPos2 * 30) + 1));
             var overflows2 = snappedTick2 + dragCard.time > 30;
             var restricted2 = snappedTick2 < 10 && dragCard.type !== 'SKILL';
             var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
@@ -2991,7 +2991,7 @@
               return snappedTick2 < pEnd2 && snappedTick2 + dragCard.time > p.tick;
             });
             if (!overlaps2) {
-              var onSpike2 = window.beat2Spikes && window.beat2Spikes.indexOf(snappedTick2) !== -1;
+              var onSpike2 = window.beat2Spikes && window.beat2Spikes.indexOf(snappedTick2 - 1) !== -1;
               window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, tick: snappedTick2, moves: dragCard.moves, onSpike: onSpike2 });
               window.redrawBeat2();
               dropped = true;
@@ -3016,7 +3016,7 @@
           if (window.beat1Placements.length === 0) return;
           var rect = zmCanvas.getBoundingClientRect();
           var localPos = (e.clientX - rect.left) / rect.width;
-          var clickTick = Math.round(localPos * 30);
+          var clickTick = Math.round(localPos * 30) + 1;
 
           for (var i = window.beat1Placements.length - 1; i >= 0; i--) {
             var p = window.beat1Placements[i];
@@ -3033,7 +3033,7 @@
         b2Canvas.addEventListener('click', function(e) {
           if (window.beat2Placements.length === 0) return;
           var rect = b2Canvas.getBoundingClientRect();
-          var clickTick = Math.round((e.clientX - rect.left) / rect.width * 30);
+          var clickTick = Math.round((e.clientX - rect.left) / rect.width * 30) + 1;
 
           for (var i = window.beat2Placements.length - 1; i >= 0; i--) {
             var p = window.beat2Placements[i];
@@ -3153,7 +3153,7 @@
 
       var hitCards = [];
       for (var i = 0; i < 14; i++) {
-        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: i * 2 });
+        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: i * 2 + 1 });
       }
       window.aiAtkCards = hitCards.slice();
       window.aiDefCards = hitCards.slice();
