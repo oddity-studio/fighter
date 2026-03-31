@@ -1649,6 +1649,10 @@
         var defTickInMove = 0;
         var lastAtkMove = '';
         var lastDefMove = '';
+        var atkSuperInterruptedTick = 0;
+        var defSuperInterruptedTick = 0;
+        var atkSuperInterrupted = false;
+        var defSuperInterrupted = false;
 
         for (var t = 0; t < maxLen; t++) {
           var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
@@ -1660,11 +1664,13 @@
           if (atkTick.cardStart && atkTick.cardIdx !== lastAtkCardIdx) {
             atkBlocked = false;
             atkCancelled = false;
+            atkSuperInterruptedTick = 0;
             lastAtkCardIdx = atkTick.cardIdx;
           }
           if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
             defBlocked = false;
             defCancelled = false;
+            defSuperInterruptedTick = 0;
             lastDefCardIdx = defTick.cardIdx;
           }
 
@@ -1720,6 +1726,11 @@
           if (atkMove !== 'Idle' && interruptMap[atkMove]) {
             atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
             atkSuperInterrupted = atkInterrupted && atkMove.match(/^SUPER[123]$/);
+            // Track which SUPER tick was interrupted
+            if (atkSuperInterrupted) {
+              var superTickNum = parseInt(atkMove.slice(5));
+              atkSuperInterruptedTick = superTickNum;
+            }
             // Don't set atkCancelled for SUPER1/2/3 - let rest of move play
             if (atkInterrupted && moveDurations[atkMove] > 1 && !atkMove.match(/^SUPER[123]$/)) atkCancelled = true;
             // If PUNCH is blocked, cancel rest of card
@@ -1732,6 +1743,11 @@
           if (defMove !== 'Idle' && interruptMap[defMove]) {
             defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
             defSuperInterrupted = defInterrupted && defMove.match(/^SUPER[123]$/);
+            // Track which SUPER tick was interrupted
+            if (defSuperInterrupted) {
+              var superTickNum = parseInt(defMove.slice(5));
+              defSuperInterruptedTick = superTickNum;
+            }
             // Don't set defCancelled for SUPER1/2/3 - let rest of move play
             if (defInterrupted && moveDurations[defMove] > 1 && !defMove.match(/^SUPER[123]$/)) defCancelled = true;
             // If PUNCH is blocked, cancel rest of card
@@ -1740,14 +1756,18 @@
             }
           }
 
-          // SUPER interrupt: remaining SUPER ticks become idle
-          var wasAtkSuper = lastAtkMove.match(/^SUPER[123]$/) && atkTick.cardIdx === lastAtkCardIdx;
-          var wasDefSuper = lastDefMove.match(/^SUPER[123]$/) && defTick.cardIdx === lastDefCardIdx;
-          if (atkSuperInterrupted && atkMove !== 'Idle') {
-            atkMove = 'Idle';
+          // SUPER interrupted: remaining SUPER ticks (same card) become idle
+          if (atkSuperInterruptedTick > 0 && atkTick.cardIdx === lastAtkCardIdx) {
+            var currentSuperTick = atkMove.match(/^SUPER(\d)$/);
+            if (currentSuperTick && parseInt(currentSuperTick[1]) > atkSuperInterruptedTick) {
+              atkMove = 'Idle';
+            }
           }
-          if (defSuperInterrupted && defMove !== 'Idle') {
-            defMove = 'Idle';
+          if (defSuperInterruptedTick > 0 && defTick.cardIdx === lastDefCardIdx) {
+            var currentSuperTick = defMove.match(/^SUPER(\d)$/);
+            if (currentSuperTick && parseInt(currentSuperTick[1]) > defSuperInterruptedTick) {
+              defMove = 'Idle';
+            }
           }
 
           // Determine animations
