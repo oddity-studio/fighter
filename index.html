@@ -1446,7 +1446,7 @@
         character.state.addListener(listener);
       }
 
-      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super' };
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super', TAUNT1: 'Taunt', TAUNT2: 'Taunt' };
 
       var animLookup = {
         'PUNCH:Idle':    'PUNCH:HIT',
@@ -1477,6 +1477,14 @@
         'SUPER3:Block':  'SUPER:DOWN',
         'SUPER3:TAUNT':  'SUPER:DOWN',
         'TAUNT:Idle':    'TAUNT:IDLE',
+        'TAUNT:PUNCH':   'TAUNT:HIT',
+        'TAUNT:SUPER':   'TAUNT:HIT',
+        'TAUNT1:Idle':   'TAUNT:IDLE',
+        'TAUNT1:PUNCH':  'TAUNT:HIT',
+        'TAUNT1:SUPER':  'TAUNT:HIT',
+        'TAUNT2:Idle':   'TAUNT:IDLE',
+        'TAUNT2:PUNCH':  'TAUNT:HIT',
+        'TAUNT2:SUPER':  'TAUNT:HIT',
         'Idle:PUNCH':    'HIT:PUNCH',
         'Idle:PUNCH+':   'HIT:PUNCH+'
       };
@@ -1484,6 +1492,7 @@
       var rigAnimMap = {
         PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
         SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super',
+        TAUNT1: 'Taunt', TAUNT2: 'Taunt',
         HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
         SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
       };
@@ -1585,8 +1594,10 @@
         SUPER1:  ['PUNCH'],
         SUPER2:  ['PUNCH'],
         SUPER3:  ['PUNCH'],
-        BLOCK:   ['SUPER'],
-        TAUNT:   ['PUNCH', 'SUPER']
+        TAUNT:   ['PUNCH', 'SUPER'],
+        TAUNT1:  ['PUNCH', 'SUPER'],
+        TAUNT2:  ['PUNCH', 'SUPER'],
+        BLOCK:   ['SUPER']
       };
 
       var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50, SUPER1: 50, SUPER2: 50, SUPER3: 50 };
