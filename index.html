@@ -1493,14 +1493,24 @@
       // Map from our names to actual Spine rig animation names
       var rigAnimMap = {
         PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
-        HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle'
+        HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
+        SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
       };
 
-      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted) {
+      var superInterruptAnims = ['Parry', 'SuperInt', 'SuperInt2'];
+
+      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove) {
         var key = atkMove + ':' + defMove;
         if (animLookup[key]) {
           var parts = animLookup[key].split(':');
           return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
+        }
+        // SUPER interrupted at specific tick
+        if (atkInterrupted && atkMove === 'SUPER' && atkTickInMove < superInterruptAnims.length) {
+          return { atk: superInterruptAnims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
+        }
+        if (defInterrupted && defMove === 'SUPER' && defTickInMove < superInterruptAnims.length) {
+          return { atk: moveAnimMap[atkMove] || atkMove, def: superInterruptAnims[defTickInMove] };
         }
         // Fallback
         return {
@@ -1573,6 +1583,10 @@
         var defBlocked = false;
         var lastAtkCardIdx = -1;
         var lastDefCardIdx = -1;
+        var atkTickInMove = 0;
+        var defTickInMove = 0;
+        var lastAtkMove = '';
+        var lastDefMove = '';
 
         for (var t = 0; t < maxLen; t++) {
           var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1 };
@@ -1595,6 +1609,10 @@
           // If blocked, entire rest of card is idle
           if (atkBlocked) atkMove = 'Idle';
           if (defBlocked) defMove = 'Idle';
+
+          // Track tick within move
+          if (atkMove === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; lastAtkMove = atkMove; }
+          if (defMove === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; lastDefMove = defMove; }
 
           // Reset cancelled flag when move changes (within same card)
           if (t > 0 && atkMove !== (atkTicks[t - 1] || { move: 'Idle' }).move) atkCancelled = false;
@@ -1636,13 +1654,19 @@
           }
 
           // Determine animations
-          var anims = getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted);
+          var anims = getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove);
           var atkAnim = anims.atk;
           var defAnim = anims.def;
 
           // Determine damage for both directions
           var atkDamage = (!atkInterrupted && damageMap[atkMove]) ? damageMap[atkMove] : 0;
           var defDamage = (!defInterrupted && damageMap[defMove]) ? damageMap[defMove] : 0;
+
+          // SUPER interruption: no damage for either side
+          if ((atkInterrupted && atkMove === 'SUPER') || (defInterrupted && defMove === 'SUPER')) {
+            atkDamage = 0;
+            defDamage = 0;
+          }
 
           // TAUNT upgrade for attacker
           if (!atkInterrupted && atkMove === 'TAUNT') {
