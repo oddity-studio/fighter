@@ -1521,6 +1521,7 @@
           var moveIdx = 0;
           moves.forEach(function(m) {
             var dur = moveDurations[m] || 1;
+            var isFirstMoveOfCard = (moveIdx === 0);
             for (var d = 0; d < dur; d++) {
               var idx = startIdx + moveIdx;
               if (idx >= 0 && idx < 30) {
@@ -1528,7 +1529,7 @@
                 if (dur > 1) {
                   expandedMove = m + (d + 1);
                 }
-                ticks[idx] = { move: expandedMove, cardStart: d === 0, cardIdx: cIdx, onSpike: c.onSpike && d === 0 };
+                ticks[idx] = { move: expandedMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
               }
               moveIdx++;
             }
