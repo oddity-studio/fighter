@@ -1494,7 +1494,7 @@
         });
       }
 
-      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, CONT: 1 };
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 1, TAUNT: 1, CONT: 1 };
 
       function generateTicks(cards) {
         var ticks = [];
@@ -1507,25 +1507,24 @@
         sorted.forEach(function(c, cIdx) {
           var startIdx = c.tick - 1;
           var moves = c.moves || [];
-          var moveIdx = 0;
-          moves.forEach(function(m) {
-            var dur = moveDurations[m] || 1;
-            var isFirstMoveOfCard = (moveIdx === 0);
-            for (var d = 0; d < dur; d++) {
-              var idx = startIdx + moveIdx;
-              if (idx >= 0 && idx < 30) {
-                var tickMove = m;
-                if (d > 0) {
-                  tickMove = 'CONT';
-                }
-                ticks[idx] = { move: tickMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
-              }
-              moveIdx++;
+          
+          for (var m = 0; m < moves.length; m++) {
+            var idx = startIdx + m;
+            if (idx >= 0 && idx < 30) {
+              ticks[idx] = { move: moves[m], cardStart: m === 0, cardIdx: cIdx, onSpike: c.onSpike && m === 0 };
             }
-          });
+          }
+          
+          var cardEndIdx = startIdx + moves.length;
+          var idleCount = (c.time || 1) - moves.length;
+          for (var idleIdx = 0; idleIdx < idleCount; idleIdx++) {
+            var idlePos = cardEndIdx + idleIdx;
+            if (idlePos < 30) {
+              ticks[idlePos] = { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+            }
+          }
         });
         
-        // After placing all card moves, fill any remaining Idle with CONT
         for (var i = 0; i < 30; i++) {
           if (ticks[i].move === 'Idle' && ticks[i].cardIdx === -1) {
             ticks[i].move = 'CONT';
@@ -1605,29 +1604,27 @@
         }
         var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
         
-        // First, place all moves from cards
         sorted.forEach(function(c, cIdx) {
           var startIdx = c.tick - 1;
           var moves = c.moves || [];
-          var moveIdx = 0;
-          moves.forEach(function(m) {
-            var dur = moveDurations[m] || 1;
-            var isFirstMoveOfCard = (moveIdx === 0);
-            for (var d = 0; d < dur; d++) {
-              var idx = startIdx + moveIdx;
-              if (idx >= 0 && idx < 30) {
-                var tickMove = m;
-                if (d > 0) {
-                  tickMove = 'CONT';
-                }
-                ticks[idx] = { move: tickMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
-              }
-              moveIdx++;
+          
+          for (var m = 0; m < moves.length; m++) {
+            var idx = startIdx + m;
+            if (idx >= 0 && idx < 30) {
+              ticks[idx] = { move: moves[m], cardStart: m === 0, cardIdx: cIdx, onSpike: c.onSpike && m === 0 };
             }
-          });
+          }
+          
+          var cardEndIdx = startIdx + moves.length;
+          var idleCount = (c.time || 1) - moves.length;
+          for (var idleIdx = 0; idleIdx < idleCount; idleIdx++) {
+            var idlePos = cardEndIdx + idleIdx;
+            if (idlePos < 30) {
+              ticks[idlePos] = { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+            }
+          }
         });
         
-        // After placing all card moves, fill any remaining Idle with CONT
         for (var i = 0; i < 30; i++) {
           if (ticks[i].move === 'Idle' && ticks[i].cardIdx === -1) {
             ticks[i].move = 'CONT';
@@ -2631,7 +2628,7 @@
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
 
-      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, CONT: 1 };
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 1, TAUNT: 1, CONT: 1 };
 
         window.beat1Placements = [];
         window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); };
@@ -2643,17 +2640,17 @@
           sorted.forEach(function(p) {
             if (p.moves) {
               p.moves.forEach(function(m) {
-                var dur = moveDurations[m] || 1;
-                for (var d = 0; d < dur; d++) {
-                  if (m === 'PUNCH' && p.onSpike && d === 0) {
-                    moves.push('PUNCH+');
-                  } else if (d > 0) {
-                    moves.push('CONT');
-                  } else {
-                    moves.push(m);
-                  }
+                if (m === 'PUNCH' && p.onSpike) {
+                  moves.push('PUNCH+');
+                } else {
+                  moves.push(m);
                 }
               });
+              // Add idle ticks based on card time minus moves
+              var idleCount = (p.time || 1) - p.moves.length;
+              for (var i = 0; i < idleCount; i++) {
+                moves.push('IDLE');
+              }
             }
           });
           for (var i = 1; i < moves.length; i++) {
@@ -2853,16 +2850,16 @@
 
       (function() {
         var cards = [
-          { name: 'Hit',            type: 'ATTACK',  time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] },
-          { name: 'Triple Hit',     type: 'ATTACK',  time: 5, uptime: 3, downtime: 2, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
-          { name: 'Sucker Punch',   type: 'ATTACK',  time: 3, uptime: 2, downtime: 1, moves: ['BLOCK', 'PUNCH'] },
-          { name: 'Power Glove',    type: 'ATTACK',  time: 5, uptime: 3, downtime: 2, moves: ['SUPER'] },
-          { name: 'Doom',           type: 'ATTACK',  time: 8, uptime: 5, downtime: 3, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
-          { name: 'Deflect',        type: 'DEFENSE', time: 2, uptime: 1, downtime: 1, moves: ['BLOCK'] },
-          { name: 'Turtle',         type: 'DEFENSE', time: 5, uptime: 3, downtime: 2, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
-          { name: 'Smartass',       type: 'DEFENSE', time: 5, uptime: 3, downtime: 2, moves: ['BLOCK', 'TAUNT'] },
-          { name: 'Wait Your Moment', type: 'DEFENSE', time: 8, uptime: 5, downtime: 3, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
-          { name: 'Boost Morale',   type: 'SKILL',   time: 3, uptime: 2, downtime: 1, moves: ['TAUNT'] }
+          { name: 'Hit',            type: 'ATTACK',  time: 1, moves: ['PUNCH'] },
+          { name: 'Triple Hit',     type: 'ATTACK',  time: 3, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
+          { name: 'Sucker Punch',   type: 'ATTACK',  time: 2, moves: ['BLOCK', 'PUNCH'] },
+          { name: 'Power Glove',    type: 'ATTACK',  time: 1, moves: ['SUPER'] },
+          { name: 'Doom',           type: 'ATTACK',  time: 3, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
+          { name: 'Deflect',        type: 'DEFENSE', time: 1, moves: ['BLOCK'] },
+          { name: 'Turtle',         type: 'DEFENSE', time: 3, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
+          { name: 'Smartass',       type: 'DEFENSE', time: 2, moves: ['BLOCK', 'TAUNT'] },
+          { name: 'Wait Your Moment', type: 'DEFENSE', time: 3, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
+          { name: 'Boost Morale',   type: 'SKILL',   time: 1, moves: ['TAUNT'] }
         ];
 
         var box = document.getElementById('info-box');
