@@ -1312,9 +1312,1250 @@
         });
         bar.insertBefore(wf, bar.querySelector('.player-label'));
       });
-      })();
+    })();
+
+    (function () {
+      var canvas = document.getElementById("game-canvas");
+      var gl, renderer, assetManager, skeletonRenderer;
+      var hammer, maxx;
+      var lastFrameTime = Date.now() / 1000;
+      var animating = false;
+      var pendingVote = null;
+      var health = { maxx: 100, hammer: 100 };
+      var hudScale = 1, charScale = 1;
+
+      var timersEnded = false;
+
+      function showVoteIfPending() {
+        if (pendingVote && timersEnded) {
+          var voteBtn = document.querySelector('.vote-btn[data-player="' + pendingVote + '"]');
+          voteBtn.style.visibility = 'visible';
+          voteBtn.classList.add('vote-visible');
+          pendingVote = null;
+        }
+      }
+
+      function setHealth(player, value) {
+        health[player] = Math.max(0, value);
+        document.querySelector('#' + player + '-health .health-bar-fill').style.width = health[player] + '%';
+        if (health[player] === 0) {
+          pendingVote = player === "maxx" ? "hammer" : "maxx";
+        }
+      }
+
+      function init() {
+        var config = { alpha: true };
+        gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+        if (!gl) {
+          alert("WebGL not supported");
+          return;
+        }
+
+        renderer = new spine.webgl.SceneRenderer(canvas, gl);
+        assetManager = new spine.webgl.AssetManager(gl, "resources/");
+        skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+
+        assetManager.loadTextureAtlas("HammerRigBox.atlas");
+        assetManager.loadText("HammerRigBox.json");
+        assetManager.loadTextureAtlas("MaxxRigBox.atlas");
+        assetManager.loadText("MaxxRigBox.json");
+
+        requestAnimationFrame(load);
+      }
+
+      function load() {
+        if (!assetManager.isLoadingComplete()) {
+          requestAnimationFrame(load);
+          return;
+        }
+
+        hammer = createSkeleton("HammerRigBox", "Idle");
+        maxx = createSkeleton("MaxxRigBox", "Idle");
+
+        resize();
+        window.addEventListener("resize", resize);
+        setupButtons();
+        updateRoundButtons();
+        requestAnimationFrame(render);
+      }
+
+      function setButtonsDisabled(disabled) {
+        document.querySelectorAll('.action-btn').forEach(function(btn) {
+          btn.disabled = disabled;
+        });
+      }
+
+      function playAnimationOnce(character, animName) {
+        character.state.setAnimation(0, animName, false);
+      }
+
+      var bgSlot = 'a';
+
+      function setupManualLoop(video) {
+        video.addEventListener('timeupdate', function() {
+          if (video.duration && video.currentTime >= video.duration - 0.15) {
+            video.currentTime = 0;
+          }
+        });
+      }
+
+      function switchBackground(src, loop) {
+        var cur = document.getElementById('bg-video-' + bgSlot);
+        var nxt = document.getElementById('bg-video-' + (bgSlot === 'a' ? 'b' : 'a'));
+
+        nxt.src = src;
+        nxt.load();
+
+        function onCanPlay() {
+          nxt.removeEventListener('canplay', onCanPlay);
+          nxt.play().catch(function() {});
+          nxt.style.zIndex = 0;
+          cur.style.zIndex = -1;
+          cur.pause();
+          bgSlot = bgSlot === 'a' ? 'b' : 'a';
+
+          if (loop) {
+            setupManualLoop(nxt);
+          } else {
+            nxt.addEventListener('timeupdate', function onNearEnd() {
+              if (nxt.duration && nxt.currentTime >= nxt.duration - 0.5) {
+                nxt.removeEventListener('timeupdate', onNearEnd);
+                switchBackground('resources/arena_idle.webm', true);
+              }
+            });
+          }
+        }
+
+        nxt.addEventListener('canplay', onCanPlay);
+      }
+
+      // Manual loop for the initial idle video
+      setupManualLoop(document.getElementById('bg-video-a'));
+
+      function playAnimationThenIdle(character, animName, onComplete) {
+        character.state.setAnimation(0, animName, false);
+        character.state.addAnimation(0, "Idle", true, 0);
+        var listener = {
+          complete: function(trackEntry) {
+            if (trackEntry.animation.name === animName) {
+              character.state.removeListener(listener);
+              if (onComplete) onComplete();
+            }
+          }
+        };
+        character.state.addListener(listener);
+      }
+
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super' };
+
+      function playSequence(character, moves, idx) {
+        if (idx >= moves.length) return;
+        var anim = moveAnimMap[moves[idx]] || 'Punch';
+        playAnimationThenIdle(character, anim, function() {
+          playSequence(character, moves, idx + 1);
+        });
+      }
+
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, SUPER1: 3, SUPER2: 3, SUPER3: 3 };
+
+      function generateTicks(cards) {
+        var ticks = [];
+        for (var i = 0; i < 30; i++) {
+          ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
+        }
+        var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
+        sorted.forEach(function(c, cIdx) {
+          var startIdx = c.tick - 1;
+          var moves = c.moves || [];
+          var moveIdx = 0;
+          moves.forEach(function(m) {
+            var dur = moveDurations[m] || 1;
+            for (var d = 0; d < dur; d++) {
+              var idx = startIdx + moveIdx;
+              if (idx >= 0 && idx < 30) {
+                var expandedMove = m;
+                if (dur > 1) {
+                  expandedMove = m + (d + 1);
+                }
+                ticks[idx] = { move: expandedMove, cardStart: d === 0, cardIdx: cIdx, onSpike: c.onSpike && d === 0 };
+              }
+              moveIdx++;
+            }
+          });
+        });
+        return ticks;
+      }
+        // SUPER interrupted at specific tick
+        if (atkInterrupted && atkMove === 'SUPER' && atkTickInMove < superInterruptAnims.length) {
+          return { atk: superInterruptAnims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
+        }
+        if (defInterrupted && defMove === 'SUPER' && defTickInMove < superInterruptAnims.length) {
+          return { atk: moveAnimMap[atkMove] || atkMove, def: superInterruptAnims[defTickInMove] };
+        }
+        // Fallback
+        return {
+          atk: atkInterrupted ? 'Hit' : (rigAnimMap[atkMove] || atkMove),
+          def: defInterrupted ? 'Hit' : (rigAnimMap[defMove] || defMove)
+        };
+      }
+
+      function buildTimedSequence(cards) {
+        var events = [];
+        cards.forEach(function(c) {
+          var moves = c.moves || [];
+          moves.forEach(function(m, idx) {
+            var move = m;
+            if (m === 'PUNCH' && c.onSpike && idx === 0) move = 'PUNCH+';
+            if (move === 'PUNCH' && events.length > 0 && events[events.length - 1].move === 'TAUNT') move = 'PUNCH+';
+            events.push({ move: move, duration: moveDurations[move] || 1 });
+          });
+          events.push({ move: 'Idle', duration: c.downtime || 1 });
+        });
+        return events;
+      }
+
+      function getSortedCards(placements) {
+        return placements.slice().sort(function(a, b) { return a.tick - b.tick; });
+      }
+
+      function playTimedSequence(character, events, idx) {
+        if (idx >= events.length) return;
+        var ev = events[idx];
+        var anim = moveAnimMap[ev.move] || ev.move;
+        character.state.setAnimation(0, anim, anim === 'Idle');
+        setTimeout(function() {
+          playTimedSequence(character, events, idx + 1);
+        }, ev.duration * 1000);
+      }
+
+      // ===== COMBAT SYSTEM =====
+      var interruptMap = {
+        PUNCH:   ['PUNCH', 'BLOCK'],
+        'PUNCH+': ['BLOCK'],
+        SUPER:   ['PUNCH'],
+        BLOCK:   ['SUPER'],
+        TAUNT:   ['PUNCH', 'SUPER']
+      };
+
+      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
+
+      function generateTicks(cards) {
+        var ticks = [];
+        for (var i = 0; i < 30; i++) {
+          ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
+        }
+        var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
+        sorted.forEach(function(c, cIdx) {
+          var startIdx = c.tick - 1;
+          var moves = c.moves || [];
+          moves.forEach(function(m, mIdx) {
+            var idx = startIdx + mIdx;
+            if (idx >= 0 && idx < 30) {
+              ticks[idx] = { move: m, cardStart: mIdx === 0, cardIdx: cIdx, onSpike: c.onSpike && mIdx === 0 };
+            }
+          });
+        });
+        return ticks;
+      }
+
+      function processCombat(atkTicks, defTicks, roundNum) {
+        var maxLen = Math.max(atkTicks.length, defTicks.length);
+        var results = [];
+        var atkTauntNext = false;
+        var defTauntNext = false;
+        var atkCancelled = false;
+        var defCancelled = false;
+        var atkBlocked = false;
+        var defBlocked = false;
+        var lastAtkCardIdx = -1;
+        var lastDefCardIdx = -1;
+        var atkTickInMove = 0;
+        var defTickInMove = 0;
+        var lastAtkMove = '';
+        var lastDefMove = '';
+
+        for (var t = 0; t < maxLen; t++) {
+          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+          var defTick = defTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+          var atkMove = atkTick.move;
+          var defMove = defTick.move;
+
+          // Reset blocked/cancelled when new card starts
+          if (atkTick.cardStart && atkTick.cardIdx !== lastAtkCardIdx) {
+            atkBlocked = false;
+            atkCancelled = false;
+            lastAtkCardIdx = atkTick.cardIdx;
+          }
+          if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
+            defBlocked = false;
+            defCancelled = false;
+            lastDefCardIdx = defTick.cardIdx;
+          }
+
+          // If blocked, entire rest of card is idle
+          if (atkBlocked) atkMove = 'Idle';
+          if (defBlocked) defMove = 'Idle';
+
+          // Track tick within move (before cancellation changes move to Idle)
+          if (atkTick.move === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; atkCancelled = false; lastAtkMove = atkTick.move; }
+          if (defTick.move === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; defCancelled = false; lastDefMove = defTick.move; }
+
+          // If cancelled (multi-second), rest of that move becomes idle
+          if (atkCancelled && atkMove !== 'Idle') atkMove = 'Idle';
+          if (defCancelled && defMove !== 'Idle') defMove = 'Idle';
+
+          // Check spike upgrade for attacker's first PUNCH
+          if (atkTick.onSpike && atkMove === 'PUNCH') {
+            atkMove = 'PUNCH+';
+          }
+
+          // Check spike upgrade for defender's first PUNCH
+          if (defTick.onSpike && defMove === 'PUNCH') {
+            defMove = 'PUNCH+';
+          }
+
+          // Check TAUNT upgrade for attacker's next PUNCH
+          if (atkTauntNext && atkMove === 'PUNCH') {
+            atkMove = 'PUNCH+';
+            atkTauntNext = false;
+          }
+
+          // Check TAUNT upgrade for defender's next PUNCH
+          if (defTauntNext && defMove === 'PUNCH') {
+            defMove = 'PUNCH+';
+            defTauntNext = false;
+          }
+
+          var atkInterrupted = atkCancelled;
+          var defInterrupted = defCancelled;
+
+          // Check if attacker gets interrupted by defender
+          if (!atkInterrupted && atkMove !== 'Idle' && interruptMap[atkMove]) {
+            atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
+            if (atkInterrupted && moveDurations[atkMove] > 1) atkCancelled = true;
+            // If PUNCH is blocked, cancel rest of card
+            if (atkInterrupted && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
+              atkBlocked = true;
+            }
+          }
+
+          // Check if defender gets interrupted by attacker
+          if (!defInterrupted && defMove !== 'Idle' && interruptMap[defMove]) {
+            defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
+            if (defInterrupted && moveDurations[defMove] > 1) defCancelled = true;
+            // If PUNCH is blocked, cancel rest of card
+            if (defInterrupted && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
+              defBlocked = true;
+            }
+          }
+
+          // Determine animations
+          var anims = getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove);
+          var atkAnim = anims.atk;
+          var defAnim = anims.def;
+
+          // Determine damage for both directions
+          var atkDamage = (!atkInterrupted && damageMap[atkMove]) ? damageMap[atkMove] : 0;
+          var defDamage = (!defInterrupted && damageMap[defMove]) ? damageMap[defMove] : 0;
+
+          // SUPER interruption: no damage for either side
+          if ((atkInterrupted && atkMove === 'SUPER') || (defInterrupted && defMove === 'SUPER')) {
+            atkDamage = 0;
+            defDamage = 0;
+          }
+
+          // TAUNT upgrade for attacker
+          if (!atkInterrupted && atkMove === 'TAUNT') {
+            atkTauntNext = true;
+          }
+
+          // TAUNT upgrade for defender too
+          if (!defInterrupted && defMove === 'TAUNT') {
+            defTauntNext = true;
+          }
+
+          results.push({
+            second: t,
+            atkMove: atkMove,
+            defMove: defMove,
+            atkInterrupted: atkInterrupted,
+            defInterrupted: defInterrupted,
+            atkDamage: atkDamage,
+            defDamage: defDamage,
+            atkAnim: atkAnim,
+            defAnim: defAnim
+          });
+        }
+        return results;
+      }
+
+      var debugTickInterval = null;
+
+      function showDebugTimeline(timeline, roundNum) {
+        if (debugTickInterval) clearInterval(debugTickInterval);
+        var p1List = document.getElementById('debug-p1-list');
+        var p2List = document.getElementById('debug-p2-list');
+        p1List.innerHTML = '';
+        p2List.innerHTML = '';
+        document.getElementById('debug-boxes').style.display = 'flex';
+
+        timeline.forEach(function(r, i) {
+          var p1m, p1a, p2m, p2a;
+          if (roundNum === 1) {
+            p1m = r.atkMove; p1a = r.atkAnim;
+            p2m = r.defMove; p2a = r.defAnim;
+          } else {
+            p1m = r.defMove; p1a = r.defAnim;
+            p2m = r.atkMove; p2a = r.atkAnim;
+          }
+          var row1 = document.createElement('div');
+          row1.className = 'debug-row';
+          row1.id = 'p1-' + i;
+          row1.dataset.idx = i;
+          row1.innerHTML = '<span class="dm">' + p1m + '</span><span class="da">' + p1a + '</span>';
+          row1.addEventListener('mouseenter', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+            var idx = this.dataset.idx;
+            this.classList.add('hover');
+            var other = document.getElementById('p2-' + idx);
+            if (other) other.classList.add('hover');
+          });
+          row1.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+          });
+          p1List.appendChild(row1);
+
+          var row2 = document.createElement('div');
+          row2.className = 'debug-row';
+          row2.id = 'p2-' + i;
+          row2.dataset.idx = i;
+          row2.innerHTML = '<span class="dm">' + p2m + '</span><span class="da">' + p2a + '</span>';
+          row2.addEventListener('mouseenter', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+            var idx = this.dataset.idx;
+            this.classList.add('hover');
+            var other = document.getElementById('p1-' + idx);
+            if (other) other.classList.add('hover');
+          });
+          row2.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+          });
+          p2List.appendChild(row2);
+        });
+
+        var tickIdx = 0;
+        debugTickInterval = setInterval(function() {
+          if (tickIdx >= timeline.length) {
+            clearInterval(debugTickInterval);
+            document.getElementById('debug-boxes').style.display = 'none';
+            return;
+          }
+          var prev = tickIdx - 1;
+          if (prev >= 0) {
+            var p1 = document.getElementById('p1-' + prev);
+            var p2 = document.getElementById('p2-' + prev);
+            if (p1) p1.classList.remove('active');
+            if (p2) p2.classList.remove('active');
+          }
+          var c1 = document.getElementById('p1-' + tickIdx);
+          var c2 = document.getElementById('p2-' + tickIdx);
+          if (c1) { c1.classList.add('active'); c1.scrollIntoView({ block: 'nearest' }); }
+          if (c2) { c2.classList.add('active'); c2.scrollIntoView({ block: 'nearest' }); }
+          tickIdx++;
+        }, 1000);
+      }
+
+      function playCombat(atkChar, defChar, combatResults, roundNum) {
+        var idx = 0;
+        var lastAtkAnim = '';
+        var lastDefAnim = '';
+
+        var combatInterval = setInterval(function() {
+          if (idx >= combatResults.length) {
+            clearInterval(combatInterval);
+            return;
+          }
+          var r = combatResults[idx];
+
+          if (r.atkAnim !== lastAtkAnim) {
+            atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
+            lastAtkAnim = r.atkAnim;
+          }
+          if (r.defAnim !== lastDefAnim) {
+            defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
+            lastDefAnim = r.defAnim;
+          }
+
+          // Apply damage at end of second
+          setTimeout(function() {
+            if (r.atkDamage > 0 || r.defDamage > 0) {
+              var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
+              var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
+
+              if (r.atkDamage > 0) {
+                var newH = Math.max(0, health[atkTarget] - r.atkDamage);
+                setHealth(atkTarget, newH);
+                if (newH <= 0) {
+                  clearInterval(combatInterval);
+                  var loser = atkTarget === 'maxx' ? maxx : hammer;
+                  var winner = atkTarget === 'maxx' ? hammer : maxx;
+                  loser.state.setAnimation(0, 'Down', false);
+                  winner.state.setAnimation(0, 'Idle', true);
+                  return;
+                }
+              }
+
+              if (r.defDamage > 0) {
+                var newH2 = Math.max(0, health[defTarget] - r.defDamage);
+                setHealth(defTarget, newH2);
+                if (newH2 <= 0) {
+                  clearInterval(combatInterval);
+                  var loser2 = defTarget === 'maxx' ? maxx : hammer;
+                  var winner2 = defTarget === 'maxx' ? hammer : maxx;
+                  loser2.state.setAnimation(0, 'Down', false);
+                  winner2.state.setAnimation(0, 'Idle', true);
+                  return;
+                }
+              }
+            }
+          }, 900);
+          idx++;
+        }, 1000);
+        window.currentCombatInterval = combatInterval;
+      }
+
+      function fireAction(attacker, defender, attackAnim, defendAnim) {
+        if (animating) return;
+        animating = true;
+        var completed = 0;
+        function onComplete() {
+          if (++completed >= 2) {
+            animating = false;
+            showVoteIfPending();
+          }
+        }
+        playAnimationThenIdle(attacker, attackAnim, onComplete);
+        playAnimationThenIdle(defender, defendAnim, onComplete);
+      }
+
+      function setupButtons() {
+        document.querySelectorAll('.action-btn[data-action="fyre"]').forEach(function(btn) {
+          btn.addEventListener("click", function() {
+          });
+        });
+
+        document.querySelectorAll('.action-btn[data-action="mid"]').forEach(function(btn) {
+          btn.addEventListener("click", function() {
+          });
+        });
+
+        function spawnFlushToast(player) {
+          var toast = document.createElement('span');
+          toast.className = 'flush-toast';
+          toast.textContent = '-1s FLUSH';
+          toast.style.color = player === 'maxx' ? '#00e5ff' : '#fc6c85';
+          toast.style.textShadow = '0 0 8px ' + (player === 'maxx' ? '#007aad' : '#7a1a3a');
+          document.getElementById('flush-toast-container').appendChild(toast);
+          toast.addEventListener('animationend', function() { toast.remove(); });
+        }
+
+        function advanceBarFill(fillEl, skipSeconds) {
+          var currentWidth = parseFloat(window.getComputedStyle(fillEl).width);
+          var parentWidth = parseFloat(window.getComputedStyle(fillEl.parentElement).width);
+          var elapsed = (currentWidth / parentWidth) * 30;
+          var newElapsed = Math.min(30, elapsed + skipSeconds);
+          fillEl.style.animation = 'none';
+          fillEl.offsetHeight; // force reflow
+          fillEl.style.animation = 'round-bar-reveal 30s linear forwards';
+          fillEl.style.animationDelay = '-' + newElapsed + 's';
+        }
+
+        document.querySelectorAll('.action-btn[data-action="flush"]').forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            if (btn.getAttribute("data-player") === "maxx") {
+              if (round === 1) {
+                countdown = Math.max(0, countdown - 1);
+                countdownEl.textContent = String(countdown).padStart(2, '0');
+                advanceBarFill(document.querySelector('#maxx-health ~ .round-bar .round-bar-fill'), 1);
+                spawnFlushToast('maxx');
+              }
+            } else {
+              if (round === 2) {
+                countdown = Math.max(0, countdown - 1);
+                countdownEl.textContent = String(countdown).padStart(2, '0');
+                advanceBarFill(document.querySelector('#hammer-health ~ .round-bar .round-bar-fill'), 1);
+                spawnFlushToast('hammer');
+              }
+            }
+          });
+        });
+
+        document.querySelectorAll('.action-btn[data-action="vote"]').forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            setButtonsDisabled(true);
+            if (btn.getAttribute("data-player") === "maxx") {
+              playAnimationThenIdle(maxx, "Win", function() {});
+              playAnimationOnce(hammer, "Lose");
+            } else {
+              playAnimationThenIdle(hammer, "Win", function() {});
+              playAnimationOnce(maxx, "Lose");
+            }
+            clearInterval(countdownInterval);
+            (round === 1 ? audio1 : audio2).pause();
+            setTimeout(function() {
+              var flash = document.getElementById('flash');
+              flash.style.transition = 'none';
+              flash.style.opacity = 1;
+              void flash.offsetWidth; // force reflow
+              flash.style.transition = 'opacity 1s ease-out';
+              flash.style.opacity = 0;
+
+              if (btn.getAttribute("data-player") === "maxx") {
+                switchBackground("resources/arena_p1win.webm");
+              } else {
+                switchBackground("resources/arena_p2win.webm");
+              }
+
+              var winner = btn.getAttribute("data-player");
+              var winnerName = winner === 'maxx' ? 'MAXX' : 'HAMMER';
+
+              var ko = document.getElementById('ko-overlay');
+              ko.classList.add('visible');
+              setTimeout(function() {
+                ko.classList.add('blink-out');
+                setTimeout(function() {
+                  ko.classList.remove('visible');
+                  ko.classList.remove('blink-out');
+                  setTimeout(function() {
+                    var wo = document.getElementById('winner-overlay');
+                    wo.querySelector('span').textContent = winnerName + ' WINS';
+                    wo.classList.add('visible');
+                    setTimeout(function() {
+                      wo.classList.add('blink-out');
+                      setTimeout(function() {
+                        wo.classList.remove('visible');
+                        wo.classList.remove('blink-out');
+                      }, 300);
+                    }, 2500);
+                  }, 600);
+                }, 300);
+              }, 1000);
+            }, 850);
+          });
+        });
+
+        document.querySelectorAll('.action-btn[data-action="fyre"], .action-btn[data-action="mid"], .action-btn[data-action="flush"]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var counter = btn.querySelector('.btn-counter');
+            var count = (parseInt(counter.textContent.replace('x', '')) || 0) + 1;
+            counter.textContent = 'x' + count;
+          });
+        });
+
+        function syncVoteWidth() {
+          ['maxx', 'hammer'].forEach(function(player) {
+            var btns = ['fyre', 'mid', 'flush'].map(function(action) {
+              return document.querySelector('.action-btn[data-player="' + player + '"][data-action="' + action + '"]');
+            });
+            var voteBtn = document.querySelector('.vote-btn[data-player="' + player + '"]');
+            if (btns.every(Boolean) && voteBtn) {
+              var total = btns.reduce(function(sum, btn) { return sum + btn.offsetWidth; }, 0);
+              var gaps = (btns.length - 1) * 8;
+              voteBtn.style.width = (total + gaps) + 'px';
+            }
+          });
+        }
+        syncVoteWidth();
+        window.addEventListener('resize', syncVoteWidth);
+      }
+
+      function updateRoundButtons() {
+        document.querySelectorAll('.action-btn[data-player]').forEach(function(btn) {
+          var player = btn.getAttribute('data-player');
+          var active = round === 0
+            || (round === 1 && player === 'maxx')
+            || (round === 2 && player === 'hammer');
+          btn.classList.toggle('inactive', !active);
+        });
+      }
+
+      function createSkeleton(name, animation) {
+        var atlas = assetManager.get(name + ".atlas");
+        var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+        var skeletonJson = new spine.SkeletonJson(atlasLoader);
+        skeletonJson.scale = 1.0;
+
+        var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
+        var skeleton = new spine.Skeleton(skeletonData);
+        skeleton.setSlotsToSetupPose();
+
+        var stateData = new spine.AnimationStateData(skeletonData);
+        var state = new spine.AnimationState(stateData);
+        state.setAnimation(0, animation, true);
+
+        return { skeleton: skeleton, state: state, data: skeletonData };
+      }
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        var portrait = window.innerHeight > window.innerWidth;
+        hudScale = portrait ? Math.min(1, window.innerWidth / 1160) : 1;
+        charScale = portrait ? hudScale * 2 : hudScale;
+        var hud = document.getElementById('hud');
+        // In portrait the layout is handled by CSS; don't scale the hud
+        // (a transform on #hud would break position:fixed on child buttons)
+        if (!portrait && hudScale < 1) {
+          hud.style.transform = 'scale(' + hudScale + ')';
+          hud.style.transformOrigin = 'top center';
+        } else {
+          hud.style.transform = '';
+          hud.style.transformOrigin = '';
+        }
+      }
+
+      function render() {
+        var now = Date.now() / 1000;
+        var delta = now - lastFrameTime;
+        lastFrameTime = now;
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        var w = canvas.width;
+        var h = canvas.height;
+
+        // Position characters on the arena floor
+        var groundY = h * 0.15 + 220;
+
+        var charSpacing = 150 * charScale;
+
+        // Maxx on the left (facing right)
+        maxx.skeleton.x = w / 2 - charSpacing;
+        maxx.skeleton.y = groundY;
+        maxx.skeleton.scaleX = charScale;
+        maxx.skeleton.scaleY = charScale;
+        maxx.state.update(delta);
+        maxx.state.apply(maxx.skeleton);
+        maxx.skeleton.updateWorldTransform();
+
+        // Hammer on the right (flipped to face left)
+        hammer.skeleton.x = w / 2 + charSpacing;
+        hammer.skeleton.y = groundY;
+        hammer.skeleton.scaleX = -charScale;
+        hammer.skeleton.scaleY = charScale;
+        hammer.state.update(delta);
+        hammer.state.apply(hammer.skeleton);
+        hammer.skeleton.updateWorldTransform();
+
+        renderer.camera.position.x = w / 2;
+        renderer.camera.position.y = h / 2;
+        renderer.camera.setViewport(w, h);
+
+        renderer.begin();
+        renderer.drawSkeleton(hammer.skeleton, true);
+        renderer.drawSkeleton(maxx.skeleton, true);
+        renderer.end();
+
+        requestAnimationFrame(render);
+      }
+
+      // Audio
+      var beat1 = new Audio('resources/Beat1.mp3');
+      var beat2 = new Audio('resources/Beat2.mp3');
+      beat1.loop = true;
+      beat2.loop = true;
+
+      function fadeOutBeat(audio, duration) {
+        var steps = 40;
+        var stepMs = Math.max(duration / steps, 16);
+        var startVol = audio.volume;
+        var step = 0;
+        var iv = setInterval(function() {
+          step++;
+          audio.volume = Math.max(0, startVol * (1 - step / steps));
+          if (step >= steps) {
+            clearInterval(iv);
+            audio.pause();
+            audio.volume = 1;
+          }
+        }, stepMs);
+      }
+
+      var beat1FadeStarted = false;
+      var beat2FadeStarted = false;
+
+      // Countdown timer — two 30s rounds
+      var round = 1;
+      var countdown = 30;
+      var countdownEl = document.getElementById('round-counter');
+      var countdownInterval;
+
+      function startBattle() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-canvas').style.display = '';
+        document.getElementById('hud').style.display = '';
+
+        window.dispatchEvent(new Event('resize'));
+
+        var dur = window.getBeat1Duration();
+        audio1.currentTime = window.getBeat1WindowPos() * (dur - 30);
+        audio1.play();
+
+        showRoundCaption('round1-overlay', 1000);
+
+        // Build full round timeline for debug
+        var atkCards = getSortedCards(window.beat1Placements);
+        var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
+        var atkTicks = generateTicks(shiftedAtkCards);
+        var defTicks = generateTicks(window.aiDefCards);
+        var combat = processCombat(atkTicks, defTicks, 1);
+
+        // Prepend intro ticks (3s Idle + 7s Taunt for attacker, 10s Idle for defender)
+        var fullTimeline = [];
+        for (var i = 0; i < 3; i++) {
+          fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
+        }
+        for (var j = 0; j < 7; j++) {
+          fullTimeline.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+        }
+        combat.forEach(function(r) { fullTimeline.push(r); });
+
+        // Show debug panels immediately
+        showDebugTimeline(fullTimeline.slice(0, 30), 1);
+
+        // 10s intro: attacker idles 3s then taunts 7s, defender idles
+        maxx.state.setAnimation(0, 'Idle', true);
+        hammer.state.setAnimation(0, 'Idle', true);
+        var tauntInterval;
+        setTimeout(function() {
+          tauntInterval = setInterval(function() {
+            maxx.state.setAnimation(0, 'Taunt', false);
+            maxx.state.addAnimation(0, 'Taunt', false, 0);
+          }, 2000);
+        }, 3000);
+
+        // After 10s intro, play sequences
+        setTimeout(function() {
+          clearInterval(tauntInterval);
+          var atkCards = getSortedCards(window.beat1Placements);
+          var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
+          var atkTicks = generateTicks(shiftedAtkCards);
+          var defTicks = generateTicks(window.aiDefCards);
+          var combat = processCombat(atkTicks, defTicks, 1);
+          playCombat(maxx, hammer, combat, 1);
+        }, 10000);
+        countdownInterval = setInterval(function() {
+        countdown--;
+        if (countdown <= 2 && countdown > 0) {
+          if (round === 2 && !beat2FadeStarted) {
+            beat2FadeStarted = true;
+            audio2.volume = 0.3;
+          }
+        }
+        if (countdown <= 0) {
+          if (round === 1) {
+            if (window.currentCombatInterval) clearInterval(window.currentCombatInterval);
+            audio1.pause();
+            audio1.volume = 1;
+            var b2Start2 = window.getBeat2Start() / window.beat2Buffer.sampleRate;
+            audio2.currentTime = b2Start2;
+            audio2.volume = 1;
+            audio2.play();
+            round = 2;
+            countdown = 30;
+            countdownEl.textContent = String(countdown).padStart(2, '0');
+            setHealth('maxx', 100);
+            setHealth('hammer', 100);
+            document.getElementById('round-label').textContent = 'ROUND 2';
+            updateRoundButtons();
+            showRoundCaption('round2-overlay', 0);
+
+            // Build full round timeline for debug
+            var atkTicks2 = generateTicks(window.aiAtkCards);
+            var defCards2 = getSortedCards(window.beat2Placements);
+            var shiftedDefCards2 = defCards2.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
+            var defTicks2 = generateTicks(shiftedDefCards2);
+            var combat2 = processCombat(atkTicks2, defTicks2, 2);
+            var fullTimeline2 = [];
+            for (var ii = 0; ii < 3; ii++) {
+              fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
+            }
+            for (var jj = 0; jj < 7; jj++) {
+              fullTimeline2.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+            }
+            combat2.forEach(function(r) { fullTimeline2.push(r); });
+            showDebugTimeline(fullTimeline2.slice(0, 30), 2);
+
+            // 10s intro: attacker idles 3s then taunts 7s, defender idles
+            hammer.state.setAnimation(0, 'Idle', true);
+            maxx.state.setAnimation(0, 'Idle', true);
+            var tauntInterval2;
+            setTimeout(function() {
+              tauntInterval2 = setInterval(function() {
+                hammer.state.setAnimation(0, 'Taunt', false);
+                hammer.state.addAnimation(0, 'Taunt', false, 0);
+              }, 2000);
+            }, 3000);
+
+            // After 10s intro, play sequences
+            setTimeout(function() {
+              clearInterval(tauntInterval2);
+              var atkTicks = generateTicks(window.aiAtkCards);
+              var defCards = getSortedCards(window.beat2Placements);
+              var shiftedDefCards = defCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
+              var defTicks = generateTicks(shiftedDefCards);
+              var combat = processCombat(atkTicks, defTicks, 2);
+              playCombat(hammer, maxx, combat, 2);
+            }, 10000);
+            var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
+            hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
+          } else {
+            // Timer fully depleted — stop audio
+            audio2.pause();
+            audio2.volume = 1;
+            countdownEl.textContent = '00';
+            clearInterval(countdownInterval);
+            timersEnded = true;
+            round = 0;
+            updateRoundButtons();
+            function getCount(player, action) {
+              var el = document.querySelector('.action-btn[data-player="' + player + '"][data-action="' + action + '"] .btn-counter');
+              return parseInt((el && el.textContent.replace('x', '')) || '0') || 0;
+            }
+            var totalFlush = getCount('maxx', 'flush') + getCount('hammer', 'flush');
+            var flushBros = totalFlush > 20 && getCount('maxx', 'fyre') < 5 && getCount('hammer', 'fyre') < 5;
+            if (flushBros) {
+              document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
+              showRoundCaption('flush-brothers-overlay', 0);
+              playAnimationThenIdle(maxx, 'Flush');
+              playAnimationThenIdle(hammer, 'Flush');
+            } else {
+              document.getElementById('round-label').textContent = 'VOTE NOW';
+              showRoundCaption('vote-overlay', 0);
+            }
+            ['maxx', 'hammer'].forEach(function(player) {
+              if (health[player] === 0) {
+                var winner = player === 'maxx' ? 'hammer' : 'maxx';
+                var voteBtn = document.querySelector('.vote-btn[data-player="' + winner + '"]');
+                voteBtn.style.visibility = 'visible';
+                voteBtn.classList.add('vote-visible');
+              }
+            });
+          }
+        } else {
+          countdownEl.textContent = String(countdown).padStart(2, '0');
+        }
+      }, 1000);
+
+      function showRoundCaption(id, delay) {
+        setTimeout(function() {
+          var el = document.getElementById(id);
+          el.classList.add('visible');
+          setTimeout(function() {
+            el.classList.add('blink-out');
+            setTimeout(function() {
+              el.classList.remove('visible');
+              el.classList.remove('blink-out');
+            }, 300);
+          }, 1500);
+        }, delay);
+      }
+
+      }
+
+      document.getElementById('start-btn').addEventListener('click', startBattle);
 
       (function() {
+        var wfCanvas = document.getElementById('waveform-canvas');
+        var wfCtx = wfCanvas.getContext('2d');
+        var zmCanvas = document.getElementById('waveform-zoom');
+        var zmCtx = zmCanvas.getContext('2d');
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        window.sharedAudioCtx = audioCtx;
+
+        function resizeWf() {
+          wfCanvas.width = wfCanvas.offsetWidth * (window.devicePixelRatio || 1);
+          wfCanvas.height = wfCanvas.offsetHeight * (window.devicePixelRatio || 1);
+          zmCanvas.width = zmCanvas.offsetWidth * (window.devicePixelRatio || 1);
+          zmCanvas.height = zmCanvas.offsetHeight * (window.devicePixelRatio || 1);
+        }
+        resizeWf();
+        window.addEventListener('resize', function() { resizeWf(); drawWaveform(wfData); });
+
+        var wfData = null;
+        var wfDuration = 0;
+        var windowPos = 0;
+
+        function roundRect(ctx, x, y, w, h, r) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.arcTo(x + w, y, x + w, y + r, r);
+          ctx.lineTo(x + w, y + h - r);
+          ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+          ctx.lineTo(x + r, y + h);
+          ctx.arcTo(x, y + h, x, y + h - r, r);
+          ctx.lineTo(x, y + r);
+          ctx.arcTo(x, y, x + r, y, r);
+          ctx.closePath();
+        }
+        window.roundRect = roundRect;
+
+        function drawWaveform(data) {
+          if (!data) return;
+          var w = wfCanvas.width;
+          var h = wfCanvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          wfCtx.clearRect(0, 0, w, h);
+
+          var len = data.length;
+          var barW = 4 * dpr;
+          var gap = 4 * dpr;
+          var totalBars = Math.floor(w / (barW + gap));
+          var step = Math.ceil(len / totalBars);
+          var mid = h / 2;
+          var barRadius = barW / 2;
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var start = i * step;
+            var end = Math.min(start + step, len);
+            var sum = 0;
+            for (var j = start; j < end; j++) {
+              sum += data[j] * data[j];
+            }
+            var rms = Math.sqrt(sum / (end - start));
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
+            var y = mid - barH / 2;
+
+            var grad = wfCtx.createLinearGradient(0, y, 0, y + barH);
+            grad.addColorStop(0, '#00e5ff');
+            grad.addColorStop(1, '#007aad');
+            wfCtx.fillStyle = grad;
+            wfCtx.beginPath();
+            wfCtx.moveTo(x + barRadius, y);
+            wfCtx.lineTo(x + barW - barRadius, y);
+            wfCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            wfCtx.lineTo(x + barW, y + barH - barRadius);
+            wfCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            wfCtx.lineTo(x + barRadius, y + barH);
+            wfCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            wfCtx.lineTo(x, y + barRadius);
+            wfCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            wfCtx.closePath();
+            wfCtx.fill();
+          }
+
+          if (wfDuration > 0) {
+            var windowW = (30 / wfDuration) * w;
+            var windowX = windowPos * (w - windowW);
+            var radius = 10 * dpr;
+
+            wfCtx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+            roundRect(wfCtx, windowX, 0, windowW, h, radius);
+            wfCtx.fill();
+
+            wfCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            wfCtx.lineWidth = 2 * dpr;
+            roundRect(wfCtx, windowX, 0, windowW, h, radius);
+            wfCtx.stroke();
+          }
+
+          drawZoom(data);
+        }
+
+        function drawZoom(data) {
+          if (!data || wfDuration === 0) return;
+          var zw = zmCanvas.width;
+          var zh = zmCanvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          zmCtx.clearRect(0, 0, zw, zh);
+
+          var len = data.length;
+          var startSample = Math.floor((windowPos * (wfDuration - 30)) / wfDuration * len);
+          var endSample = Math.floor(((windowPos * (wfDuration - 30)) + 30) / wfDuration * len);
+          var sampleRange = endSample - startSample;
+
+          var totalBars = 30;
+          var gap = 5 * dpr;
+          var barW = (zw - gap * (totalBars - 1)) / totalBars;
+          var step = Math.ceil(sampleRange / totalBars);
+          var mid = zh / 2;
+          var barRadius = barW / 2;
+
+          var barHeights = [];
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var s = startSample + i * step;
+            var e = Math.min(s + step, endSample, len);
+            if (s >= len) break;
+            var sum = 0;
+            var count = 0;
+            for (var j = s; j < e; j++) {
+              sum += data[j] * data[j];
+              count++;
+            }
+            var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
+            var y = mid - barH / 2;
+            barHeights.push({ i: i, h: barH, x: x, y: y });
+
+            var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
+            if (i < 10) {
+              grad.addColorStop(0, '#7a8f93');
+              grad.addColorStop(1, '#6a7b80');
+            } else {
+              grad.addColorStop(0, '#00e5ff');
+              grad.addColorStop(1, '#007aad');
+            }
+            zmCtx.fillStyle = grad;
+            zmCtx.beginPath();
+            zmCtx.moveTo(x + barRadius, y);
+            zmCtx.lineTo(x + barW - barRadius, y);
+            zmCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            zmCtx.lineTo(x + barW, y + barH - barRadius);
+            zmCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            zmCtx.lineTo(x + barRadius, y + barH);
+            zmCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            zmCtx.lineTo(x, y + barRadius);
+            zmCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
+          }
+
+          var colored = barHeights.filter(function(b) { return b.i >= 10; });
+          colored.sort(function(a, b) { return b.h - a.h; });
+          var spikes = [];
+          for (var si = 0; si < colored.length && spikes.length < 3; si++) {
+            var candidate = colored[si];
+            var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
+            if (!tooClose) spikes.push(candidate);
+          }
+          window.beat1Spikes = spikes.map(function(s) { return s.i; });
+          zmCtx.shadowColor = '#00ffff';
+          zmCtx.shadowBlur = 14 * dpr;
+          spikes.forEach(function(sp) {
+            var grad2 = zmCtx.createLinearGradient(0, sp.y, 0, sp.y + sp.h);
+            grad2.addColorStop(0, '#80ffff');
+            grad2.addColorStop(1, '#33d6ff');
+            zmCtx.fillStyle = grad2;
+            zmCtx.beginPath();
+            zmCtx.moveTo(sp.x + barRadius, sp.y);
+            zmCtx.lineTo(sp.x + barW - barRadius, sp.y);
+            zmCtx.arcTo(sp.x + barW, sp.y, sp.x + barW, sp.y + barRadius, barRadius);
+            zmCtx.lineTo(sp.x + barW, sp.y + sp.h - barRadius);
+            zmCtx.arcTo(sp.x + barW, sp.y + sp.h, sp.x + barW - barRadius, sp.y + sp.h, barRadius);
+            zmCtx.lineTo(sp.x + barRadius, sp.y + sp.h);
+            zmCtx.arcTo(sp.x, sp.y + sp.h, sp.x, sp.y + sp.h - barRadius, barRadius);
+            zmCtx.lineTo(sp.x, sp.y + barRadius);
+            zmCtx.arcTo(sp.x, sp.y, sp.x + barRadius, sp.y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
+          });
+          zmCtx.shadowBlur = 0;
+
+          if (window.beat1Placements) {
+            var zWindowStart = windowPos * (wfDuration - 30);
+            var zWindowEnd = zWindowStart + 30;
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat1Placements.forEach(function(p) {
+              var px = ((p.tick - 1) / 30) * zw;
+              var pw = (p.time / 30) * zw;
+              var pr = 6 * dpr;
+              var blockH = zh * 0.6;
+              var blockY = (zh - blockH) / 2;
+              zmCtx.fillStyle = typeColors[p.type];
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
+              zmCtx.fill();
+              zmCtx.strokeStyle = typeBorders[p.type];
+              zmCtx.lineWidth = 2 * dpr;
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
+              zmCtx.stroke();
+
+              zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
+              zmCtx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
+              zmCtx.textAlign = 'center';
+              zmCtx.fillText(p.name, px + pw / 2, zh / 2 + 5 * dpr);
+            });
+          }
+
+          if (window.dragPreview && window.dragPreview.canvas === 'zoom') {
+            var dp = window.dragPreview;
+            var dpx = dp.bar * zw;
+            var dpw = (dp.time / 30) * zw;
+            var dpr2 = 6 * dpr;
+            var dpH = zh * 0.6;
+            var dpY = (zh - dpH) / 2;
+            if (dp.overlap) {
+              zmCtx.fillStyle = 'rgba(220, 40, 40, 0.35)';
+              zmCtx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
+            } else {
+              var colors = { ATTACK: 'rgba(140, 50, 200, 0.35)', DEFENSE: 'rgba(120, 120, 120, 0.35)', SKILL: 'rgba(200, 170, 50, 0.35)' };
+              zmCtx.fillStyle = colors[dp.type];
+              zmCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+            }
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
+            zmCtx.fill();
+            zmCtx.setLineDash([4 * dpr, 4 * dpr]);
+            zmCtx.lineWidth = 2 * dpr;
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
+            zmCtx.stroke();
+            zmCtx.setLineDash([]);
+          }
+        }
+
+        fetch('resources/Beat1.mp3')
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) { return audioCtx.decodeAudioData(buf); })
+          .then(function(audioBuffer) {
+            wfData = audioBuffer.getChannelData(0);
+            wfDuration = audioBuffer.duration;
+            window.beat1Buffer = audioBuffer;
+            drawWaveform(wfData);
+          });
+
+        var dragging = false;
+
+        function getCanvasX(e) {
+          var rect = wfCanvas.getBoundingClientRect();
+          var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          return (clientX - rect.left) / rect.width;
+        }
+
+        wfCanvas.style.cursor = 'pointer';
+        var snippetLocked = false;
+
+        wfCanvas.addEventListener('mousedown', function(e) {
+          if (snippetLocked) return;
+          dragging = true;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        });
+        window.addEventListener('mousemove', function(e) {
+          if (!dragging || snippetLocked) return;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        });
+        window.addEventListener('mouseup', function() { dragging = false; });
+
+        wfCanvas.addEventListener('touchstart', function(e) {
+          if (snippetLocked) return;
+          dragging = true;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        }, { passive: true });
+        window.addEventListener('touchmove', function(e) {
+          if (!dragging || snippetLocked) return;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        }, { passive: true });
+        window.addEventListener('touchend', function() { dragging = false; });
+
         var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, SUPER1: 3, SUPER2: 3, SUPER3: 3 };
 
         window.beat1Placements = [];
