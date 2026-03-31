@@ -1744,10 +1744,17 @@
         } else {
           // Convert old format to new format
           var normalized = timeline.map(function(r, t) {
+            var p1Move = r.atkMove;
+            var p2Move = r.defMove;
+            // After first tick, non-Idle moves show as CONT (continuing from previous)
+            if (t > 0) {
+              if (p1Move !== 'Idle') p1Move = 'CONT';
+              if (p2Move !== 'Idle') p2Move = 'CONT';
+            }
             return {
               tick: t + 1,
-              p1: { move: r.atkMove, anim: r.atkAnim, fromTick: r.atkMove === 'CONT' ? t : null },
-              p2: { move: r.defMove, anim: r.defAnim, fromTick: r.defMove === 'CONT' ? t : null }
+              p1: { move: p1Move, anim: r.atkAnim, fromTick: t > 0 && r.atkMove !== 'Idle' ? t : null },
+              p2: { move: p2Move, anim: r.defAnim, fromTick: t > 0 && r.defMove !== 'Idle' ? t : null }
             };
           });
           processedTimeline = applyCombatRules(normalized);
