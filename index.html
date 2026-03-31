@@ -1467,6 +1467,15 @@
         'SUPER:Idle':    'SUPER:HIT',
         'SUPER:Block':   'SUPER:DOWN',
         'SUPER:TAUNT':   'SUPER:DOWN',
+        'SUPER1:Idle':   'SUPER:HIT',
+        'SUPER1:Block':  'SUPER:DOWN',
+        'SUPER1:TAUNT':  'SUPER:DOWN',
+        'SUPER2:Idle':   'SUPER:HIT',
+        'SUPER2:Block':  'SUPER:DOWN',
+        'SUPER2:TAUNT':  'SUPER:DOWN',
+        'SUPER3:Idle':   'SUPER:HIT',
+        'SUPER3:Block':  'SUPER:DOWN',
+        'SUPER3:TAUNT':  'SUPER:DOWN',
         'TAUNT:Idle':    'TAUNT:IDLE',
         'Idle:PUNCH':    'HIT:PUNCH',
         'Idle:PUNCH+':   'HIT:PUNCH+'
@@ -1474,6 +1483,7 @@
 
       var rigAnimMap = {
         PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
+        SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super',
         HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
         SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
       };
@@ -1572,11 +1582,14 @@
         PUNCH:   ['PUNCH', 'BLOCK'],
         'PUNCH+': ['BLOCK'],
         SUPER:   ['PUNCH'],
+        SUPER1:  ['PUNCH'],
+        SUPER2:  ['PUNCH'],
+        SUPER3:  ['PUNCH'],
         BLOCK:   ['SUPER'],
         TAUNT:   ['PUNCH', 'SUPER']
       };
 
-      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
+      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50, SUPER1: 50, SUPER2: 50, SUPER3: 50 };
 
       function generateTicks(cards) {
         var ticks = [];
