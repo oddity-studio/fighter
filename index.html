@@ -1719,10 +1719,10 @@
       var debugTickInterval = null;
 
       // Format move with tick for display
-      function formatMove(entry) {
+      function formatMove(entry, tick) {
         var move = entry.move;
         var anim = entry.anim;
-        var tick = entry.tick || 1;
+        tick = tick || 1;
         
         if (move === 'CONT') {
           var fromTick = entry.fromTick || (tick - 1);
@@ -1763,6 +1763,7 @@
         }
 
         processedTimeline.forEach(function(r, i) {
+          var tick = r.tick || (i + 1);
           var p1Entry, p2Entry;
           if (roundNum === 1) {
             p1Entry = r.p1;
@@ -1772,7 +1773,7 @@
             p2Entry = r.p1;
           }
           
-          var p1Display = formatMove(p1Entry) + ':' + formatMove(p2Entry);
+          var p1Display = formatMove(p1Entry, tick) + ':' + formatMove(p2Entry, tick);
           
           var row1 = document.createElement('div');
           row1.className = 'debug-row';
