@@ -966,42 +966,6 @@
       border-color: rgba(255, 255, 255, 0.6);
     }
 
-    #ai-popup {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #ai-popup-inner {
-      background: #1a1520;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 500px;
-      width: 90vw;
-      font-family: 'Exo 2', sans-serif;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.6;
-    }
-    #ai-popup-close {
-      margin-top: 16px;
-      padding: 6px 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 6px;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-family: 'Exo 2', sans-serif;
-    }
-    #ai-popup-close:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-    }
-
     .picker-slide {
       position: absolute;
       top: 0;
@@ -1264,14 +1228,10 @@
       <canvas id="waveform-beat2"></canvas>
     </div>
     <div id="move-seq-2" class="move-sequence"></div>
-    <button id="start-btn" style="display:none">Start Battle</button>
-    <button id="ai-mode-btn" class="ai-btn" style="bottom:80px">HIT</button>
-    <button id="ai-popup-btn" class="ai-btn">AI</button>
-  </div>
-  <div id="ai-popup" style="display:none">
-    <div id="ai-popup-inner">
-      <div id="ai-popup-body"></div>
-      <button id="ai-popup-close">Close</button>
+    <div id="mode-controls" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+      <button id="ai-mode-btn" class="ai-btn" style="position:static">HIT</button>
+      <button id="ai-popup-btn" class="ai-btn" style="position:static">AI</button>
+      <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
     </div>
   </div>
   <div id="flash"></div>
@@ -3161,41 +3121,6 @@
         updateMode();
       });
       updateMode();
-
-      document.getElementById('ai-popup-btn').addEventListener('click', function() {
-        var atkCards = window.aiAtkCards;
-        var defCards = window.aiDefCards;
-        var atkMoves = [];
-        var defMoves = [];
-        atkCards.forEach(function(c) { c.moves.forEach(function(m) { atkMoves.push(m); }); });
-        defCards.forEach(function(c) { c.moves.forEach(function(m) { defMoves.push(m); }); });
-        for (var i = 1; i < atkMoves.length; i++) {
-          if (atkMoves[i] === 'PUNCH' && atkMoves[i - 1] === 'TAUNT') atkMoves[i] = 'PUNCH+';
-        }
-        for (var j = 1; j < defMoves.length; j++) {
-          if (defMoves[j] === 'PUNCH' && defMoves[j - 1] === 'TAUNT') defMoves[j] = 'PUNCH+';
-        }
-        var label = aiMode ? 'AI' : 'HIT';
-        var html = '<div style="margin-bottom:16px"><strong style="color:#00e5ff">' + label + ' ATTACKING</strong><br>';
-        html += atkCards.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
-        html += atkMoves.map(function(m) {
-          var style = m === 'PUNCH+' ? 'color:#ffcc00' : m === 'SUPER' ? 'color:#ff4444' : '';
-          return '<span style="' + style + '">' + m + '</span>';
-        }).join(' ');
-        html += '</div><div><strong style="color:#fc6c85">' + label + ' DEFENDING</strong><br>';
-        html += defCards.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
-        html += defMoves.map(function(m) {
-          var style = m === 'BLOCK' ? 'color:#aaa' : '';
-          return '<span style="' + style + '">' + m + '</span>';
-        }).join(' ');
-        html += '</div>';
-        document.getElementById('ai-popup-body').innerHTML = html;
-        document.getElementById('ai-popup').style.display = 'flex';
-      });
-
-      document.getElementById('ai-popup-close').addEventListener('click', function() {
-        document.getElementById('ai-popup').style.display = 'none';
-      });
 
       init();
     })();
