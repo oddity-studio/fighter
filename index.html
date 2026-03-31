@@ -1580,14 +1580,20 @@
       var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
 
       function generateTicks(cards) {
-        var events = buildTimedSequence(cards);
         var ticks = [];
-        var cardIdx = 0;
-        events.forEach(function(ev, eIdx) {
-          for (var i = 0; i < ev.duration; i++) {
-            ticks.push({ move: ev.move, cardStart: i === 0 && ev.move !== 'Idle', cardIdx: cardIdx });
-          }
-          if (ev.move === 'Idle') cardIdx++;
+        for (var i = 0; i < 30; i++) {
+          ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
+        }
+        var sorted = cards.slice().sort(function(a, b) { return a.pos - b.pos; });
+        sorted.forEach(function(c, cIdx) {
+          var startBar = Math.round(c.pos * 30);
+          var moves = c.moves || [];
+          moves.forEach(function(m, mIdx) {
+            var tick = startBar + mIdx;
+            if (tick >= 0 && tick < 30) {
+              ticks[tick] = { move: m, cardStart: mIdx === 0, cardIdx: cIdx, onSpike: c.onSpike && mIdx === 0 };
+            }
+          });
         });
         return ticks;
       }
@@ -1609,8 +1615,8 @@
         var lastDefMove = '';
 
         for (var t = 0; t < maxLen; t++) {
-          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1 };
-          var defTick = defTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1 };
+          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+          var defTick = defTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
           var atkMove = atkTick.move;
           var defMove = defTick.move;
 
@@ -1637,6 +1643,16 @@
           // If cancelled (multi-second), rest of that move becomes idle
           if (atkCancelled && atkMove !== 'Idle') atkMove = 'Idle';
           if (defCancelled && defMove !== 'Idle') defMove = 'Idle';
+
+          // Check spike upgrade for attacker's first PUNCH
+          if (atkTick.onSpike && atkMove === 'PUNCH') {
+            atkMove = 'PUNCH+';
+          }
+
+          // Check spike upgrade for defender's first PUNCH
+          if (defTick.onSpike && defMove === 'PUNCH') {
+            defMove = 'PUNCH+';
+          }
 
           // Check TAUNT upgrade for attacker's next PUNCH
           if (atkTauntNext && atkMove === 'PUNCH') {
