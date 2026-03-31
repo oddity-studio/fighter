@@ -954,6 +954,11 @@
       background: rgba(255, 255, 255, 0.15);
       color: #fff;
     }
+    .ai-btn.mode-on {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.6);
+    }
 
     #ai-popup {
       position: fixed;
@@ -3145,10 +3150,13 @@
       window.aiAtkCards = hitCards.slice();
       window.aiDefCards = hitCards.slice();
 
+      var hitBtn = document.getElementById('ai-mode-btn');
+      var aiBtn = document.getElementById('ai-popup-btn');
       var aiMode = false;
-      document.getElementById('ai-mode-btn').addEventListener('click', function() {
-        aiMode = !aiMode;
-        this.textContent = aiMode ? 'AI' : 'HIT';
+
+      function updateMode() {
+        hitBtn.classList.toggle('mode-on', !aiMode);
+        aiBtn.classList.toggle('mode-on', aiMode);
         if (aiMode) {
           window.aiAtkCards = aiAtk.slice();
           window.aiDefCards = aiDef.slice();
@@ -3156,7 +3164,17 @@
           window.aiAtkCards = hitCards.slice();
           window.aiDefCards = hitCards.slice();
         }
+      }
+
+      hitBtn.addEventListener('click', function() {
+        aiMode = false;
+        updateMode();
       });
+      aiBtn.addEventListener('click', function() {
+        aiMode = true;
+        updateMode();
+      });
+      updateMode();
 
       document.getElementById('ai-popup-btn').addEventListener('click', function() {
         var atkCards = window.aiAtkCards;
