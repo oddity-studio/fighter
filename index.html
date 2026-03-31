@@ -2170,15 +2170,9 @@
         var defTicks = generateTicks(window.aiDefCards);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Prepend intro ticks (10s Idle for attacker, 10s Idle for defender)
+        // Prepend intro ticks (single Idle for attacker and defender)
         var fullTimeline = [];
-        for (var i = 0; i < 10; i++) {
-          var atkMove = (i === 0) ? 'Idle' : 'CONT';
-          var defMove = (i === 0) ? 'Idle' : 'CONT';
-          var atkAnim = (i === 0) ? 'Idle' : 'Idle';
-          var defAnim = (i === 0) ? 'Idle' : 'Idle';
-          fullTimeline.push({ atkMove: atkMove, defMove: defMove, atkAnim: atkAnim, defAnim: defAnim });
-        }
+        fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
         combat.forEach(function(r) { fullTimeline.push(r); });
 
         // Show debug panels immediately
@@ -2230,13 +2224,7 @@
             var defTicks2 = generateTicks(shiftedDefCards2);
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
-            for (var ii = 0; ii < 10; ii++) {
-              var atkMove = (ii === 0) ? 'Idle' : 'CONT';
-              var defMove = (ii === 0) ? 'Idle' : 'CONT';
-              var atkAnim = (ii === 0) ? 'Idle' : 'Idle';
-              var defAnim = (ii === 0) ? 'Idle' : 'Idle';
-              fullTimeline2.push({ atkMove: atkMove, defMove: defMove, atkAnim: atkAnim, defAnim: defAnim });
-            }
+            fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
             combat2.forEach(function(r) { fullTimeline2.push(r); });
             showDebugTimeline(fullTimeline2.slice(0, 30), 2);
 
