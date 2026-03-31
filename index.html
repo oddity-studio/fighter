@@ -900,6 +900,11 @@
     #debug-p1 .debug-row.active .dm { color: #00e5ff; }
     #debug-p2 .debug-row.active { background: rgba(252, 108, 133, 0.15); }
     #debug-p2 .debug-row.active .dm { color: #fc6c85; }
+    .debug-row.hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .debug-row.hover .dm { color: #fff; }
+    .debug-row.hover .da { color: rgba(255, 255, 255, 0.7); }
 
     .move-sequence {
       position: relative;
@@ -1730,13 +1735,35 @@
           var row1 = document.createElement('div');
           row1.className = 'debug-row';
           row1.id = 'p1-' + i;
+          row1.dataset.idx = i;
           row1.innerHTML = '<span class="dm">' + p1m + '</span><span class="da">' + p1a + '</span>';
+          row1.addEventListener('mouseenter', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+            var idx = this.dataset.idx;
+            this.classList.add('hover');
+            var other = document.getElementById('p2-' + idx);
+            if (other) other.classList.add('hover');
+          });
+          row1.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+          });
           p1List.appendChild(row1);
 
           var row2 = document.createElement('div');
           row2.className = 'debug-row';
           row2.id = 'p2-' + i;
+          row2.dataset.idx = i;
           row2.innerHTML = '<span class="dm">' + p2m + '</span><span class="da">' + p2a + '</span>';
+          row2.addEventListener('mouseenter', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+            var idx = this.dataset.idx;
+            this.classList.add('hover');
+            var other = document.getElementById('p1-' + idx);
+            if (other) other.classList.add('hover');
+          });
+          row2.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
+          });
           p2List.appendChild(row2);
         });
 
