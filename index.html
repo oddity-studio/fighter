@@ -2183,33 +2183,26 @@
         var defTicks = generateTicks(window.aiDefCards);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Prepend intro ticks (3s Idle + 7s Taunt for attacker, 10s Idle for defender)
+        // Prepend intro ticks (10s Idle for attacker, 10s Idle for defender)
         var fullTimeline = [];
-        for (var i = 0; i < 3; i++) {
-          fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
-        }
-        for (var j = 0; j < 7; j++) {
-          fullTimeline.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+        for (var i = 0; i < 10; i++) {
+          var atkMove = (i === 0) ? 'Idle' : 'CONT';
+          var defMove = (i === 0) ? 'Idle' : 'CONT';
+          var atkAnim = (i === 0) ? 'Idle' : 'Idle';
+          var defAnim = (i === 0) ? 'Idle' : 'Idle';
+          fullTimeline.push({ atkMove: atkMove, defMove: defMove, atkAnim: atkAnim, defAnim: defAnim });
         }
         combat.forEach(function(r) { fullTimeline.push(r); });
 
         // Show debug panels immediately
         showDebugTimeline(fullTimeline.slice(0, 30), 1);
 
-        // 10s intro: attacker idles 3s then taunts 7s, defender idles
+        // 10s intro: both players idle
         maxx.state.setAnimation(0, 'Idle', true);
         hammer.state.setAnimation(0, 'Idle', true);
-        var tauntInterval;
-        setTimeout(function() {
-          tauntInterval = setInterval(function() {
-            maxx.state.setAnimation(0, 'Taunt', false);
-            maxx.state.addAnimation(0, 'Taunt', false, 0);
-          }, 2000);
-        }, 3000);
 
         // After 10s intro, play sequences
         setTimeout(function() {
-          clearInterval(tauntInterval);
           var atkCards = getSortedCards(window.beat1Placements);
           var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
           var atkTicks = generateTicks(shiftedAtkCards);
@@ -2250,29 +2243,22 @@
             var defTicks2 = generateTicks(shiftedDefCards2);
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
-            for (var ii = 0; ii < 3; ii++) {
-              fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
-            }
-            for (var jj = 0; jj < 7; jj++) {
-              fullTimeline2.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+            for (var ii = 0; ii < 10; ii++) {
+              var atkMove = (ii === 0) ? 'Idle' : 'CONT';
+              var defMove = (ii === 0) ? 'Idle' : 'CONT';
+              var atkAnim = (ii === 0) ? 'Idle' : 'Idle';
+              var defAnim = (ii === 0) ? 'Idle' : 'Idle';
+              fullTimeline2.push({ atkMove: atkMove, defMove: defMove, atkAnim: atkAnim, defAnim: defAnim });
             }
             combat2.forEach(function(r) { fullTimeline2.push(r); });
             showDebugTimeline(fullTimeline2.slice(0, 30), 2);
 
-            // 10s intro: attacker idles 3s then taunts 7s, defender idles
+            // 10s intro: both players idle
             hammer.state.setAnimation(0, 'Idle', true);
             maxx.state.setAnimation(0, 'Idle', true);
-            var tauntInterval2;
-            setTimeout(function() {
-              tauntInterval2 = setInterval(function() {
-                hammer.state.setAnimation(0, 'Taunt', false);
-                hammer.state.addAnimation(0, 'Taunt', false, 0);
-              }, 2000);
-            }, 3000);
 
             // After 10s intro, play sequences
             setTimeout(function() {
-              clearInterval(tauntInterval2);
               var atkTicks = generateTicks(window.aiAtkCards);
               var defCards = getSortedCards(window.beat2Placements);
               var shiftedDefCards = defCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
