@@ -2923,14 +2923,15 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
-            var overflows = snappedBar + dragCard.time / 30 > 1;
-            var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
+            var visualBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
+            var placedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
+            var overflows = placedBar + dragCard.time / 30 > 1;
+            var restricted = placedBar < 10 / 30 && dragCard.type !== 'SKILL';
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / 30;
-              return snappedBar < pEnd && snappedBar + dragCard.time / 30 > p.pos;
+              return placedBar < pEnd && placedBar + dragCard.time / 30 > p.pos;
             });
-            window.dragPreview = { canvas: 'zoom', bar: snappedBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
+            window.dragPreview = { canvas: 'zoom', bar: visualBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
             window.redrawWaveforms();
           } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
                      e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
@@ -2969,18 +2970,18 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
-            var overflows = snappedBar + dragCard.time / 30 > 1;
-            var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
+            var placedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
+            var overflows = placedBar + dragCard.time / 30 > 1;
+            var restricted = placedBar < 10 / 30 && dragCard.type !== 'SKILL';
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.pos + p.time / 30;
-              return snappedBar < pEnd && snappedBar + dragCard.time / 30 > p.pos;
+              return placedBar < pEnd && placedBar + dragCard.time / 30 > p.pos;
             });
             if (!overlaps) {
-              var barIndex = Math.round(snappedBar * 30);
+              var barIndex = Math.round(placedBar * 30);
               var onSpike = window.beat1Spikes && window.beat1Spikes.indexOf(barIndex) !== -1;
               var isFirst = window.beat1Placements.length === 0;
-              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: snappedBar, moves: dragCard.moves, onSpike: onSpike });
+              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, pos: placedBar, moves: dragCard.moves, onSpike: onSpike });
               window.redrawWaveforms();
               if (isFirst) window.lockSnippet();
               dropped = true;
