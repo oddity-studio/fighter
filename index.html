@@ -1485,6 +1485,13 @@
         });
         return ticks;
       }
+
+      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove) {
+        var key = atkMove + ':' + defMove;
+        if (animLookup[key]) {
+          var parts = animLookup[key].split(':');
+          return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
+        }
         // SUPER interrupted at specific tick
         if (atkInterrupted && atkMove === 'SUPER' && atkTickInMove < superInterruptAnims.length) {
           return { atk: superInterruptAnims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
