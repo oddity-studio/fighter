@@ -1610,13 +1610,13 @@
           if (atkBlocked) atkMove = 'Idle';
           if (defBlocked) defMove = 'Idle';
 
-          // Track tick within move
-          if (atkMove === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; lastAtkMove = atkMove; }
-          if (defMove === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; lastDefMove = defMove; }
+          // Track tick within move (before cancellation changes move to Idle)
+          if (atkTick.move === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; lastAtkMove = atkTick.move; }
+          if (defTick.move === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; lastDefMove = defTick.move; }
 
-          // Reset cancelled flag when move changes (within same card)
-          if (t > 0 && atkMove !== (atkTicks[t - 1] || { move: 'Idle' }).move) atkCancelled = false;
-          if (t > 0 && defMove !== (defTicks[t - 1] || { move: 'Idle' }).move) defCancelled = false;
+          // If cancelled (multi-second), rest of that move becomes idle
+          if (atkCancelled && atkMove !== 'Idle') atkMove = 'Idle';
+          if (defCancelled && defMove !== 'Idle') defMove = 'Idle';
 
           // Check TAUNT upgrade for attacker's next PUNCH
           if (atkTauntNext && atkMove === 'PUNCH') {
