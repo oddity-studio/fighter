@@ -779,8 +779,14 @@
     .card-img {
       width: 100%;
       aspect-ratio: 1;
-      background: rgba(255, 255, 255, 0.1);
       border-radius: 6px;
+      overflow: hidden;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .card-name {
@@ -2864,11 +2870,25 @@
         var dragCard = null;
         var dragEl = null;
 
+        var cardImages = {
+          'Hit': 'hit',
+          'Triple Hit': 'triple_hit',
+          'Sucker Punch': 'sucker_punch',
+          'Power Glove': 'power_glove',
+          'Doom': 'doom',
+          'Deflect': 'deflect',
+          'Turtle': 'turtle',
+          'Smartass': 'smartass',
+          'Wait Your Moment': 'wait_your_moment',
+          'Boost Morale': 'boost_morale'
+        };
+
         function createCardEl(c) {
+          var imgFile = cardImages[c.name] || 'hit';
           var el = document.createElement('div');
           el.className = 'card type-' + c.type;
           el.innerHTML =
-            '<div class="card-img"></div>' +
+            '<div class="card-img"><img src="resources/cards/' + imgFile + '.webp" alt="' + c.name + '"></div>' +
             '<div class="card-name">' + c.name + '</div>' +
             '<div class="card-type">' + c.type + '</div>' +
             '<div class="card-time">' + c.time + 's</div>' +
