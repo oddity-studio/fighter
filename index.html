@@ -1708,18 +1708,17 @@
         return results;
       }
 
-      function playCombat(atkChar, defChar, combatResults, roundNum) {
-        var idx = 0;
-        var lastAtkAnim = '';
-        var lastDefAnim = '';
-        document.getElementById('debug-boxes').style.display = 'flex';
+      var debugTickInterval = null;
 
-        // Build full debug lists
+      function showDebugTimeline(timeline, roundNum) {
+        if (debugTickInterval) clearInterval(debugTickInterval);
         var p1List = document.getElementById('debug-p1-list');
         var p2List = document.getElementById('debug-p2-list');
         p1List.innerHTML = '';
         p2List.innerHTML = '';
-        combatResults.forEach(function(r, i) {
+        document.getElementById('debug-boxes').style.display = 'flex';
+
+        timeline.forEach(function(r, i) {
           var p1m, p1a, p2m, p2a;
           if (roundNum === 1) {
             p1m = r.atkMove; p1a = r.atkAnim;
@@ -1741,26 +1740,39 @@
           p2List.appendChild(row2);
         });
 
-        var combatInterval = setInterval(function() {
-          if (idx >= combatResults.length) {
-            clearInterval(combatInterval);
+        var tickIdx = 0;
+        debugTickInterval = setInterval(function() {
+          if (tickIdx >= timeline.length) {
+            clearInterval(debugTickInterval);
             document.getElementById('debug-boxes').style.display = 'none';
             return;
           }
-          var r = combatResults[idx];
-
-          // Highlight current row and scroll to it
-          var prevIdx = idx - 1;
-          if (prevIdx >= 0) {
-            var prev1 = document.getElementById('p1-' + prevIdx);
-            var prev2 = document.getElementById('p2-' + prevIdx);
-            if (prev1) prev1.classList.remove('active');
-            if (prev2) prev2.classList.remove('active');
+          var prev = tickIdx - 1;
+          if (prev >= 0) {
+            var p1 = document.getElementById('p1-' + prev);
+            var p2 = document.getElementById('p2-' + prev);
+            if (p1) p1.classList.remove('active');
+            if (p2) p2.classList.remove('active');
           }
-          var cur1 = document.getElementById('p1-' + idx);
-          var cur2 = document.getElementById('p2-' + idx);
-          if (cur1) { cur1.classList.add('active'); cur1.scrollIntoView({ block: 'nearest' }); }
-          if (cur2) { cur2.classList.add('active'); cur2.scrollIntoView({ block: 'nearest' }); }
+          var c1 = document.getElementById('p1-' + tickIdx);
+          var c2 = document.getElementById('p2-' + tickIdx);
+          if (c1) { c1.classList.add('active'); c1.scrollIntoView({ block: 'nearest' }); }
+          if (c2) { c2.classList.add('active'); c2.scrollIntoView({ block: 'nearest' }); }
+          tickIdx++;
+        }, 1000);
+      }
+
+      function playCombat(atkChar, defChar, combatResults, roundNum) {
+        var idx = 0;
+        var lastAtkAnim = '';
+        var lastDefAnim = '';
+
+        var combatInterval = setInterval(function() {
+          if (idx >= combatResults.length) {
+            clearInterval(combatInterval);
+            return;
+          }
+          var r = combatResults[idx];
 
           if (r.atkAnim !== lastAtkAnim) {
             atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
@@ -2091,6 +2103,25 @@
 
         showRoundCaption('round1-overlay', 1000);
 
+        // Build full round timeline for debug
+        var atkCards = getSortedCards(window.beat1Placements);
+        var atkTicks = generateTicks(atkCards);
+        var defTicks = generateTicks(window.aiDefCards);
+        var combat = processCombat(atkTicks, defTicks, 1);
+
+        // Prepend intro ticks (3s Idle + 7s Taunt for attacker, 10s Idle for defender)
+        var fullTimeline = [];
+        for (var i = 0; i < 3; i++) {
+          fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
+        }
+        for (var j = 0; j < 7; j++) {
+          fullTimeline.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+        }
+        combat.forEach(function(r) { fullTimeline.push(r); });
+
+        // Show debug panels immediately
+        showDebugTimeline(fullTimeline, 1);
+
         // 10s intro: attacker idles 3s then taunts 7s, defender idles
         maxx.state.setAnimation(0, 'Idle', true);
         hammer.state.setAnimation(0, 'Idle', true);
@@ -2136,6 +2167,21 @@
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
+
+            // Build full round timeline for debug
+            var atkTicks2 = generateTicks(window.aiAtkCards);
+            var defCards2 = getSortedCards(window.beat2Placements);
+            var defTicks2 = generateTicks(defCards2);
+            var combat2 = processCombat(atkTicks2, defTicks2, 2);
+            var fullTimeline2 = [];
+            for (var ii = 0; ii < 3; ii++) {
+              fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
+            }
+            for (var jj = 0; jj < 7; jj++) {
+              fullTimeline2.push({ atkMove: 'Taunt', defMove: 'Idle', atkAnim: 'Taunt', defAnim: 'Idle' });
+            }
+            combat2.forEach(function(r) { fullTimeline2.push(r); });
+            showDebugTimeline(fullTimeline2, 2);
 
             // 10s intro: attacker idles 3s then taunts 7s, defender idles
             hammer.state.setAnimation(0, 'Idle', true);
