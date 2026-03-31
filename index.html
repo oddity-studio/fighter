@@ -2930,7 +2930,7 @@
             var snappedTick2 = Math.max(1, Math.min(30, Math.round(localPos2 * 30) + 1));
             var snappedBar2 = snappedTick2 / 30;
             var overflows2 = snappedTick2 + dragCard.time > 30;
-            var restricted2 = snappedTick2 < 10 && dragCard.type !== 'SKILL';
+            var restricted2 = snappedTick2 < 11 && dragCard.type !== 'SKILL';
             var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
               var pEnd2 = p.tick + p.time;
               return snappedTick2 < pEnd2 && snappedTick2 + dragCard.time > p.tick;
