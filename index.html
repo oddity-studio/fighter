@@ -1446,7 +1446,7 @@
         character.state.addListener(listener);
       }
 
-      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt' };
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super' };
 
       function playSequence(character, moves, idx) {
         if (idx >= moves.length) return;
@@ -1456,48 +1456,35 @@
         });
       }
 
-      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2 };
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, SUPER1: 3, SUPER2: 3, SUPER3: 3 };
 
-      // Animation lookup: atkMove:defMove → atkAnim:defAnim
-      var animLookup = {
-        'PUNCH:Idle':    'PUNCH:HIT',
-        'PUNCH:TAUNT':   'PUNCH:HIT',
-        'PUNCH:SUPER':   'PUNCH:HIT',
-        'PUNCH:PUNCH':   'PARRY:PARRY',
-        'PUNCH+:Idle':   'PUNCH+:HIT',
-        'PUNCH+:Block':  'PUNCH+:HIT',
-        'PUNCH+:PUNCH':  'PUNCH+:HIT',
-        'PUNCH+:TAUNT':  'PUNCH+:HIT',
-        'PUNCH+:SUPER':  'PUNCH+:HIT',
-        'PUNCH+:PUNCH+': 'PARRY:PARRY',
-        'BLOCK:Idle':    'BLOCK:IDLE',
-        'BLOCK:TAUNT':   'BLOCK:TAUNT',
-        'BLOCK:PUNCH':   'DEFLECT:PUNCH',
-        'BLOCK:PUNCH+':  'HIT:PUNCH+',
-        'BLOCK:SUPER':   'DOWN:SUPER',
-        'SUPER:Idle':    'SUPER:HIT',
-        'SUPER:Block':   'SUPER:DOWN',
-        'SUPER:TAUNT':   'SUPER:DOWN',
-        'TAUNT:Idle':    'TAUNT:IDLE',
-        'Idle:PUNCH':    'HIT:PUNCH',
-        'Idle:PUNCH+':   'HIT:PUNCH+'
-      };
-
-      // Map from our names to actual Spine rig animation names
-      var rigAnimMap = {
-        PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
-        HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
-        SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
-      };
-
-      var superInterruptAnims = ['Parry', 'SuperInt', 'SuperInt2'];
-
-      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove) {
-        var key = atkMove + ':' + defMove;
-        if (animLookup[key]) {
-          var parts = animLookup[key].split(':');
-          return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
+      function generateTicks(cards) {
+        var ticks = [];
+        for (var i = 0; i < 30; i++) {
+          ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
         }
+        var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
+        sorted.forEach(function(c, cIdx) {
+          var startIdx = c.tick - 1;
+          var moves = c.moves || [];
+          var moveIdx = 0;
+          moves.forEach(function(m) {
+            var dur = moveDurations[m] || 1;
+            for (var d = 0; d < dur; d++) {
+              var idx = startIdx + moveIdx;
+              if (idx >= 0 && idx < 30) {
+                var expandedMove = m;
+                if (dur > 1) {
+                  expandedMove = m + (d + 1);
+                }
+                ticks[idx] = { move: expandedMove, cardStart: d === 0, cardIdx: cIdx, onSpike: c.onSpike && d === 0 };
+              }
+              moveIdx++;
+            }
+          });
+        });
+        return ticks;
+      }
         // SUPER interrupted at specific tick
         if (atkInterrupted && atkMove === 'SUPER' && atkTickInMove < superInterruptAnims.length) {
           return { atk: superInterruptAnims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
@@ -2578,12 +2565,19 @@
           var moves = [];
           sorted.forEach(function(p) {
             if (p.moves) {
-              p.moves.forEach(function(m, idx) {
-                if (m === 'PUNCH' && p.onSpike && idx === 0) {
-                  moves.push('PUNCH+');
-                } else {
-                  moves.push(m);
+              var moveIdx = 0;
+              p.moves.forEach(function(m) {
+                var dur = moveDurations[m] || 1;
+                for (var d = 0; d < dur; d++) {
+                  if (m === 'PUNCH' && p.onSpike && d === 0) {
+                    moves.push('PUNCH+');
+                  } else if (dur > 1) {
+                    moves.push(m + (d + 1));
+                  } else {
+                    moves.push(m);
+                  }
                 }
+                moveIdx++;
               });
             }
           });
