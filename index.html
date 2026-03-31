@@ -2962,8 +2962,8 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedTick = Math.max(0, Math.min(29, Math.round(localPos * 30)));
-            var restricted = snappedTick < 10 && dragCard.type !== 'SKILL';
+            var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
+            var restricted = snappedTick < 11 && dragCard.type !== 'SKILL';
             var overflows = snappedTick + dragCard.time > 30;
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
               var pEnd = p.tick + p.time;
