@@ -1790,7 +1790,7 @@
           }
 
           // Defender's animation
-          if (defIsSuper1) {
+          if (defIsSuper) {
             if (defSuperInterrupted) {
               defAnim = 'Hit';
             } else {
@@ -2518,7 +2518,7 @@
 
           var totalBars = 30;
           var gap = 5 * dpr;
-          var barW = (zw - gap * (totalBars - 1)) / totalBars;
+          var barW = Math.max(2 * dpr, (zw - gap * (totalBars - 1)) / totalBars);
           var step = Math.ceil(sampleRange / totalBars);
           var mid = zh / 2;
           var barRadius = barW / 2;
@@ -2768,7 +2768,7 @@
 
           var totalBars = 30;
           var gap = 5 * dpr;
-          var barW = (w - gap * (totalBars - 1)) / totalBars;
+          var barW = Math.max(2 * dpr, (w - gap * (totalBars - 1)) / totalBars);
           var step = Math.ceil(sampleRange / totalBars);
           var mid = h / 2;
           var barRadius = barW / 2;
