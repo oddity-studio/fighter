@@ -1565,10 +1565,16 @@
         var results = [];
         var atkTauntNext = false;
         var defTauntNext = false;
+        var atkCancelled = false;
+        var defCancelled = false;
 
         for (var t = 0; t < maxLen; t++) {
           var atkMove = atkTicks[t] || 'Idle';
           var defMove = defTicks[t] || 'Idle';
+
+          // Reset cancelled flag when move changes
+          if (t > 0 && atkMove !== atkTicks[t - 1]) atkCancelled = false;
+          if (t > 0 && defMove !== defTicks[t - 1]) defCancelled = false;
 
           // Check TAUNT upgrade for attacker's next PUNCH
           if (atkTauntNext && atkMove === 'PUNCH') {
@@ -1587,17 +1593,19 @@
             defMove = 'PUNCH+';
           }
 
-          var atkInterrupted = false;
-          var defInterrupted = false;
+          var atkInterrupted = atkCancelled;
+          var defInterrupted = defCancelled;
 
           // Check if attacker gets interrupted by defender
-          if (atkMove !== 'Idle' && interruptMap[atkMove]) {
+          if (!atkInterrupted && atkMove !== 'Idle' && interruptMap[atkMove]) {
             atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
+            if (atkInterrupted && moveDurations[atkMove] > 1) atkCancelled = true;
           }
 
           // Check if defender gets interrupted by attacker
-          if (defMove !== 'Idle' && interruptMap[defMove]) {
+          if (!defInterrupted && defMove !== 'Idle' && interruptMap[defMove]) {
             defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
+            if (defInterrupted && moveDurations[defMove] > 1) defCancelled = true;
           }
 
           // Determine animations
