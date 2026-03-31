@@ -2521,7 +2521,16 @@
               zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
               zmCtx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
               zmCtx.textAlign = 'center';
-              zmCtx.fillText(p.name, px + pw / 2, zh / 2 + 5 * dpr);
+              var nameParts = p.name.split(' ');
+              if (nameParts.length > 1) {
+                zmCtx.fillText(nameParts[0], px + pw / 2, zh / 2 - 5 * dpr);
+                zmCtx.fillText(nameParts.slice(1).join(' '), px + pw / 2, zh / 2 + 12 * dpr);
+              } else if (p.name.length > 6) {
+                zmCtx.fillText(p.name.substring(0, 6), px + pw / 2, zh / 2 - 5 * dpr);
+                zmCtx.fillText(p.name.substring(6), px + pw / 2, zh / 2 + 12 * dpr);
+              } else {
+                zmCtx.fillText(p.name, px + pw / 2, zh / 2 + 5 * dpr);
+              }
             });
           }
 
@@ -2766,7 +2775,16 @@
               b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
               b2Ctx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
               b2Ctx.textAlign = 'center';
-              b2Ctx.fillText(p.name, px + pw / 2, h / 2 + 5 * dpr);
+              var nameParts = p.name.split(' ');
+              if (nameParts.length > 1) {
+                b2Ctx.fillText(nameParts[0], px + pw / 2, h / 2 - 5 * dpr);
+                b2Ctx.fillText(nameParts.slice(1).join(' '), px + pw / 2, h / 2 + 12 * dpr);
+              } else if (p.name.length > 6) {
+                b2Ctx.fillText(p.name.substring(0, 6), px + pw / 2, h / 2 - 5 * dpr);
+                b2Ctx.fillText(p.name.substring(6), px + pw / 2, h / 2 + 12 * dpr);
+              } else {
+                b2Ctx.fillText(p.name, px + pw / 2, h / 2 + 5 * dpr);
+              }
             });
           }
 
