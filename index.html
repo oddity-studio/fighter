@@ -1287,7 +1287,7 @@
     </div>
   </div>
 
-  <div id="debug-boxes" style="display:none">
+  <div id="debug-boxes">
     <div id="debug-p1" class="debug-panel">
       <div class="debug-panel-title">P1</div>
       <div class="debug-panel-list" id="debug-p1-list"></div>
@@ -2336,6 +2336,7 @@
         fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
         combat.forEach(function(r) { fullTimeline.push(r); });
 
+        document.getElementById('debug-boxes').style.display = 'flex';
         showDebugTimeline(fullTimeline.slice(0, 30), 1);
       };
 
@@ -2639,7 +2640,7 @@
       var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 1, TAUNT: 1, CONT: 1 };
 
         window.beat1Placements = [];
-        window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); if (document.getElementById('debug-boxes').style.display !== 'none') { window.updateDebugTimeline(); } };
+        window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); var db = document.getElementById('debug-boxes'); var visible = db.style.display !== 'none'; if (!visible) try { visible = getComputedStyle(db).display !== 'none'; } catch(e) {} if (visible) { window.updateDebugTimeline(); } };
 
         window.updateMoveSeq = function(elId, placements) {
           var el = document.getElementById(elId);
