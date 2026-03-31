@@ -1544,12 +1544,14 @@
           var parts = animLookup[key].split(':');
           return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
         }
-        // SUPER interrupted at specific tick
-        if (atkInterrupted && atkMove === 'SUPER' && atkTickInMove < superInterruptAnims.length) {
-          return { atk: superInterruptAnims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
+        // SUPER1/2/3 interrupted at specific tick
+        if (atkInterrupted && atkMove.match(/^SUPER[123]$/)) {
+          var tickToAnim = { SUPER1: 'Hit', SUPER2: 'SuperInt', SUPER3: 'SuperInt2' };
+          return { atk: tickToAnim[atkMove], def: moveAnimMap[defMove] || defMove };
         }
-        if (defInterrupted && defMove === 'SUPER' && defTickInMove < superInterruptAnims.length) {
-          return { atk: moveAnimMap[atkMove] || atkMove, def: superInterruptAnims[defTickInMove] };
+        if (defInterrupted && defMove.match(/^SUPER[123]$/)) {
+          var tickToAnim = { SUPER1: 'Hit', SUPER2: 'SuperInt', SUPER3: 'SuperInt2' };
+          return { atk: moveAnimMap[atkMove] || atkMove, def: tickToAnim[defMove] };
         }
         // Fallback
         return {
@@ -1706,7 +1708,8 @@
           // Check if attacker gets interrupted by defender
           if (!atkInterrupted && atkMove !== 'Idle' && interruptMap[atkMove]) {
             atkInterrupted = interruptMap[atkMove].indexOf(defMove) !== -1;
-            if (atkInterrupted && moveDurations[atkMove] > 1) atkCancelled = true;
+            // Don't set atkCancelled for SUPER1/2/3 - let rest of move play
+            if (atkInterrupted && moveDurations[atkMove] > 1 && !atkMove.match(/^SUPER[123]$/)) atkCancelled = true;
             // If PUNCH is blocked, cancel rest of card
             if (atkInterrupted && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
               atkBlocked = true;
@@ -1716,7 +1719,8 @@
           // Check if defender gets interrupted by attacker
           if (!defInterrupted && defMove !== 'Idle' && interruptMap[defMove]) {
             defInterrupted = interruptMap[defMove].indexOf(atkMove) !== -1;
-            if (defInterrupted && moveDurations[defMove] > 1) defCancelled = true;
+            // Don't set defCancelled for SUPER1/2/3 - let rest of move play
+            if (defInterrupted && moveDurations[defMove] > 1 && !defMove.match(/^SUPER[123]$/)) defCancelled = true;
             // If PUNCH is blocked, cancel rest of card
             if (defInterrupted && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
               defBlocked = true;
