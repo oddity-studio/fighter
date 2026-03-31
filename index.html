@@ -1569,17 +1569,81 @@
         }, ev.duration * 1000);
       }
 
-      // ===== COMBAT SYSTEM =====
-      var interruptMap = {
-        PUNCH:   ['PUNCH', 'BLOCK'],
-        'PUNCH+': ['BLOCK'],
-        SUPER:   ['PUNCH'],
-        CONT:    ['PUNCH'],
-        TAUNT:   ['PUNCH', 'SUPER'],
-        BLOCK:   ['SUPER']
-      };
+      // ===== COMBAT RULES =====
+      // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
+      // null means no change, 'REMOVE' means set to idle
+      var combatRules = [
+        // PUNCH vs BLOCK -> Defender deflects
+        [['PUNCH', 'BLOCK'], { defAnim: 'Deflect' }],
+        [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
+        
+        // PUNCH vs PUNCH -> Both parry
+        [['PUNCH', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Parry' }],
+        [['PUNCH+', 'PUNCH+'], { atkAnim: 'Parry', defAnim: 'Parry' }],
+        [['PUNCH', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Parry' }],
+        [['PUNCH+', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Hit' }],
+        
+        // TAUNT vs any attack
+        [['TAUNT', 'PUNCH'], { atkAnim: 'Hit' }],
+        [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
+        [['TAUNT', 'SUPER'], { atkAnim: 'Hit' }],
+        
+        // SUPER vs PUNCH/PUNCH+ -> SUPER interrupted
+        [['SUPER', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'Hit' }],
+        [['SUPER', 'PUNCH+'], { atkMove: 'Idle', atkAnim: 'Hit' }],
+        [['PUNCH', 'SUPER'], { defMove: 'Idle', defAnim: 'Hit' }],
+        [['PUNCH+', 'SUPER'], { defMove: 'Idle', defAnim: 'Hit' }],
+        
+        // BLOCK vs SUPER -> defender down
+        [['BLOCK', 'SUPER'], { defAnim: 'Down' }],
+        [['SUPER', 'BLOCK'], { atkAnim: 'Down' }],
+        
+        // CONT follows the animation of previous move
+      ];
 
-      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
+      // Apply rules to timeline
+      function applyCombatRules(timeline) {
+        var result = [];
+        
+        for (var t = 0; t < timeline.length; t++) {
+          var entry = timeline[t];
+          var newEntry = { 
+            tick: t + 1,
+            p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick },
+            p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick }
+          };
+          
+          // Find matching rule
+          for (var r = 0; r < combatRules.length; r++) {
+            var rule = combatRules[r];
+            var moves = rule[0];
+            if (moves[0] === entry.p1.move && moves[1] === entry.p2.move) {
+              var changes = rule[1];
+              if (changes.atkMove) newEntry.p1.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
+              if (changes.atkAnim) newEntry.p1.anim = changes.atkAnim;
+              if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
+              if (changes.defAnim) newEntry.p2.anim = changes.defAnim;
+              break;
+            }
+          }
+          
+          // Handle CONT - follows previous animation
+          if (newEntry.p1.move === 'CONT' && t > 0) {
+            newEntry.p1.anim = result[t-1].p1.anim;
+          }
+          if (newEntry.p2.move === 'CONT' && t > 0) {
+            newEntry.p2.anim = result[t-1].p2.anim;
+          }
+          
+          // IDLE default animation
+          if (newEntry.p1.move === 'Idle') newEntry.p1.anim = 'Idle';
+          if (newEntry.p2.move === 'Idle') newEntry.p2.anim = 'Idle';
+          
+          result.push(newEntry);
+        }
+        
+        return result;
+      }
 
       function generateTicks(cards) {
         var ticks = [];
@@ -1604,147 +1668,65 @@
       }
 
       function processCombat(atkTicks, defTicks, roundNum) {
-        var maxLen = Math.max(atkTicks.length, defTicks.length);
-        var results = [];
-        var atkTauntNext = false;
-        var defTauntNext = false;
-        var atkBlocked = false;
-        var defBlocked = false;
-        var lastAtkCardIdx = -1;
-        var lastDefCardIdx = -1;
-        var atkSuperInterrupted = false;
-        var defSuperInterrupted = false;
-
-        for (var t = 0; t < maxLen; t++) {
-          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
-          var defTick = defTicks[t] || { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
-          var atkMove = atkTick.move;
-          var defMove = defTick.move;
-
-          // Reset when new card starts
-          if (atkTick.cardStart && atkTick.cardIdx !== lastAtkCardIdx) {
-            atkBlocked = false;
-            atkSuperInterrupted = false;
-            lastAtkCardIdx = atkTick.cardIdx;
+        // Create initial timeline
+        var timeline = [];
+        for (var t = 0; t < 30; t++) {
+          var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false };
+          var defTick = defTicks[t] || { move: 'Idle', cardStart: false };
+          
+          // Determine animations based on moves
+          var atkAnim = rigAnimMap[atkTick.move] || 'Idle';
+          var defAnim = rigAnimMap[defTick.move] || 'Idle';
+          
+          // CONT gets animation from previous tick later
+          var fromTick = null;
+          if (atkTick.move === 'CONT' && t > 0) {
+            atkAnim = 'CONT';
+            fromTick = t;
           }
-          if (defTick.cardStart && defTick.cardIdx !== lastDefCardIdx) {
-            defBlocked = false;
-            defSuperInterrupted = false;
-            lastDefCardIdx = defTick.cardIdx;
+          if (defTick.move === 'CONT' && t > 0) {
+            defAnim = 'CONT';
           }
-
-          // If blocked, entire rest of card is idle
-          if (atkBlocked) atkMove = 'Idle';
-          if (defBlocked) defMove = 'Idle';
-
-          // Determine if moves are SUPER or CONT, and if they get interrupted
-          var atkIsSuper = atkMove === 'SUPER';
-          var atkIsCont = atkMove === 'CONT';
-          var defIsSuper = defMove === 'SUPER';
-          var defIsCont = defMove === 'CONT';
-
-          var atkInterruptBy = (defMove === 'PUNCH' || defMove === 'PUNCH+' || defMove === 'SUPER' || defIsSuper);
-          var defInterruptBy = (atkMove === 'PUNCH' || atkMove === 'PUNCH+' || atkMove === 'SUPER' || atkIsSuper);
-
-          // Check if SUPER gets interrupted this tick
-          if ((atkIsSuper || atkIsCont) && atkInterruptBy && !atkSuperInterrupted) {
-            atkSuperInterrupted = true;
-          }
-          if ((defIsSuper || defIsCont) && defInterruptBy && !defSuperInterrupted) {
-            defSuperInterrupted = true;
-          }
-
-          // After SUPER was interrupted, remaining CONT ticks become idle
-          if (atkSuperInterrupted && (atkIsSuper || atkIsCont)) {
-            atkMove = 'Idle';
-          }
-          if (defSuperInterrupted && (defIsSuper || defIsCont)) {
-            defMove = 'Idle';
-          }
-
-          // Determine animations
-          var atkAnim, defAnim, atkDamage, defDamage;
-
-          // Attacker's animation
-          if (atkIsSuper) {
-            if (atkSuperInterrupted) {
-              atkAnim = 'Hit';
-            } else {
-              atkAnim = 'Super';
-            }
-            atkDamage = 0;
-          } else if (atkIsCont) {
-            if (atkSuperInterrupted) {
-              atkAnim = 'Hit';
-            } else {
-              atkAnim = 'Cont';
-            }
-            atkDamage = 0;
-          } else {
-            // Normal move
-            var atkKey = atkMove + ':' + defMove;
-            if (animLookup[atkKey]) {
-              var parts = animLookup[atkKey].split(':');
-              atkAnim = rigAnimMap[parts[0]] || parts[0];
-            } else {
-              atkAnim = rigAnimMap[atkMove] || atkMove;
-            }
-            atkDamage = damageMap[atkMove] || 0;
-            if (atkInterruptBy) atkDamage = 0;
-          }
-
-          // Defender's animation
-          if (defIsSuper) {
-            if (defSuperInterrupted) {
-              defAnim = 'Hit';
-            } else {
-              defAnim = 'Super';
-            }
-            defDamage = 0;
-          } else if (defIsCont) {
-            if (defSuperInterrupted) {
-              defAnim = 'Hit';
-            } else {
-              defAnim = 'Cont';
-            }
-            defDamage = 0;
-          } else {
-            var defKey = atkMove + ':' + defMove;
-            if (animLookup[defKey]) {
-              var parts = animLookup[defKey].split(':');
-              defAnim = rigAnimMap[parts[1]] || parts[1];
-            } else {
-              defAnim = rigAnimMap[defMove] || defMove;
-            }
-            defDamage = damageMap[defMove] || 0;
-            if (defInterruptBy) defDamage = 0;
-          }
-
-          // If PUNCH is blocked, cancel rest of card
-          if (atkInterruptBy && (atkMove === 'PUNCH' || atkMove === 'PUNCH+') && defMove === 'BLOCK') {
-            atkBlocked = true;
-          }
-          if (defInterruptBy && (defMove === 'PUNCH' || defMove === 'PUNCH+') && atkMove === 'BLOCK') {
-            defBlocked = true;
-          }
-
-          // Check spike upgrade
-          if (atkTick.onSpike && atkMove === 'PUNCH') { atkMove = 'PUNCH+'; atkAnim = 'Punch+'; atkDamage = 25; }
-          if (defTick.onSpike && defMove === 'PUNCH') { defMove = 'PUNCH+'; defAnim = 'Punch+'; defDamage = 25; }
-
-          // Check TAUNT upgrade
-          if (atkTauntNext && atkMove === 'PUNCH') { atkMove = 'PUNCH+'; atkAnim = 'Punch+'; atkDamage = 25; atkTauntNext = false; }
-          if (defTauntNext && defMove === 'PUNCH') { defMove = 'PUNCH+'; defAnim = 'Punch+'; defDamage = 25; defTauntNext = false; }
-          if (atkMove === 'TAUNT') atkTauntNext = true;
-          if (defMove === 'TAUNT') defTauntNext = true;
-
-          results.push({ atkMove: atkMove, defMove: defMove, atkAnim: atkAnim, defAnim: defAnim, atkDamage: atkDamage, defDamage: defDamage });
+          
+          timeline.push({
+            p1: { move: atkTick.move, anim: atkAnim, fromTick: fromTick },
+            p2: { move: defTick.move, anim: defAnim, fromTick: null }
+          });
         }
-
+        
+        // Apply combat rules
+        var finalTimeline = applyCombatRules(timeline);
+        
+        // Convert to old format for now
+        var results = [];
+        for (var i = 0; i < finalTimeline.length; i++) {
+          results.push({
+            atkMove: finalTimeline[i].p1.move,
+            defMove: finalTimeline[i].p2.move,
+            atkAnim: finalTimeline[i].p1.anim,
+            defAnim: finalTimeline[i].p2.anim,
+            atkDamage: 0,
+            defDamage: 0
+          });
+        }
+        
         return results;
       }
 
       var debugTickInterval = null;
+
+      // Format move with tick for display
+      function formatMove(entry) {
+        var move = entry.move;
+        var anim = entry.anim;
+        var tick = entry.tick || 1;
+        
+        if (move === 'CONT') {
+          var fromTick = entry.fromTick || (tick - 1);
+          return 'CONT(' + tick + ',' + fromTick + ')';
+        }
+        return move + '(' + tick + ',' + anim + ')';
+      }
 
       function showDebugTimeline(timeline, roundNum) {
         if (debugTickInterval) clearInterval(debugTickInterval);
@@ -1754,20 +1736,39 @@
         p2List.innerHTML = '';
         document.getElementById('debug-boxes').style.display = 'flex';
 
-        timeline.forEach(function(r, i) {
-          var p1m, p1a, p2m, p2a;
+        // Normalize timeline to new format if needed
+        var processedTimeline;
+        if (timeline[0] && timeline[0].p1) {
+          processedTimeline = applyCombatRules(timeline);
+        } else {
+          // Convert old format to new format
+          var normalized = timeline.map(function(r, t) {
+            return {
+              tick: t + 1,
+              p1: { move: r.atkMove, anim: r.atkAnim, fromTick: r.atkMove === 'CONT' ? t : null },
+              p2: { move: r.defMove, anim: r.defAnim, fromTick: r.defMove === 'CONT' ? t : null }
+            };
+          });
+          processedTimeline = applyCombatRules(normalized);
+        }
+
+        processedTimeline.forEach(function(r, i) {
+          var p1Entry, p2Entry;
           if (roundNum === 1) {
-            p1m = r.atkMove; p1a = r.atkAnim;
-            p2m = r.defMove; p2a = r.defAnim;
+            p1Entry = r.p1;
+            p2Entry = r.p2;
           } else {
-            p1m = r.defMove; p1a = r.defAnim;
-            p2m = r.atkMove; p2a = r.atkAnim;
+            p1Entry = r.p2;
+            p2Entry = r.p1;
           }
+          
+          var p1Display = formatMove(p1Entry) + ':' + formatMove(p2Entry);
+          
           var row1 = document.createElement('div');
           row1.className = 'debug-row';
           row1.id = 'p1-' + i;
           row1.dataset.idx = i;
-          row1.innerHTML = '<span class="dm">' + p1m + '</span><span class="da">' + p1a + '</span>';
+          row1.innerHTML = '<span class="dm">' + p1Display + '</span>';
           row1.addEventListener('mouseenter', function() {
             document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
             var idx = this.dataset.idx;
@@ -1784,7 +1785,7 @@
           row2.className = 'debug-row';
           row2.id = 'p2-' + i;
           row2.dataset.idx = i;
-          row2.innerHTML = '<span class="dm">' + p2m + '</span><span class="da">' + p2a + '</span>';
+          row2.innerHTML = '<span class="dm">' + p1Display.split(':')[1] + '</span>';
           row2.addEventListener('mouseenter', function() {
             document.querySelectorAll('.debug-row.hover').forEach(function(el) { el.classList.remove('hover'); });
             var idx = this.dataset.idx;
