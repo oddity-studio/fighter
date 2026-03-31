@@ -1254,6 +1254,7 @@
     </div>
     <div id="move-seq-2" class="move-sequence"></div>
     <button id="start-btn" style="display:none">Start Battle</button>
+    <button id="ai-mode-btn" class="ai-btn" style="bottom:80px">HIT</button>
     <button id="ai-popup-btn" class="ai-btn">AI</button>
   </div>
   <div id="ai-popup" style="display:none">
@@ -3137,24 +3138,48 @@
 
       var aiAtk = generateAttacking();
       var aiDef = generateDefending();
-      window.aiAtkCards = [];
-      window.aiDefCards = [];
+      var hitCards = [];
       for (var i = 0; i < 14; i++) {
-        window.aiAtkCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
-        window.aiDefCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
+        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] });
       }
+      window.aiAtkCards = hitCards.slice();
+      window.aiDefCards = hitCards.slice();
+
+      var aiMode = false;
+      document.getElementById('ai-mode-btn').addEventListener('click', function() {
+        aiMode = !aiMode;
+        this.textContent = aiMode ? 'AI' : 'HIT';
+        if (aiMode) {
+          window.aiAtkCards = aiAtk.slice();
+          window.aiDefCards = aiDef.slice();
+        } else {
+          window.aiAtkCards = hitCards.slice();
+          window.aiDefCards = hitCards.slice();
+        }
+      });
 
       document.getElementById('ai-popup-btn').addEventListener('click', function() {
-        var atkMoves = processMoves(aiAtk);
-        var defMoves = processMoves(aiDef);
-        var html = '<div style="margin-bottom:16px"><strong style="color:#00e5ff">AI ATTACKING</strong><br>';
-        html += aiAtk.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
+        var atkCards = window.aiAtkCards;
+        var defCards = window.aiDefCards;
+        var atkMoves = [];
+        var defMoves = [];
+        atkCards.forEach(function(c) { c.moves.forEach(function(m) { atkMoves.push(m); }); });
+        defCards.forEach(function(c) { c.moves.forEach(function(m) { defMoves.push(m); }); });
+        for (var i = 1; i < atkMoves.length; i++) {
+          if (atkMoves[i] === 'PUNCH' && atkMoves[i - 1] === 'TAUNT') atkMoves[i] = 'PUNCH+';
+        }
+        for (var j = 1; j < defMoves.length; j++) {
+          if (defMoves[j] === 'PUNCH' && defMoves[j - 1] === 'TAUNT') defMoves[j] = 'PUNCH+';
+        }
+        var label = aiMode ? 'AI' : 'HIT';
+        var html = '<div style="margin-bottom:16px"><strong style="color:#00e5ff">' + label + ' ATTACKING</strong><br>';
+        html += atkCards.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
         html += atkMoves.map(function(m) {
           var style = m === 'PUNCH+' ? 'color:#ffcc00' : m === 'SUPER' ? 'color:#ff4444' : '';
           return '<span style="' + style + '">' + m + '</span>';
         }).join(' ');
-        html += '</div><div><strong style="color:#fc6c85">AI DEFENDING</strong><br>';
-        html += aiDef.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
+        html += '</div><div><strong style="color:#fc6c85">' + label + ' DEFENDING</strong><br>';
+        html += defCards.map(function(c) { return c.name; }).join(' → ') + '<br><br>';
         html += defMoves.map(function(m) {
           var style = m === 'BLOCK' ? 'color:#aaa' : '';
           return '<span style="' + style + '">' + m + '</span>';
