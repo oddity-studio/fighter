@@ -1757,15 +1757,14 @@
           }
 
           // SUPER interrupted: remaining SUPER ticks (same card) become idle
+          // If SUPER1 was interrupted, both SUPER2 and SUPER3 become idle
           if (atkSuperInterruptedTick > 0 && atkTick.cardIdx === lastAtkCardIdx) {
-            var currentSuperTick = atkMove.match(/^SUPER(\d)$/);
-            if (currentSuperTick && parseInt(currentSuperTick[1]) > atkSuperInterruptedTick) {
+            if (atkMove.match(/^SUPER[123]$/)) {
               atkMove = 'Idle';
             }
           }
           if (defSuperInterruptedTick > 0 && defTick.cardIdx === lastDefCardIdx) {
-            var currentSuperTick = defMove.match(/^SUPER(\d)$/);
-            if (currentSuperTick && parseInt(currentSuperTick[1]) > defSuperInterruptedTick) {
+            if (defMove.match(/^SUPER[123]$/)) {
               defMove = 'Idle';
             }
           }
