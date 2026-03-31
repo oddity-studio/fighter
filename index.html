@@ -1446,7 +1446,7 @@
         character.state.addListener(listener);
       }
 
-      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super', TAUNT1: 'Taunt', TAUNT2: 'Taunt', CONT: 'SuperInt' };
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', CONT: 'SuperInt' };
 
       var animLookup = {
         'PUNCH:Idle':    'PUNCH:HIT',
@@ -1467,32 +1467,19 @@
         'SUPER:Idle':    'SUPER:HIT',
         'SUPER:Block':   'SUPER:DOWN',
         'SUPER:TAUNT':   'SUPER:DOWN',
-        'SUPER1:Idle':   'SUPER:HIT',
-        'SUPER1:Block':  'SUPER:DOWN',
-        'SUPER1:TAUNT':  'SUPER:DOWN',
-        'SUPER2:Idle':   'SUPER:HIT',
-        'SUPER2:Block':  'SUPER:DOWN',
-        'SUPER2:TAUNT':  'SUPER:DOWN',
-        'SUPER3:Idle':   'SUPER:HIT',
-        'SUPER3:Block':  'SUPER:DOWN',
-        'SUPER3:TAUNT':  'SUPER:DOWN',
+        'CONT:Idle':     'CONT:HIT',
+        'CONT:Block':    'CONT:HIT',
+        'CONT:TAUNT':    'CONT:HIT',
+        'CONT:PUNCH':    'CONT:HIT',
         'TAUNT:Idle':    'TAUNT:IDLE',
         'TAUNT:PUNCH':   'TAUNT:HIT',
         'TAUNT:SUPER':   'TAUNT:HIT',
-        'TAUNT1:Idle':   'TAUNT:IDLE',
-        'TAUNT1:PUNCH':  'TAUNT:HIT',
-        'TAUNT1:SUPER':  'TAUNT:HIT',
-        'TAUNT2:Idle':   'TAUNT:IDLE',
-        'TAUNT2:PUNCH':  'TAUNT:HIT',
-        'TAUNT2:SUPER':  'TAUNT:HIT',
         'Idle:PUNCH':    'HIT:PUNCH',
         'Idle:PUNCH+':   'HIT:PUNCH+'
       };
 
       var rigAnimMap = {
-        PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt',
-        SUPER1: 'Super', SUPER2: 'Super', SUPER3: 'Super',
-        TAUNT1: 'Taunt', TAUNT2: 'Taunt', CONT: 'SuperInt',
+        PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', CONT: 'SuperInt',
         HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
         SUPERINT: 'SuperInt', SUPERINT2: 'SuperInt2'
       };
@@ -1507,7 +1494,7 @@
         });
       }
 
-      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, SUPER1: 3, SUPER2: 3, SUPER3: 3 };
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, CONT: 1 };
 
       function generateTicks(cards) {
         var ticks = [];
@@ -1525,11 +1512,12 @@
             for (var d = 0; d < dur; d++) {
               var idx = startIdx + moveIdx;
               if (idx >= 0 && idx < 30) {
-                var expandedMove = m;
-                if (dur > 1) {
-                  expandedMove = m + (d + 1);
+                var tickMove = m;
+                // If duration > 1, first tick is the move, rest are CONT
+                if (d > 0) {
+                  tickMove = 'CONT';
                 }
-                ticks[idx] = { move: expandedMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
+                ticks[idx] = { move: tickMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
               }
               moveIdx++;
             }
@@ -1594,16 +1582,12 @@
         PUNCH:   ['PUNCH', 'BLOCK'],
         'PUNCH+': ['BLOCK'],
         SUPER:   ['PUNCH'],
-        SUPER1:  ['PUNCH'],
-        SUPER2:  ['PUNCH'],
-        SUPER3:  ['PUNCH'],
+        CONT:    ['PUNCH'],
         TAUNT:   ['PUNCH', 'SUPER'],
-        TAUNT1:  ['PUNCH', 'SUPER'],
-        TAUNT2:  ['PUNCH', 'SUPER'],
         BLOCK:   ['SUPER']
       };
 
-      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50, SUPER1: 50, SUPER2: 50, SUPER3: 50 };
+      var damageMap = { PUNCH: 10, 'PUNCH+': 25, SUPER: 50 };
 
       function generateTicks(cards) {
         var ticks = [];
@@ -1621,11 +1605,11 @@
             for (var d = 0; d < dur; d++) {
               var idx = startIdx + moveIdx;
               if (idx >= 0 && idx < 30) {
-                var expandedMove = m;
-                if (dur > 1) {
-                  expandedMove = m + (d + 1);
+                var tickMove = m;
+                if (d > 0) {
+                  tickMove = 'CONT';
                 }
-                ticks[idx] = { move: expandedMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
+                ticks[idx] = { move: tickMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
               }
               moveIdx++;
             }
@@ -1668,28 +1652,28 @@
           if (atkBlocked) atkMove = 'Idle';
           if (defBlocked) defMove = 'Idle';
 
-          // Determine if moves are SUPER and get interrupted
-          var atkIsSuper1 = atkMove === 'SUPER1';
-          var atkIsSuperCont = atkMove === 'SUPER2' || atkMove === 'SUPER3';
-          var defIsSuper1 = defMove === 'SUPER1';
-          var defIsSuperCont = defMove === 'SUPER2' || defMove === 'SUPER3';
+          // Determine if moves are SUPER or CONT, and if they get interrupted
+          var atkIsSuper = atkMove === 'SUPER';
+          var atkIsCont = atkMove === 'CONT';
+          var defIsSuper = defMove === 'SUPER';
+          var defIsCont = defMove === 'CONT';
 
-          var atkInterruptBy = (defMove === 'PUNCH' || defMove === 'PUNCH+' || defMove === 'SUPER' || defIsSuper1);
-          var defInterruptBy = (atkMove === 'PUNCH' || atkMove === 'PUNCH+' || atkMove === 'SUPER' || atkIsSuper1);
+          var atkInterruptBy = (defMove === 'PUNCH' || defMove === 'PUNCH+' || defMove === 'SUPER' || defIsSuper);
+          var defInterruptBy = (atkMove === 'PUNCH' || atkMove === 'PUNCH+' || atkMove === 'SUPER' || atkIsSuper);
 
           // Check if SUPER gets interrupted this tick
-          if ((atkIsSuper1 || atkIsSuperCont) && atkInterruptBy && !atkSuperInterrupted) {
+          if ((atkIsSuper || atkIsCont) && atkInterruptBy && !atkSuperInterrupted) {
             atkSuperInterrupted = true;
           }
-          if ((defIsSuper1 || defIsSuperCont) && defInterruptBy && !defSuperInterrupted) {
+          if ((defIsSuper || defIsCont) && defInterruptBy && !defSuperInterrupted) {
             defSuperInterrupted = true;
           }
 
-          // After SUPER was interrupted, remaining SUPER ticks become idle
-          if (atkSuperInterrupted && (atkIsSuper1 || atkIsSuperCont)) {
+          // After SUPER was interrupted, remaining CONT ticks become idle
+          if (atkSuperInterrupted && (atkIsSuper || atkIsCont)) {
             atkMove = 'Idle';
           }
-          if (defSuperInterrupted && (defIsSuper1 || defIsSuperCont)) {
+          if (defSuperInterrupted && (defIsSuper || defIsCont)) {
             defMove = 'Idle';
           }
 
@@ -1697,18 +1681,18 @@
           var atkAnim, defAnim, atkDamage, defDamage;
 
           // Attacker's animation
-          if (atkIsSuper1) {
+          if (atkIsSuper) {
             if (atkSuperInterrupted) {
               atkAnim = 'Hit';
             } else {
               atkAnim = 'Super';
             }
             atkDamage = 0;
-          } else if (atkIsSuperCont) {
+          } else if (atkIsCont) {
             if (atkSuperInterrupted) {
               atkAnim = 'Hit';
             } else {
-              atkAnim = 'Cont'; // Continue previous animation
+              atkAnim = 'Cont';
             }
             atkDamage = 0;
           } else {
@@ -2642,7 +2626,7 @@
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
 
-        var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, SUPER1: 3, SUPER2: 3, SUPER3: 3 };
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 3, TAUNT: 2, CONT: 1 };
 
         window.beat1Placements = [];
         window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); };
@@ -2653,19 +2637,17 @@
           var moves = [];
           sorted.forEach(function(p) {
             if (p.moves) {
-              var moveIdx = 0;
               p.moves.forEach(function(m) {
                 var dur = moveDurations[m] || 1;
                 for (var d = 0; d < dur; d++) {
                   if (m === 'PUNCH' && p.onSpike && d === 0) {
                     moves.push('PUNCH+');
-                  } else if (dur > 1) {
-                    moves.push(m + (d + 1));
+                  } else if (d > 0) {
+                    moves.push('CONT');
                   } else {
                     moves.push(m);
                   }
                 }
-                moveIdx++;
               });
             }
           });
