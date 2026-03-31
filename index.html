@@ -2412,28 +2412,6 @@
             wfCtx.stroke();
           }
 
-          if (window.beat1Placements) {
-            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
-            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
-            window.beat1Placements.forEach(function(p) {
-              var px = ((p.tick - 1) / 30) * w;
-              var pw = (p.time / 30) * w;
-              var pr = 6 * dpr;
-              wfCtx.fillStyle = typeColors[p.type];
-              roundRect(wfCtx, px, 0, pw, h, pr);
-              wfCtx.fill();
-              wfCtx.strokeStyle = typeBorders[p.type];
-              wfCtx.lineWidth = 2 * dpr;
-              roundRect(wfCtx, px, 0, pw, h, pr);
-              wfCtx.stroke();
-
-              wfCtx.fillStyle = 'rgba(255,255,255,0.9)';
-              wfCtx.font = 'bold ' + (10 * dpr) + 'px "Exo 2", sans-serif';
-              wfCtx.textAlign = 'center';
-              wfCtx.fillText(p.name, px + pw / 2, h / 2 + 4 * dpr);
-            });
-          }
-
           drawZoom(data);
         }
 
