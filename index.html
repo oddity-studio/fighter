@@ -2923,7 +2923,7 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
+            var snappedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
             var overflows = snappedBar + dragCard.time / 30 > 1;
             var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
@@ -2969,7 +2969,7 @@
           if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
               e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
             var localPos = (e.clientX - zmRect.left) / zmRect.width;
-            var snappedBar = Math.max(0, Math.min(29, Math.round(localPos * 30))) / 30;
+            var snappedBar = Math.max(10, Math.min(29, Math.round(localPos * 20) + 10)) / 30;
             var overflows = snappedBar + dragCard.time / 30 > 1;
             var restricted = snappedBar < 10 / 30 && dragCard.type !== 'SKILL';
             var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
