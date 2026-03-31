@@ -1612,10 +1612,20 @@
         sorted.forEach(function(c, cIdx) {
           var startIdx = c.tick - 1;
           var moves = c.moves || [];
-          moves.forEach(function(m, mIdx) {
-            var idx = startIdx + mIdx;
-            if (idx >= 0 && idx < 30) {
-              ticks[idx] = { move: m, cardStart: mIdx === 0, cardIdx: cIdx, onSpike: c.onSpike && mIdx === 0 };
+          var moveIdx = 0;
+          moves.forEach(function(m) {
+            var dur = moveDurations[m] || 1;
+            var isFirstMoveOfCard = (moveIdx === 0);
+            for (var d = 0; d < dur; d++) {
+              var idx = startIdx + moveIdx;
+              if (idx >= 0 && idx < 30) {
+                var expandedMove = m;
+                if (dur > 1) {
+                  expandedMove = m + (d + 1);
+                }
+                ticks[idx] = { move: expandedMove, cardStart: isFirstMoveOfCard && d === 0, cardIdx: cIdx, onSpike: c.onSpike && isFirstMoveOfCard && d === 0 };
+              }
+              moveIdx++;
             }
           });
         });
