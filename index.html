@@ -1611,8 +1611,8 @@
           if (defBlocked) defMove = 'Idle';
 
           // Track tick within move (before cancellation changes move to Idle)
-          if (atkTick.move === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; lastAtkMove = atkTick.move; }
-          if (defTick.move === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; lastDefMove = defTick.move; }
+          if (atkTick.move === lastAtkMove) { atkTickInMove++; } else { atkTickInMove = 0; atkCancelled = false; lastAtkMove = atkTick.move; }
+          if (defTick.move === lastDefMove) { defTickInMove++; } else { defTickInMove = 0; defCancelled = false; lastDefMove = defTick.move; }
 
           // If cancelled (multi-second), rest of that move becomes idle
           if (atkCancelled && atkMove !== 'Idle') atkMove = 'Idle';
