@@ -1502,6 +1502,8 @@
           ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
         }
         var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
+        
+        // First, place all moves from cards
         sorted.forEach(function(c, cIdx) {
           var startIdx = c.tick - 1;
           var moves = c.moves || [];
@@ -1513,7 +1515,6 @@
               var idx = startIdx + moveIdx;
               if (idx >= 0 && idx < 30) {
                 var tickMove = m;
-                // If duration > 1, first tick is the move, rest are CONT
                 if (d > 0) {
                   tickMove = 'CONT';
                 }
@@ -1523,6 +1524,45 @@
             }
           });
         });
+        
+        // Then, fill in Idle after each card ends, then CONT until next card
+        var lastEndIdx = -1;
+        sorted.forEach(function(c) {
+          var cardStartIdx = c.tick - 1;
+          var cardEndIdx = cardStartIdx;
+          if (c.moves) {
+            c.moves.forEach(function(m) {
+              cardEndIdx += (moveDurations[m] || 1);
+            });
+          }
+          
+          // Fill idle after this card ends
+          if (cardEndIdx < 30) {
+            // First idle after card
+            if (cardEndIdx !== lastEndIdx + 1 || lastEndIdx === -1) {
+              ticks[cardEndIdx] = { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+            }
+            // CONT for rest until next card
+            for (var i = cardEndIdx + 1; i < 30; i++) {
+              // Check if next card starts here
+              var nextCardStarts = sorted.some(function(nextC) {
+                var nextStart = nextC.tick - 1;
+                var nextEnd = nextStart;
+                if (nextC.moves) {
+                  nextC.moves.forEach(function(nm) {
+                    nextEnd += (moveDurations[nm] || 1);
+                  });
+                }
+                return nextStart === i;
+              });
+              if (!nextCardStarts) {
+                ticks[i] = { move: 'CONT', cardStart: false, cardIdx: -1, onSpike: false };
+              }
+            }
+          }
+          lastEndIdx = cardEndIdx;
+        });
+        
         return ticks;
       }
 
@@ -1595,6 +1635,8 @@
           ticks.push({ move: 'Idle', cardStart: false, cardIdx: -1 });
         }
         var sorted = cards.slice().sort(function(a, b) { return a.tick - b.tick; });
+        
+        // First, place all moves from cards
         sorted.forEach(function(c, cIdx) {
           var startIdx = c.tick - 1;
           var moves = c.moves || [];
@@ -1615,6 +1657,45 @@
             }
           });
         });
+        
+        // Then, fill in Idle after each card ends, then CONT until next card
+        var lastEndIdx = -1;
+        sorted.forEach(function(c) {
+          var cardStartIdx = c.tick - 1;
+          var cardEndIdx = cardStartIdx;
+          if (c.moves) {
+            c.moves.forEach(function(m) {
+              cardEndIdx += (moveDurations[m] || 1);
+            });
+          }
+          
+          // Fill idle after this card ends
+          if (cardEndIdx < 30) {
+            // First idle after card
+            if (cardEndIdx !== lastEndIdx + 1 || lastEndIdx === -1) {
+              ticks[cardEndIdx] = { move: 'Idle', cardStart: false, cardIdx: -1, onSpike: false };
+            }
+            // CONT for rest until next card
+            for (var i = cardEndIdx + 1; i < 30; i++) {
+              // Check if next card starts here
+              var nextCardStarts = sorted.some(function(nextC) {
+                var nextStart = nextC.tick - 1;
+                var nextEnd = nextStart;
+                if (nextC.moves) {
+                  nextC.moves.forEach(function(nm) {
+                    nextEnd += (moveDurations[nm] || 1);
+                  });
+                }
+                return nextStart === i;
+              });
+              if (!nextCardStarts) {
+                ticks[i] = { move: 'CONT', cardStart: false, cardIdx: -1, onSpike: false };
+              }
+            }
+          }
+          lastEndIdx = cardEndIdx;
+        });
+        
         return ticks;
       }
 
