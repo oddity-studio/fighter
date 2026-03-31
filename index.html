@@ -2308,19 +2308,26 @@
       document.getElementById('start-btn').addEventListener('click', startBattle);
 
       document.getElementById('debug-btn').addEventListener('click', function() {
-        if (!window.beat1Placements || window.beat1Placements.length === 0) return;
+        var debugBoxes = document.getElementById('debug-boxes');
+        var isVisible = debugBoxes.style.display !== 'none';
         
-        var atkCards = getSortedCards(window.beat1Placements);
-        var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
-        var atkTicks = generateTicks(shiftedAtkCards);
-        var defTicks = generateTicks(window.aiDefCards || []);
-        var combat = processCombat(atkTicks, defTicks, 1);
+        if (isVisible) {
+          debugBoxes.style.display = 'none';
+        } else {
+          if (!window.beat1Placements || window.beat1Placements.length === 0) return;
+          
+          var atkCards = getSortedCards(window.beat1Placements);
+          var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
+          var atkTicks = generateTicks(shiftedAtkCards);
+          var defTicks = generateTicks(window.aiDefCards || []);
+          var combat = processCombat(atkTicks, defTicks, 1);
 
-        var fullTimeline = [];
-        fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
-        combat.forEach(function(r) { fullTimeline.push(r); });
+          var fullTimeline = [];
+          fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
+          combat.forEach(function(r) { fullTimeline.push(r); });
 
-        showDebugTimeline(fullTimeline.slice(0, 30), 1);
+          showDebugTimeline(fullTimeline.slice(0, 30), 1);
+        }
       });
 
       (function() {
