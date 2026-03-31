@@ -2508,7 +2508,7 @@
               var px = ((p.tick - 1) / 30) * zw;
               var pw = (p.time / 30) * zw;
               var pr = 6 * dpr;
-              var blockH = zh * 0.6;
+              var blockH = zh * 0.8;
               var blockY = (zh - blockH) / 2;
               zmCtx.fillStyle = typeColors[p.type];
               window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
@@ -2519,7 +2519,7 @@
               zmCtx.stroke();
 
               zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
-              zmCtx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
+              zmCtx.font = 'bold ' + (14 * dpr) + 'px "Exo 2", sans-serif';
               zmCtx.textAlign = 'center';
               var nameParts = p.name.split(' ');
               if (nameParts.length > 1) {
@@ -2762,7 +2762,7 @@
               var px = ((p.tick - 1) / 30) * w;
               var pw = (p.time / 30) * w;
               var pr = 6 * dpr;
-              var blockH = h * 0.6;
+              var blockH = h * 0.8;
               var blockY = (h - blockH) / 2;
               b2Ctx.fillStyle = typeColors[p.type];
               window.roundRect(b2Ctx, px, blockY, pw, blockH, pr);
@@ -2773,7 +2773,7 @@
               b2Ctx.stroke();
 
               b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
-              b2Ctx.font = 'bold ' + (12 * dpr) + 'px "Exo 2", sans-serif';
+              b2Ctx.font = 'bold ' + (14 * dpr) + 'px "Exo 2", sans-serif';
               b2Ctx.textAlign = 'center';
               var nameParts = p.name.split(' ');
               if (nameParts.length > 1) {
