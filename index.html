@@ -1808,27 +1808,6 @@
           });
           p2List.appendChild(row2);
         });
-
-        var tickIdx = 0;
-        debugTickInterval = setInterval(function() {
-          if (tickIdx >= timeline.length) {
-            clearInterval(debugTickInterval);
-            document.getElementById('debug-boxes').style.display = 'none';
-            return;
-          }
-          var prev = tickIdx - 1;
-          if (prev >= 0) {
-            var p1 = document.getElementById('p1-' + prev);
-            var p2 = document.getElementById('p2-' + prev);
-            if (p1) p1.classList.remove('active');
-            if (p2) p2.classList.remove('active');
-          }
-          var c1 = document.getElementById('p1-' + tickIdx);
-          var c2 = document.getElementById('p2-' + tickIdx);
-          if (c1) { c1.classList.add('active'); c1.scrollIntoView({ block: 'nearest' }); }
-          if (c2) { c2.classList.add('active'); c2.scrollIntoView({ block: 'nearest' }); }
-          tickIdx++;
-        }, 1000);
       }
 
       function playCombat(atkChar, defChar, combatResults, roundNum) {
