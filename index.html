@@ -2731,8 +2731,8 @@
           var moves = [];
           sorted.forEach(function(p) {
             if (p.moves) {
-              p.moves.forEach(function(m) {
-                if (m === 'PUNCH' && p.onSpike) {
+              p.moves.forEach(function(m, idx) {
+                if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
                 } else if (m !== 'IDLE' && m !== 'CONT') {
                   moves.push(m);
