@@ -2448,7 +2448,6 @@
         var combat = processCombat(atkTicks, defTicks, 1);
 
         // Timeline shows actual battle ticks (10-30 range where cards placed)
-        // Add offset so tick numbers match card slot positions
         var fullTimeline = [];
         for (var t = 0; t < combat.length; t++) {
           fullTimeline.push({
