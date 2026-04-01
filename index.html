@@ -1826,24 +1826,21 @@
           });
           // Apply rules BEFORE converting to CONT, so Idle changes are preserved
           var afterRules = applyCombatRules(normalized);
-          // Now convert to CONT format - first entry stays Idle, others become CONT if they were Idle
+          // Now convert to CONT format - first stays Idle, all others become CONT
           normalized = afterRules.map(function(r, t) {
             var newP1 = Object.assign({}, r.p1);
             var newP2 = Object.assign({}, r.p2);
-            // First entry stays as IDLE
+            // First entry stays as IDLE, all others become CONT
             if (t === 0) {
-              if (newP1.move === 'Idle') newP1.anim = 'Idle';
-              if (newP2.move === 'Idle') newP2.anim = 'Idle';
+              newP1.move = 'Idle';
+              newP1.anim = 'Idle';
+              newP2.move = 'Idle';
+              newP2.anim = 'Idle';
             } else {
-              // Only convert to CONT if original was Idle
-              if (r.originalMove === 'Idle') {
-                newP1.move = 'CONT';
-                newP1.fromTick = r.tick - 1;
-              }
-              if (r.originalMove === 'Idle') {
-                newP2.move = 'CONT';
-                newP2.fromTick = r.tick - 1;
-              }
+              newP1.move = 'CONT';
+              newP1.fromTick = r.tick - 1;
+              newP2.move = 'CONT';
+              newP2.fromTick = r.tick - 1;
             }
             return { tick: r.tick, p1: newP1, p2: newP2 };
           });
