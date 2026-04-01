@@ -1838,13 +1838,13 @@
               p1Origin = r.tick;
             } else if (t > 0 && r.originalMove === 'Idle') {
               newP1.move = 'CONT';
-              newP1.fromTick = p1Origin;
+              newP1.fromTick = p1Origin || 1; // Default to tick 1 if no non-Idle move
             }
             if (r.p2.move !== 'Idle') {
               p2Origin = r.tick;
             } else if (t > 0 && r.originalMove === 'Idle') {
               newP2.move = 'CONT';
-              newP2.fromTick = p2Origin;
+              newP2.fromTick = p2Origin || 1;
             }
             return { tick: r.tick, p1: newP1, p2: newP2 };
           });
