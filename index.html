@@ -1550,7 +1550,6 @@
           moves.forEach(function(m, idx) {
             var move = m;
             if (m === 'PUNCH' && c.onSpike && idx === 0) move = 'PUNCH+';
-            if (move === 'PUNCH' && events.length > 0 && events[events.length - 1].move === 'TAUNT') move = 'PUNCH+';
             events.push({ move: move, duration: moveDurations[move] || 1 });
           });
           events.push({ move: 'Idle', duration: c.downtime || 1 });
@@ -3191,9 +3190,6 @@
       function processMoves(cards) {
         var moves = [];
         cards.forEach(function(c) { c.moves.forEach(function(m) { moves.push(m); }); });
-        for (var i = 1; i < moves.length; i++) {
-          if (moves[i] === 'PUNCH' && moves[i - 1] === 'TAUNT') moves[i] = 'PUNCH+';
-        }
         return moves;
       }
 
