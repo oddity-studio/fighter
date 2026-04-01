@@ -1584,12 +1584,12 @@
         [['PUNCH+', 'PUNCH+'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         
         // PUNCH vs IDLE -> PUNCH hits, deals 10% damage
-        [['PUNCH', 'Idle'], { atkAnim: 'Hit', defAnim: 'Hit', atkDamage: 10 }],
-        [['PUNCH+', 'Idle'], { atkAnim: 'Hit', defAnim: 'Hit', atkDamage: 20 }],
+        [['PUNCH', 'Idle'], { atkAnim: 'Punch', defAnim: 'Hit', atkDamage: 10 }],
+        [['PUNCH+', 'Idle'], { atkAnim: 'Punch+', defAnim: 'Hit', atkDamage: 20 }],
         
         // PUNCH vs TAUNT -> PUNCH hits, TAUNT gets hit and goes idle
-        [['PUNCH', 'TAUNT'], { atkAnim: 'Hit', defMove: 'Idle', defAnim: 'Hit' }],
-        [['PUNCH+', 'TAUNT'], { atkAnim: 'Hit', defMove: 'Idle', defAnim: 'Hit', atkDamage: 15 }],
+        [['PUNCH', 'TAUNT'], { atkAnim: 'Punch', defMove: 'Idle', defAnim: 'Hit' }],
+        [['PUNCH+', 'TAUNT'], { atkAnim: 'Punch+', defMove: 'Idle', defAnim: 'Hit', atkDamage: 15 }],
         
         // TAUNT vs PUNCH+ (same tick) -> TAUNT gets hit
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
