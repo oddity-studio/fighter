@@ -2415,9 +2415,13 @@
 
       }
 
-      document.getElementById('start-btn').addEventListener('click', startBattle);
+      document.getElementById('start-btn').addEventListener('click', function() {
+        console.log('Start button clicked');
+        startBattle();
+      });
 
       document.getElementById('debug-btn').addEventListener('click', function() {
+        console.log('Debug button clicked');
         var debugBoxes = document.getElementById('debug-boxes');
         var isVisible = debugBoxes.style.display !== 'none';
         
