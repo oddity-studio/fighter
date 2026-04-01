@@ -2689,11 +2689,6 @@
               });
             }
           });
-          for (var i = 1; i < moves.length; i++) {
-            if (moves[i] === 'PUNCH' && moves[i - 1] === 'TAUNT') {
-              moves[i] = 'PUNCH+';
-            }
-          }
           el.innerHTML = moves.map(function(m) {
             var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';
             return '<span class="' + cls + '">' + m + '</span>';
