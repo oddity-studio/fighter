@@ -2474,7 +2474,7 @@
           moveSelect.addEventListener('change', function() {
             window.p2EditorMoves[idx].move = this.value;
             // Auto-fill default animation for the move
-            var defaults = { 'Idle': 'Idle', 'CONT': 'Idle', 'PUNCH': 'Punch', 'PUNCH+': 'Punch', 'BLOCK': 'Block', 'TAUNT': 'Idle', 'SUPER': 'Super' };
+            var defaults = { 'Idle': 'Idle', 'CONT': 'Idle', 'PUNCH': 'Punch', 'PUNCH+': 'Punch+', 'BLOCK': 'Block', 'TAUNT': 'Idle', 'SUPER': 'Super' };
             window.p2EditorMoves[idx].anim = defaults[this.value] || 'Idle';
             window.renderP2Editor();
             updateP2EditorFromSelection();
