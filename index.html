@@ -1287,7 +1287,7 @@
     </div>
   </div>
 
-  <div id="debug-boxes">
+  <div id="debug-boxes" style="display:none">
     <div id="debug-p1" class="debug-panel">
       <div class="debug-panel-title">P1</div>
       <div class="debug-panel-list" id="debug-p1-list"></div>
@@ -1731,13 +1731,13 @@
         return move + '(' + tick + ',' + anim + ')';
       }
 
-      function showDebugTimeline(timeline, roundNum, autoPlay) {
+      function showDebugTimeline(timeline, roundNum, autoPlay, showBox) {
         if (debugTickInterval) clearInterval(debugTickInterval);
         var p1List = document.getElementById('debug-p1-list');
         var p2List = document.getElementById('debug-p2-list');
         p1List.innerHTML = '';
         p2List.innerHTML = '';
-        document.getElementById('debug-boxes').style.display = 'flex';
+        if (showBox) document.getElementById('debug-boxes').style.display = 'flex';
 
         // Normalize timeline to new format if needed
         var processedTimeline;
@@ -2187,7 +2187,7 @@
         combat.forEach(function(r) { fullTimeline.push(r); });
 
         // Show debug panels immediately
-        showDebugTimeline(fullTimeline.slice(0, 30), 1, true);
+        showDebugTimeline(fullTimeline.slice(0, 30), 1, true, true);
 
         // 10s intro: both players idle
         maxx.state.setAnimation(0, 'Idle', true);
@@ -2237,7 +2237,7 @@
             var fullTimeline2 = [];
             fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
             combat2.forEach(function(r) { fullTimeline2.push(r); });
-            showDebugTimeline(fullTimeline2.slice(0, 30), 2, true);
+            showDebugTimeline(fullTimeline2.slice(0, 30), 2, true, true);
 
             // 10s intro: both players idle
             hammer.state.setAnimation(0, 'Idle', true);
