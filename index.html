@@ -1852,7 +1852,7 @@
         }
 
         processedTimeline.forEach(function(r, i) {
-          var tick = i + 1;
+          var tick = r.tick || (i + 1);
           var p1Entry, p2Entry;
           if (roundNum === 1) {
             p1Entry = r.p1;
