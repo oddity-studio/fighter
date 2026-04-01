@@ -1575,17 +1575,14 @@
       // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
       // null means no change, 'REMOVE' means set to idle
       var combatRules = [
-        // BLOCK vs PUNCH -> Defender deflects, attacker idles (both directions)
+        // BLOCK vs PUNCH -> Defender deflects, attacker idles
         [['PUNCH', 'BLOCK'], { atkMove: 'Idle', defAnim: 'Deflect' }],
-        [['BLOCK', 'PUNCH'], { atkAnim: 'Deflect', defMove: 'Idle' }],
         [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
-        [['BLOCK', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Hit' }],
         
         // PUNCH vs PUNCH -> Both parry
         [['PUNCH', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         [['PUNCH+', 'PUNCH+'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         [['PUNCH', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Parry' }],
-        [['PUNCH+', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Hit' }],
         
         // TAUNT vs PUNCH+ (same tick) -> TAUNT gets hit
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
@@ -1594,11 +1591,9 @@
         [['SUPER', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'Hit' }],
         [['SUPER', 'PUNCH+'], { atkMove: 'Idle', atkAnim: 'Hit' }],
         [['PUNCH', 'SUPER'], { defMove: 'Idle', defAnim: 'Hit' }],
-        [['PUNCH+', 'SUPER'], { defMove: 'Idle', defAnim: 'Hit' }],
         
         // BLOCK vs SUPER -> defender down
         [['BLOCK', 'SUPER'], { defAnim: 'Down' }],
-        [['SUPER', 'BLOCK'], { atkAnim: 'Down' }],
         
         // CONT follows the animation of previous move
       ];
@@ -1636,16 +1631,29 @@
             }
           }
           
-          // Find matching rule
+          // Find matching rule (check both directions)
+          var ruleFound = false;
           for (var r = 0; r < combatRules.length; r++) {
             var rule = combatRules[r];
             var moves = rule[0];
+            // Check forward direction
             if (moves[0] === entry.p1.move && moves[1] === entry.p2.move) {
               var changes = rule[1];
               if (changes.atkMove) newEntry.p1.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
               if (changes.atkAnim) newEntry.p1.anim = changes.atkAnim;
               if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
               if (changes.defAnim) newEntry.p2.anim = changes.defAnim;
+              ruleFound = true;
+              break;
+            }
+            // Check reverse direction
+            if (moves[0] === entry.p2.move && moves[1] === entry.p1.move) {
+              var changes = rule[1];
+              if (changes.defMove) newEntry.p1.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
+              if (changes.defAnim) newEntry.p1.anim = changes.defAnim;
+              if (changes.atkMove) newEntry.p2.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
+              if (changes.atkAnim) newEntry.p2.anim = changes.atkAnim;
+              ruleFound = true;
               break;
             }
           }
