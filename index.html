@@ -1732,7 +1732,7 @@
           for (var m = 0; m < moves.length; m++) {
             var idx = startIdx + m;
             if (idx >= 0 && idx < 30) {
-              ticks[idx] = { move: moves[m], cardStart: m === 0, cardIdx: cIdx, onSpike: c.onSpike && m === 0 };
+              ticks[idx] = { move: moves[m], cardStart: m === 0, cardIdx: cIdx, onSpike: c.onSpike && m === 0, anim: c.anim };
             }
           }
         });
@@ -1755,9 +1755,13 @@
             defTick.move = 'PUNCH+';
           }
           
+          // Custom animation from editor
+          if (atkTick.anim) atkTick.customAnim = atkTick.anim;
+          if (defTick.anim) defTick.customAnim = defTick.anim;
+          
           // Determine animations based on moves
-          var atkAnim = rigAnimMap[atkTick.move] || 'Idle';
-          var defAnim = rigAnimMap[defTick.move] || 'Idle';
+          var atkAnim = atkTick.customAnim || rigAnimMap[atkTick.move] || 'Idle';
+          var defAnim = defTick.customAnim || rigAnimMap[defTick.move] || 'Idle';
           
           // CONT gets animation from previous tick later
           var fromTick = null;
@@ -2450,37 +2454,54 @@
         list.innerHTML = '';
         window.p2EditorMoves.forEach(function(m, idx) {
           var row = document.createElement('div');
-          row.style.cssText = 'display:flex;align-items:center;padding:4px 8px;gap:8px;';
+          row.style.cssText = 'display:flex;align-items:center;padding:4px 4px;gap:4px;';
           
           var label = document.createElement('span');
-          label.style.cssText = 'color:#888;font-size:11px;min-width:20px;';
+          label.style.cssText = 'color:#888;font-size:10px;min-width:18px;';
           label.textContent = (idx + 1) + '.';
           
-          var select = document.createElement('select');
-          select.style.cssText = 'flex:1;font-size:11px;padding:2px;';
-          select.dataset.idx = idx;
+          var moveSelect = document.createElement('select');
+          moveSelect.style.cssText = 'flex:1;font-size:10px;padding:1px;';
+          moveSelect.dataset.idx = idx;
           var moves = ['Idle', 'CONT', 'PUNCH', 'PUNCH+', 'BLOCK', 'TAUNT', 'SUPER'];
           moves.forEach(function(mv) {
             var opt = document.createElement('option');
             opt.value = mv;
             opt.textContent = mv;
             if (mv === m.move) opt.selected = true;
-            select.appendChild(opt);
+            moveSelect.appendChild(opt);
           });
-          select.addEventListener('change', function() {
+          moveSelect.addEventListener('change', function() {
             window.p2EditorMoves[idx].move = this.value;
             updateP2EditorFromSelection();
           });
           
+          var animSelect = document.createElement('select');
+          animSelect.style.cssText = 'flex:1;font-size:10px;padding:1px;';
+          animSelect.dataset.idx = idx;
+          var anims = ['Idle', 'Punch', 'Hit', 'Parry', 'Deflect', 'Down', 'Super', 'SuperInt', 'Block'];
+          anims.forEach(function(anim) {
+            var opt = document.createElement('option');
+            opt.value = anim;
+            opt.textContent = anim;
+            if (anim === m.anim) opt.selected = true;
+            animSelect.appendChild(opt);
+          });
+          animSelect.addEventListener('change', function() {
+            window.p2EditorMoves[idx].anim = this.value;
+            updateP2EditorFromSelection();
+          });
+          
           row.appendChild(label);
-          row.appendChild(select);
+          row.appendChild(moveSelect);
+          row.appendChild(animSelect);
           list.appendChild(row);
         });
       };
 
       function updateP2EditorFromSelection() {
         window.aiDefCards = window.p2EditorMoves.map(function(m, idx) {
-          return { moves: [m.move], tick: idx + 1 };
+          return { moves: [m.move], tick: idx + 1, anim: m.anim };
         });
         if (window.debugEnabled) {
           window.updateDebugTimeline();
