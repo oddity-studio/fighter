@@ -1819,7 +1819,7 @@
           // Convert old format to new format
           var normalized = timeline.map(function(r, t) {
             return {
-              tick: t + 1,
+              tick: r.tick || (t + 1),
               p1: { move: r.atkMove, anim: r.atkAnim, fromTick: null, originalMove: r.atkMove },
               p2: { move: r.defMove, anim: r.defAnim, fromTick: null, originalMove: r.defMove }
             };
@@ -1838,13 +1838,13 @@
               p1Origin = r.tick;
             } else if (t > 0 && r.originalMove === 'Idle') {
               newP1.move = 'CONT';
-              newP1.fromTick = p1Origin || 1; // Default to tick 1 if no non-Idle move
+              newP1.fromTick = p1Origin || 10; // Default to tick 10 if no non-Idle move
             }
             if (r.p2.move !== 'Idle') {
               p2Origin = r.tick;
             } else if (t > 0 && r.originalMove === 'Idle') {
               newP2.move = 'CONT';
-              newP2.fromTick = p2Origin || 1;
+              newP2.fromTick = p2Origin || 10;
             }
             return { tick: r.tick, p1: newP1, p2: newP2 };
           });
