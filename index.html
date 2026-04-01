@@ -2263,10 +2263,9 @@
 
         showRoundCaption('round1-overlay', 1000);
 
-        // Build full round timeline for debug
+        // Build full round timeline for debug (same as menu debug)
         var atkCards = getSortedCards(window.beat1Placements);
-        var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
-        var atkTicks = generateTicks(shiftedAtkCards);
+        var atkTicks = generateTicks(atkCards);
         var defTicks = generateTicks(window.aiDefCards);
         var combat = processCombat(atkTicks, defTicks, 1);
 
