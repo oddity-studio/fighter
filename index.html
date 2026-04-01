@@ -1235,6 +1235,7 @@
       <button id="ai-popup-btn" class="ai-btn" style="position:static">AI</button>
       <button id="idle-mode-btn" class="ai-btn" style="position:static">IDLE</button>
       <button id="debug-btn" class="ai-btn" style="position:static">Debug</button>
+      <button id="p2-edit-btn" class="ai-btn" style="position:static">Edit P2</button>
       <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
     </div>
   </div>
@@ -1296,6 +1297,11 @@
       <div class="debug-panel-title">P2</div>
       <div class="debug-panel-list" id="debug-p2-list"></div>
     </div>
+  </div>
+
+  <div id="p2-editor-box" style="display:none;position:fixed;top:0;right:0;width:180px;height:100%;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;padding:10px 0;">
+    <div style="color:white;text-align:center;padding:10px;font-weight:bold;">P2 Moves</div>
+    <div id="p2-editor-list"></div>
   </div>
 
   <script src="lib/spine-webgl.js"></script>
@@ -2431,6 +2437,65 @@
         } else {
           updateDebugTimeline();
           window.debugEnabled = true;
+        }
+      });
+
+      window.p2EditorMoves = [];
+      for (var i = 0; i < 30; i++) {
+        window.p2EditorMoves.push({ move: i === 0 ? 'Idle' : 'CONT', anim: 'Idle' });
+      }
+
+      window.renderP2Editor = function() {
+        var list = document.getElementById('p2-editor-list');
+        list.innerHTML = '';
+        window.p2EditorMoves.forEach(function(m, idx) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;padding:4px 8px;gap:8px;';
+          
+          var label = document.createElement('span');
+          label.style.cssText = 'color:#888;font-size:11px;min-width:20px;';
+          label.textContent = (idx + 1) + '.';
+          
+          var select = document.createElement('select');
+          select.style.cssText = 'flex:1;font-size:11px;padding:2px;';
+          select.dataset.idx = idx;
+          var moves = ['Idle', 'CONT', 'PUNCH', 'PUNCH+', 'BLOCK', 'TAUNT', 'SUPER'];
+          moves.forEach(function(mv) {
+            var opt = document.createElement('option');
+            opt.value = mv;
+            opt.textContent = mv;
+            if (mv === m.move) opt.selected = true;
+            select.appendChild(opt);
+          });
+          select.addEventListener('change', function() {
+            window.p2EditorMoves[idx].move = this.value;
+            updateP2EditorFromSelection();
+          });
+          
+          row.appendChild(label);
+          row.appendChild(select);
+          list.appendChild(row);
+        });
+      };
+
+      function updateP2EditorFromSelection() {
+        window.aiDefCards = window.p2EditorMoves.map(function(m, idx) {
+          return { moves: [m.move], tick: idx + 1 };
+        });
+        if (window.debugEnabled) {
+          window.updateDebugTimeline();
+        }
+      }
+
+      document.getElementById('p2-edit-btn').addEventListener('click', function() {
+        var editorBox = document.getElementById('p2-editor-box');
+        var isVisible = editorBox.style.display !== 'none';
+        
+        if (isVisible) {
+          editorBox.style.display = 'none';
+        } else {
+          window.renderP2Editor();
+          editorBox.style.display = 'block';
         }
       });
       
