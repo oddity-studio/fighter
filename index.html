@@ -1577,12 +1577,19 @@
       var combatRules = [
         // BLOCK vs PUNCH -> Defender deflects, attacker idles but keeps punch anim
         [['PUNCH', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch', defAnim: 'Deflect' }],
-        [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
+        [['PUNCH+', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch+', defAnim: 'Hit' }],
         
         // PUNCH vs PUNCH -> Both parry
         [['PUNCH', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         [['PUNCH+', 'PUNCH+'], { atkAnim: 'Parry', defAnim: 'Parry' }],
-        [['PUNCH', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Parry' }],
+        
+        // PUNCH vs IDLE -> PUNCH hits, deals 10% damage
+        [['PUNCH', 'Idle'], { atkAnim: 'Hit', defAnim: 'Hit', atkDamage: 10 }],
+        [['PUNCH+', 'Idle'], { atkAnim: 'Hit', defAnim: 'Hit', atkDamage: 15 }],
+        
+        // PUNCH vs TAUNT -> PUNCH hits, TAUNT gets hit and goes idle
+        [['PUNCH', 'TAUNT'], { atkAnim: 'Hit', defMove: 'Idle', defAnim: 'Hit' }],
+        [['PUNCH+', 'TAUNT'], { atkAnim: 'Hit', defMove: 'Idle', defAnim: 'Hit', atkDamage: 15 }],
         
         // TAUNT vs PUNCH+ (same tick) -> TAUNT gets hit
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
@@ -1636,6 +1643,16 @@
             }
           }
           
+          // CONT after TAUNT (not matching any other rule) -> goes Idle
+          if (entry.p1.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
+            newEntry.p1.move = 'Idle';
+            newEntry.p1.anim = 'Idle';
+          }
+          if (entry.p2.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
+            newEntry.p2.move = 'Idle';
+            newEntry.p2.anim = 'Idle';
+          }
+          
           // CONT vs Idle -> falls to Down (only if no rule matched above)
           if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
             newEntry.p1.move = 'Idle';
@@ -1658,6 +1675,8 @@
               if (changes.atkAnim) newEntry.p1.anim = changes.atkAnim;
               if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
               if (changes.defAnim) newEntry.p2.anim = changes.defAnim;
+              newEntry.p1.damage = changes.atkDamage || 0;
+              newEntry.p2.damage = changes.defDamage || 0;
               ruleFound = true;
               break;
             }
@@ -1667,6 +1686,12 @@
               if (changes.defMove) newEntry.p1.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
               if (changes.defAnim) newEntry.p1.anim = changes.defAnim;
               if (changes.atkMove) newEntry.p2.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
+              if (changes.atkAnim) newEntry.p2.anim = changes.atkAnim;
+              newEntry.p1.damage = changes.defDamage || 0;
+              newEntry.p2.damage = changes.atkDamage || 0;
+              ruleFound = true;
+              break;
+            }
               if (changes.atkAnim) newEntry.p2.anim = changes.atkAnim;
               ruleFound = true;
               break;
@@ -1759,8 +1784,8 @@
             defMove: finalTimeline[i].p2.move,
             atkAnim: finalTimeline[i].p1.anim,
             defAnim: finalTimeline[i].p2.anim,
-            atkDamage: 0,
-            defDamage: 0
+            atkDamage: finalTimeline[i].p1.damage || 0,
+            defDamage: finalTimeline[i].p2.damage || 0
           });
         }
         
