@@ -1575,9 +1575,6 @@
       // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
       // null means no change, 'REMOVE' means set to idle
       var combatRules = [
-        // TAUNT turns same-tick PUNCH into PUNCH+
-        [['TAUNT', 'PUNCH'], { defMove: 'PUNCH+', defAnim: 'Hit' }],
-        
         // PUNCH vs BLOCK -> Defender deflects
         [['PUNCH', 'BLOCK'], { defAnim: 'Deflect' }],
         [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
@@ -1588,9 +1585,8 @@
         [['PUNCH', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Parry' }],
         [['PUNCH+', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Hit' }],
         
-        // TAUNT vs any attack (other than PUNCH which is handled above)
+        // TAUNT vs PUNCH+ (same tick) -> TAUNT gets hit
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
-        [['TAUNT', 'SUPER'], { atkAnim: 'Hit' }],
         
         // SUPER vs PUNCH/PUNCH+ -> SUPER interrupted
         [['SUPER', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'Hit' }],
@@ -1616,6 +1612,27 @@
             p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick },
             p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick }
           };
+          
+          // TAUNT on P2 turns P1's PUNCH 3 ticks later into PUNCH+
+          if (entry.p1.move === 'PUNCH') {
+            for (var back = Math.max(0, t - 3); back < t; back++) {
+              if (result[back] && result[back].p2.move === 'TAUNT') {
+                newEntry.p1.move = 'PUNCH+';
+                newEntry.p1.anim = 'Hit';
+                break;
+              }
+            }
+          }
+          // TAUNT on P1 turns P2's PUNCH 3 ticks later into PUNCH+
+          if (entry.p2.move === 'PUNCH') {
+            for (var back = Math.max(0, t - 3); back < t; back++) {
+              if (result[back] && result[back].p1.move === 'TAUNT') {
+                newEntry.p2.move = 'PUNCH+';
+                newEntry.p2.anim = 'Hit';
+                break;
+              }
+            }
+          }
           
           // Find matching rule
           for (var r = 0; r < combatRules.length; r++) {
