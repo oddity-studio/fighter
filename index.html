@@ -1774,36 +1774,37 @@
         } else {
           // Convert old format to new format
           var normalized = timeline.map(function(r, t) {
-            var p1Move = r.atkMove;
-            var p2Move = r.defMove;
             return {
               tick: t + 1,
-              p1: { move: p1Move, anim: r.atkAnim, fromTick: null },
-              p2: { move: p2Move, anim: r.defAnim, fromTick: null }
+              p1: { move: r.atkMove, anim: r.atkAnim, fromTick: null, originalMove: r.atkMove },
+              p2: { move: r.defMove, anim: r.defAnim, fromTick: null, originalMove: r.defMove }
             };
           });
-          // Find origin tick for each CONT (the tick where animation started)
+          // Apply rules BEFORE converting to CONT, so Idle changes are preserved
+          var afterRules = applyCombatRules(normalized);
+          // Now convert to CONT format - but only if original move was Idle
           var p1Origin = 0;
           var p2Origin = 0;
-          normalized = normalized.map(function(r, t) {
+          normalized = afterRules.map(function(r, t) {
             var newP1 = Object.assign({}, r.p1);
             var newP2 = Object.assign({}, r.p2);
-            // Track where moves start
+            // Track where moves start (after rules applied)
+            // Only convert to CONT if original move was Idle (not changed by rule)
             if (r.p1.move !== 'Idle') {
               p1Origin = r.tick;
-            } else if (t > 0) {
+            } else if (t > 0 && r.originalMove === 'Idle') {
               newP1.move = 'CONT';
               newP1.fromTick = p1Origin;
             }
             if (r.p2.move !== 'Idle') {
               p2Origin = r.tick;
-            } else if (t > 0) {
+            } else if (t > 0 && r.originalMove === 'Idle') {
               newP2.move = 'CONT';
               newP2.fromTick = p2Origin;
             }
             return { tick: r.tick, p1: newP1, p2: newP2 };
           });
-          processedTimeline = applyCombatRules(normalized);
+          processedTimeline = normalized;
         }
 
         processedTimeline.forEach(function(r, i) {
