@@ -2473,13 +2473,17 @@
           });
           moveSelect.addEventListener('change', function() {
             window.p2EditorMoves[idx].move = this.value;
+            // Auto-fill default animation for the move
+            var defaults = { 'Idle': 'Idle', 'CONT': 'Idle', 'PUNCH': 'Punch', 'PUNCH+': 'Punch', 'BLOCK': 'Block', 'TAUNT': 'Idle', 'SUPER': 'Super' };
+            window.p2EditorMoves[idx].anim = defaults[this.value] || 'Idle';
+            window.renderP2Editor();
             updateP2EditorFromSelection();
           });
           
           var animSelect = document.createElement('select');
           animSelect.style.cssText = 'flex:1;font-size:10px;padding:1px;';
           animSelect.dataset.idx = idx;
-          var anims = ['Idle', 'Punch', 'Hit', 'Parry', 'Deflect', 'Down', 'Super', 'SuperInt', 'Block'];
+          var anims = ['Idle', 'Punch', 'Hit', 'Parry', 'Deflect', 'Down', 'Super', 'SuperInt', 'Block', 'Punch+'];
           anims.forEach(function(anim) {
             var opt = document.createElement('option');
             opt.value = anim;
