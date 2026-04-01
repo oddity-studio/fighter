@@ -1779,7 +1779,7 @@
         }
 
         processedTimeline.forEach(function(r, i) {
-          var tick = r.tick || (i + 1);
+          var tick = i + 1;
           var p1Entry, p2Entry;
           if (roundNum === 1) {
             p1Entry = r.p1;
@@ -2352,8 +2352,20 @@
         var defTicks = generateTicks(window.aiDefCards || []);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Use combat results directly (ticks 1-30)
-        var fullTimeline = combat;
+        // Timeline shows actual battle ticks (10-30 range where cards placed)
+        // Add offset so tick numbers match card slot positions
+        var fullTimeline = [];
+        for (var t = 0; t < combat.length; t++) {
+          fullTimeline.push({
+            atkMove: combat[t].atkMove,
+            defMove: combat[t].defMove,
+            atkAnim: combat[t].atkAnim,
+            defAnim: combat[t].defAnim,
+            atkDamage: combat[t].atkDamage,
+            defDamage: combat[t].defDamage,
+            tick: t + 1
+          });
+        }
 
         document.getElementById('debug-boxes').style.display = 'flex';
         showDebugTimeline(fullTimeline.slice(0, 30), 1);
