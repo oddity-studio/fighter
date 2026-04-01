@@ -2447,7 +2447,7 @@
         var defTicks = generateTicks(window.aiDefCards || []);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Timeline shows actual battle ticks (10-30 range where cards placed)
+        // Timeline shows tick numbers matching card positions
         var fullTimeline = [];
         for (var t = 0; t < combat.length; t++) {
           fullTimeline.push({
@@ -2457,7 +2457,7 @@
             defAnim: combat[t].defAnim,
             atkDamage: combat[t].atkDamage,
             defDamage: combat[t].defDamage,
-            tick: t + 10
+            tick: t + 1
           });
         }
 
