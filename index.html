@@ -1587,13 +1587,18 @@
         // TAUNT vs PUNCH+ (same tick) -> TAUNT gets hit
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
         
-        // SUPER vs PUNCH/PUNCH+ -> SUPER interrupted
+        // SUPER vs PUNCH -> SUPER interrupted to Idle with Hit
         [['SUPER', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'Hit' }],
         [['SUPER', 'PUNCH+'], { atkMove: 'Idle', atkAnim: 'Hit' }],
-        [['PUNCH', 'SUPER'], { defMove: 'Idle', defAnim: 'Hit' }],
+        
+        // CONT vs PUNCH -> SUPER continues with SuperInt animation
+        [['CONT', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'SuperInt' }],
         
         // BLOCK vs SUPER -> defender down
         [['BLOCK', 'SUPER'], { defAnim: 'Down' }],
+        
+        // CONT vs Idle -> falls to Down
+        [['CONT', 'Idle'], { atkMove: 'Idle', atkAnim: 'Down' }],
         
         // CONT follows the animation of previous move
       ];
@@ -1629,6 +1634,16 @@
                 break;
               }
             }
+          }
+          
+          // CONT vs Idle -> falls to Down (only if no rule matched above)
+          if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
+            newEntry.p1.move = 'Idle';
+            newEntry.p1.anim = 'Down';
+          }
+          if (entry.p2.move === 'CONT' && entry.p1.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p2.move === 'CONT')) {
+            newEntry.p2.move = 'Idle';
+            newEntry.p2.anim = 'Down';
           }
           
           // Find matching rule (check both directions)
