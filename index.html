@@ -2270,10 +2270,19 @@
         var defTicks = generateTicks(window.aiDefCards);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Prepend intro ticks (single Idle for attacker and defender)
+        // Timeline shows actual battle ticks (10-30 range where cards placed)
         var fullTimeline = [];
-        fullTimeline.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
-        combat.forEach(function(r) { fullTimeline.push(r); });
+        for (var t = 0; t < combat.length; t++) {
+          fullTimeline.push({
+            atkMove: combat[t].atkMove,
+            defMove: combat[t].defMove,
+            atkAnim: combat[t].atkAnim,
+            defAnim: combat[t].defAnim,
+            atkDamage: combat[t].atkDamage,
+            defDamage: combat[t].defDamage,
+            tick: t + 10
+          });
+        }
 
         // Show debug panels immediately
         showDebugTimeline(fullTimeline.slice(0, 30), 1, true, false);
@@ -2324,8 +2333,17 @@
             var defTicks2 = generateTicks(shiftedDefCards2);
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
-            fullTimeline2.push({ atkMove: 'Idle', defMove: 'Idle', atkAnim: 'Idle', defAnim: 'Idle' });
-            combat2.forEach(function(r) { fullTimeline2.push(r); });
+            for (var t = 0; t < combat2.length; t++) {
+              fullTimeline2.push({
+                atkMove: combat2[t].atkMove,
+                defMove: combat2[t].defMove,
+                atkAnim: combat2[t].atkAnim,
+                defAnim: combat2[t].defAnim,
+                atkDamage: combat2[t].atkDamage,
+                defDamage: combat2[t].defDamage,
+                tick: t + 10
+              });
+            }
             showDebugTimeline(fullTimeline2.slice(0, 30), 2, true, false);
 
             // 10s intro: both players idle
