@@ -1576,6 +1576,9 @@
       // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
       // null means no change, 'REMOVE' means set to idle
       var combatRules = [
+        // TAUNT turns same-tick PUNCH into PUNCH+
+        [['TAUNT', 'PUNCH'], { defMove: 'PUNCH+', defAnim: 'Hit' }],
+        
         // PUNCH vs BLOCK -> Defender deflects
         [['PUNCH', 'BLOCK'], { defAnim: 'Deflect' }],
         [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
@@ -1586,8 +1589,7 @@
         [['PUNCH', 'PUNCH+'], { atkAnim: 'Hit', defAnim: 'Parry' }],
         [['PUNCH+', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Hit' }],
         
-        // TAUNT vs any attack
-        [['TAUNT', 'PUNCH'], { atkAnim: 'Hit' }],
+        // TAUNT vs any attack (other than PUNCH which is handled above)
         [['TAUNT', 'PUNCH+'], { atkAnim: 'Hit' }],
         [['TAUNT', 'SUPER'], { atkAnim: 'Hit' }],
         
