@@ -2270,7 +2270,7 @@
         var defTicks = generateTicks(window.aiDefCards);
         var combat = processCombat(atkTicks, defTicks, 1);
 
-        // Timeline shows actual battle ticks (10-30 range where cards placed)
+        // Timeline shows tick numbers matching card positions (1-30)
         var fullTimeline = [];
         for (var t = 0; t < combat.length; t++) {
           fullTimeline.push({
@@ -2280,7 +2280,7 @@
             defAnim: combat[t].defAnim,
             atkDamage: combat[t].atkDamage,
             defDamage: combat[t].defDamage,
-            tick: t + 10
+            tick: t + 1
           });
         }
 
@@ -2341,7 +2341,7 @@
                 defAnim: combat2[t].defAnim,
                 atkDamage: combat2[t].atkDamage,
                 defDamage: combat2[t].defDamage,
-                tick: t + 10
+                tick: t + 1
               });
             }
             showDebugTimeline(fullTimeline2.slice(0, 30), 2, true, false);
