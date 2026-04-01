@@ -1604,16 +1604,16 @@
         [['SUPER', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'Hit' }],
         [['SUPER', 'PUNCH+'], { atkMove: 'Idle', atkAnim: 'Hit' }],
         
-        // CONT vs PUNCH -> SUPER continues with SuperInt animation
-        [['CONT', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'SuperInt' }],
+        // Idle with continue vs PUNCH -> SUPER continues with SuperInt animation
+        [['Idle', 'PUNCH'], { atkMove: 'Idle', atkAnim: 'SuperInt' }],
         
         // BLOCK vs SUPER -> defender down
         [['BLOCK', 'SUPER'], { defAnim: 'Down' }],
         
-        // CONT vs Idle -> falls to Down
-        [['CONT', 'Idle'], { atkMove: 'Idle', atkAnim: 'Down' }],
+        // Idle with continue vs Idle -> falls to Down
+        [['Idle', 'Idle'], { atkMove: 'Idle', atkAnim: 'Down' }],
         
-        // CONT follows the animation of previous move
+        // Idle with continue follows the animation of previous move
       ];
 
       // Apply rules to timeline
@@ -1649,7 +1649,28 @@
             }
           }
           
-          // CONT after TAUNT (not matching any other rule) -> goes Idle
+          // Idle+cont after TAUNT (not matching any other rule) -> goes Idle
+          if (entry.p1.move === 'Idle' && entry.p1.anim === 'cont' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
+            newEntry.p1.move = 'Idle';
+            newEntry.p1.anim = 'Idle';
+          }
+          if (entry.p2.move === 'Idle' && entry.p2.anim === 'cont' && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
+            newEntry.p2.move = 'Idle';
+            newEntry.p2.anim = 'Idle';
+          }
+          
+          // Idle+cont vs Idle -> falls to Down (only if no rule matched above)
+          if (entry.p1.move === 'Idle' && entry.p1.anim === 'cont' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'Idle')) {
+            newEntry.p1.move = 'Idle';
+            newEntry.p1.anim = 'Down';
+          }
+          if (entry.p2.move === 'Idle' && entry.p2.anim === 'cont' && entry.p1.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p2.move === 'Idle')) {
+            newEntry.p2.move = 'Idle';
+            newEntry.p2.anim = 'Down';
+          }
+          
+          // Also keep CONT rules for backwards compatibility with cards
+          // CONT after TAUNT
           if (entry.p1.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Idle';
@@ -1659,7 +1680,7 @@
             newEntry.p2.anim = 'Idle';
           }
           
-          // CONT vs Idle -> falls to Down (only if no rule matched above)
+          // CONT vs Idle -> falls to Down
           if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Down';
@@ -1705,6 +1726,14 @@
             newEntry.p1.anim = result[t-1].p1.anim;
           }
           if (newEntry.p2.move === 'CONT' && t > 0) {
+            newEntry.p2.anim = result[t-1].p2.anim;
+          }
+          
+          // Handle continueAnim flag - continues previous animation
+          if (entry.p1.continueAnim && t > 0) {
+            newEntry.p1.anim = result[t-1].p1.anim;
+          }
+          if (entry.p2.continueAnim && t > 0) {
             newEntry.p2.anim = result[t-1].p2.anim;
           }
           
@@ -1755,15 +1784,27 @@
             defTick.move = 'PUNCH+';
           }
           
-          // Custom animation from editor
-          if (atkTick.anim) atkTick.customAnim = atkTick.anim;
-          if (defTick.anim) defTick.customAnim = defTick.anim;
+          // Custom animation from editor (includes 'cont' for continue)
+          if (atkTick.anim) {
+            if (atkTick.anim === 'cont') {
+              atkTick.continueAnim = true;
+            } else {
+              atkTick.customAnim = atkTick.anim;
+            }
+          }
+          if (defTick.anim) {
+            if (defTick.anim === 'cont') {
+              defTick.continueAnim = true;
+            } else {
+              defTick.customAnim = defTick.anim;
+            }
+          }
           
           // Determine animations based on moves
           var atkAnim = atkTick.customAnim || rigAnimMap[atkTick.move] || 'Idle';
           var defAnim = defTick.customAnim || rigAnimMap[defTick.move] || 'Idle';
           
-          // CONT gets animation from previous tick later
+          // CONT/continue gets animation from previous tick later
           var fromTick = null;
           if (atkTick.move === 'CONT' && t > 0) {
             atkAnim = 'CONT';
@@ -1774,8 +1815,8 @@
           }
           
           timeline.push({
-            p1: { move: atkTick.move, anim: atkAnim, fromTick: fromTick },
-            p2: { move: defTick.move, anim: defAnim, fromTick: null }
+            p1: { move: atkTick.move, anim: atkAnim, fromTick: fromTick, continueAnim: atkTick.continueAnim },
+            p2: { move: defTick.move, anim: defAnim, fromTick: null, continueAnim: defTick.continueAnim }
           });
         }
         
@@ -1807,8 +1848,11 @@
         tick = tick || 1;
         
         if (move === 'CONT') {
-          var fromTick = entry.fromTick || (tick - 1);
-          return 'CONT(' + tick + ',' + fromTick + ')';
+          // Show as IDLE(tick, cont) for continue
+          return 'IDLE(' + tick + ',cont)';
+        }
+        if (anim === 'cont') {
+          return 'IDLE(' + tick + ',cont)';
         }
         return move + '(' + tick + ',' + anim + ')';
       }
@@ -1834,9 +1878,9 @@
               p2: { move: r.defMove, anim: r.defAnim, fromTick: null, originalMove: r.defMove }
             };
           });
-          // Apply rules BEFORE converting to CONT, so Idle changes are preserved
+          // Apply rules BEFORE converting to continue, so Idle changes are preserved
           var afterRules = applyCombatRules(normalized);
-          // Now convert to CONT format - first stays Idle, others become CONT if Idle
+          // Now convert to IDLE(tick, cont) format - first stays Idle, others use cont if Idle
           normalized = afterRules.map(function(r, t) {
             var newP1 = Object.assign({}, r.p1);
             var newP2 = Object.assign({}, r.p2);
@@ -1847,14 +1891,14 @@
               newP2.move = 'Idle';
               newP2.anim = 'Idle';
             } else {
-              // Keep actual moves, only convert Idle to CONT
+              // Keep actual moves, only convert Idle to continue
               if (r.p1.move === 'Idle') {
-                newP1.move = 'CONT';
-                newP1.fromTick = r.tick - 1;
+                newP1.move = 'Idle';
+                newP1.anim = 'cont';
               }
               if (r.p2.move === 'Idle') {
-                newP2.move = 'CONT';
-                newP2.fromTick = r.tick - 1;
+                newP2.move = 'Idle';
+                newP2.anim = 'cont';
               }
             }
             return { tick: r.tick, p1: newP1, p2: newP2 };
@@ -2446,7 +2490,7 @@
 
       window.p2EditorMoves = [];
       for (var i = 0; i < 30; i++) {
-        window.p2EditorMoves.push({ move: i === 0 ? 'Idle' : 'CONT', anim: 'Idle' });
+        window.p2EditorMoves.push({ move: 'Idle', anim: i === 0 ? 'Idle' : 'cont' });
       }
 
       window.renderP2Editor = function() {
@@ -2463,7 +2507,7 @@
           var moveSelect = document.createElement('select');
           moveSelect.style.cssText = 'flex:1;font-size:10px;padding:1px;';
           moveSelect.dataset.idx = idx;
-          var moves = ['Idle', 'CONT', 'PUNCH', 'PUNCH+', 'BLOCK', 'TAUNT', 'SUPER'];
+          var moves = ['Idle', 'PUNCH', 'PUNCH+', 'BLOCK', 'TAUNT', 'SUPER'];
           moves.forEach(function(mv) {
             var opt = document.createElement('option');
             opt.value = mv;
@@ -2474,7 +2518,7 @@
           moveSelect.addEventListener('change', function() {
             window.p2EditorMoves[idx].move = this.value;
             // Auto-fill default animation for the move
-            var defaults = { 'Idle': 'Idle', 'CONT': 'Idle', 'PUNCH': 'Punch', 'PUNCH+': 'Punch+', 'BLOCK': 'Block', 'TAUNT': 'Idle', 'SUPER': 'Super' };
+            var defaults = { 'Idle': 'Idle', 'PUNCH': 'Punch', 'PUNCH+': 'Punch+', 'BLOCK': 'Block', 'TAUNT': 'Idle', 'SUPER': 'Super' };
             window.p2EditorMoves[idx].anim = defaults[this.value] || 'Idle';
             window.renderP2Editor();
             updateP2EditorFromSelection();
@@ -2483,7 +2527,7 @@
           var animSelect = document.createElement('select');
           animSelect.style.cssText = 'flex:1;font-size:10px;padding:1px;';
           animSelect.dataset.idx = idx;
-          var anims = ['Idle', 'Punch', 'Hit', 'Parry', 'Deflect', 'Down', 'Super', 'SuperInt', 'Block', 'Punch+'];
+          var anims = ['Idle', 'Punch', 'Hit', 'Parry', 'Deflect', 'Down', 'Super', 'SuperInt', 'Block', 'Punch+', 'cont'];
           anims.forEach(function(anim) {
             var opt = document.createElement('option');
             opt.value = anim;
