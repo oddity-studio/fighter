@@ -1666,9 +1666,9 @@
             newEntry.p2.anim = result[t-1].p2.anim;
           }
           
-          // IDLE default animation
-          if (newEntry.p1.move === 'Idle') newEntry.p1.anim = 'Idle';
-          if (newEntry.p2.move === 'Idle') newEntry.p2.anim = 'Idle';
+          // IDLE default animation (only if not already set by rule)
+          if (newEntry.p1.move === 'Idle' && !newEntry.p1.anim) newEntry.p1.anim = 'Idle';
+          if (newEntry.p2.move === 'Idle' && !newEntry.p2.anim) newEntry.p2.anim = 'Idle';
           
           result.push(newEntry);
         }
