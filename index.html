@@ -1648,23 +1648,31 @@
               }
             }
           }
-          
+
+          // Handle continueAnim flag FIRST - continue previous animation before any rules
+          if (entry.p1.continueAnim && t > 0 && result[t-1]) {
+            newEntry.p1.anim = result[t-1].p1.anim;
+          }
+          if (entry.p2.continueAnim && t > 0 && result[t-1]) {
+            newEntry.p2.anim = result[t-1].p2.anim;
+          }
+
           // Idle+cont after TAUNT (not matching any other rule) -> goes Idle
-          if (entry.p1.move === 'Idle' && entry.p1.anim === 'cont' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
+          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Idle';
           }
-          if (entry.p2.move === 'Idle' && entry.p2.anim === 'cont' && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
+          if (entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
             newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Idle';
           }
           
           // Idle+cont vs Idle -> falls to Down (only if no rule matched above)
-          if (entry.p1.move === 'Idle' && entry.p1.anim === 'cont' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'Idle')) {
+          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && entry.p2.move === 'Idle' && !entry.p2.continueAnim && t > 0 && (!ruleFound || newEntry.p1.move === 'Idle')) {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Down';
           }
-          if (entry.p2.move === 'Idle' && entry.p2.anim === 'cont' && entry.p1.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p2.move === 'Idle')) {
+          if (entry.p2.move === 'Idle' && entry.p2.continueAnim && entry.p1.move === 'Idle' && !entry.p1.continueAnim && t > 0 && (!ruleFound || newEntry.p2.move === 'Idle')) {
             newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Down';
           }
@@ -1680,7 +1688,7 @@
             newEntry.p2.anim = 'Idle';
           }
           
-          // CONT vs Idle -> falls to Down
+          // CONT vs Idle -> falls to Down (only CONT moves fall, not Idle+cont)
           if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Down';
@@ -1695,6 +1703,14 @@
           for (var r = 0; r < combatRules.length; r++) {
             var rule = combatRules[r];
             var moves = rule[0];
+            
+            // Skip Idle vs Idle rule unless both have continueAnim
+            if (moves[0] === 'Idle' && moves[1] === 'Idle') {
+              if (!(entry.p1.continueAnim && entry.p2.continueAnim)) {
+                continue;
+              }
+            }
+            
             // Check forward direction
             if (moves[0] === entry.p1.move && moves[1] === entry.p2.move) {
               var changes = rule[1];
@@ -1726,14 +1742,6 @@
             newEntry.p1.anim = result[t-1].p1.anim;
           }
           if (newEntry.p2.move === 'CONT' && t > 0) {
-            newEntry.p2.anim = result[t-1].p2.anim;
-          }
-          
-          // Handle continueAnim flag - continues previous animation
-          if (entry.p1.continueAnim && t > 0) {
-            newEntry.p1.anim = result[t-1].p1.anim;
-          }
-          if (entry.p2.continueAnim && t > 0) {
             newEntry.p2.anim = result[t-1].p2.anim;
           }
           
