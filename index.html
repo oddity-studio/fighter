@@ -1575,8 +1575,8 @@
       // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
       // null means no change, 'REMOVE' means set to idle
       var combatRules = [
-        // BLOCK vs PUNCH -> Defender deflects, attacker idles
-        [['PUNCH', 'BLOCK'], { atkMove: 'Idle', defAnim: 'Deflect' }],
+        // BLOCK vs PUNCH -> Defender deflects, attacker idles but keeps punch anim
+        [['PUNCH', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch', defAnim: 'Deflect' }],
         [['PUNCH+', 'BLOCK'], { defAnim: 'Hit', atkAnim: 'Hit' }],
         
         // PUNCH vs PUNCH -> Both parry
