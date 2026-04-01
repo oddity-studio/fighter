@@ -2734,6 +2734,8 @@
               p.moves.forEach(function(m, idx) {
                 if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
+                } else if (m === 'PUNCH' && idx > 0 && moves[moves.length - 1] === 'TAUNT') {
+                  moves.push('PUNCH+');
                 } else if (m !== 'IDLE' && m !== 'CONT') {
                   moves.push(m);
                 }
