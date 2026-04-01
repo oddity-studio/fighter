@@ -1720,6 +1720,14 @@
           var atkTick = atkTicks[t] || { move: 'Idle', cardStart: false };
           var defTick = defTicks[t] || { move: 'Idle', cardStart: false };
           
+          // OnSpike: first PUNCH of card on spike becomes PUNCH+
+          if (atkTick.move === 'PUNCH' && atkTick.onSpike) {
+            atkTick.move = 'PUNCH+';
+          }
+          if (defTick.move === 'PUNCH' && defTick.onSpike) {
+            defTick.move = 'PUNCH+';
+          }
+          
           // Determine animations based on moves
           var atkAnim = rigAnimMap[atkTick.move] || 'Idle';
           var defAnim = rigAnimMap[defTick.move] || 'Idle';
