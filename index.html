@@ -1617,7 +1617,7 @@
         for (var t = 0; t < timeline.length; t++) {
           var entry = timeline[t];
           var newEntry = { 
-            tick: t + 1,
+            tick: entry.tick || (t + 1),
             p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick },
             p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick }
           };
@@ -2454,7 +2454,7 @@
             defAnim: combat[t].defAnim,
             atkDamage: combat[t].atkDamage,
             defDamage: combat[t].defDamage,
-            tick: t + 1
+            tick: t + 10
           });
         }
 
