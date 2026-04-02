@@ -1811,11 +1811,13 @@
         
         // Convert to old format for now
         var results = [];
+        console.log('processCombat output:');
         for (var i = 0; i < finalTimeline.length; i++) {
           var p1Anim = finalTimeline[i].p1.anim;
           var p2Anim = finalTimeline[i].p2.anim;
           var p1Move = finalTimeline[i].p1.move;
           var p2Move = finalTimeline[i].p2.move;
+          console.log('tick', i, 'p1:', p1Move, 'prev:', finalTimeline[i-1] ? finalTimeline[i-1].p1.move : 'none');
           // CONT or Idle following non-Idle should continue previous animation
           if (finalTimeline[i].p1.continueAnim || p1Anim === 'cont' || p1Anim === 'CONT' || p1Move === 'CONT') {
             p1Anim = 'cont';
