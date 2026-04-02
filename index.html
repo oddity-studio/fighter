@@ -1691,10 +1691,10 @@
             if (moves[0] === entry.p1.move && moves[1] === entry.p2.move) {
               var changes = rule[1];
               if (changes.atkMove) newEntry.p1.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
-              // Only override anim if rule specifies one AND entry isn't explicitly 'cont'
-              if (changes.atkAnim && newEntry.p1.anim !== 'cont') newEntry.p1.anim = changes.atkAnim;
+              // Only override anim if rule specifies one AND entry isn't explicitly 'cont' or 'Punch+'
+              if (changes.atkAnim && newEntry.p1.anim !== 'cont' && newEntry.p1.anim !== 'Punch+') newEntry.p1.anim = changes.atkAnim;
               if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
-              if (changes.defAnim && newEntry.p2.anim !== 'cont') newEntry.p2.anim = changes.defAnim;
+              if (changes.defAnim && newEntry.p2.anim !== 'cont' && newEntry.p2.anim !== 'Punch+') newEntry.p2.anim = changes.defAnim;
               newEntry.p1.damage = changes.atkDamage || 0;
               newEntry.p2.damage = changes.defDamage || 0;
               ruleFound = true;
@@ -1704,9 +1704,9 @@
             if (moves[0] === entry.p2.move && moves[1] === entry.p1.move) {
               var changes = rule[1];
               if (changes.defMove) newEntry.p1.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
-              if (changes.defAnim && newEntry.p1.anim !== 'cont') newEntry.p1.anim = changes.defAnim;
+              if (changes.defAnim && newEntry.p1.anim !== 'cont' && newEntry.p1.anim !== 'Punch+') newEntry.p1.anim = changes.defAnim;
               if (changes.atkMove) newEntry.p2.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
-              if (changes.atkAnim && newEntry.p2.anim !== 'cont') newEntry.p2.anim = changes.atkAnim;
+              if (changes.atkAnim && newEntry.p2.anim !== 'cont' && newEntry.p2.anim !== 'Punch+') newEntry.p2.anim = changes.atkAnim;
               newEntry.p1.damage = changes.defDamage || 0;
               newEntry.p2.damage = changes.atkDamage || 0;
               ruleFound = true;
