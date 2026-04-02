@@ -1996,6 +1996,7 @@
           var r = combatResults[idx];
 
         // cont means continue previous animation - don't reset
+        console.log('Tick', idx, 'atkAnim:', r.atkAnim, 'defAnim:', r.defAnim, 'atkMove:', r.atkMove, 'defMove:', r.defMove);
         if (r.atkAnim !== 'cont') {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
