@@ -1624,8 +1624,8 @@
           var entry = timeline[t];
           var newEntry = { 
             tick: entry.tick || (t + 1),
-            p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick },
-            p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick }
+            p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick, continueAnim: entry.p1.continueAnim },
+            p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick, continueAnim: entry.p2.continueAnim }
           };
           
           // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+
@@ -1995,6 +1995,7 @@
           var r = combatResults[idx];
 
         // cont means continue previous animation - don't reset
+        console.log('Tick', idx, 'atkAnim:', r.atkAnim, 'defAnim:', r.defAnim);
         if (r.atkAnim !== 'cont') {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
