@@ -1994,11 +1994,16 @@
           }
           var r = combatResults[idx];
 
-        atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
-        lastAtkAnim = r.atkAnim;
+        // cont means continue previous animation - don't reset
+        if (r.atkAnim !== 'cont') {
+          atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
+          lastAtkAnim = r.atkAnim;
+        }
         
-        defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
-        lastDefAnim = r.defAnim;
+        if (r.defAnim !== 'cont') {
+          defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
+          lastDefAnim = r.defAnim;
+        }
 
           // Apply damage at end of second
           setTimeout(function() {
