@@ -1652,26 +1652,22 @@
           var prevP1WasSuper = false;
           var prevP2WasSuper = false;
           
-          // Look back through CONTs to find SUPER
-          for (var superBack = t - 1; superBack >= 0 && superBack >= t - 3; superBack--) {
-            if (result[superBack]) {
-              if (result[superBack].p1.move === 'SUPER') {
-                prevP1WasSuper = true;
-              }
-              if (result[superBack].p2.move === 'SUPER') {
-                prevP2WasSuper = true;
-              }
-              // Stop if we hit something other than CONT
-              if (result[superBack].p1.move !== 'CONT') break;
-              if (result[superBack].p2.move !== 'CONT') break;
+          // Look back through timeline (before this entry) to find SUPER
+          for (var superBack = 0; superBack < t; superBack++) {
+            var checkEntry = timeline[superBack];
+            if (checkEntry && checkEntry.p1.move === 'SUPER') {
+              prevP1WasSuper = true;
+            }
+            if (checkEntry && checkEntry.p2.move === 'SUPER') {
+              prevP2WasSuper = true;
             }
           }
           
-          // If current is IDLE (not CONT) and we found SUPER in last 3 ticks, deal 90% damage
-          if (entry.p1.move === 'Idle' && prevP1WasSuper) {
+          // If current is IDLE and we found SUPER earlier, deal 90% damage
+          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && prevP1WasSuper) {
             newEntry.p1.damage = 90;
           }
-          if (entry.p2.move === 'Idle' && prevP2WasSuper) {
+          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && prevP2WasSuper) {
             newEntry.p2.damage = 90;
           }
 
