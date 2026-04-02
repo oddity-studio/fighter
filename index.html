@@ -1839,6 +1839,9 @@
           // Check both continueAnim flag AND explicit 'cont' in anim
           if (finalTimeline[i].p1.continueAnim || p1Anim === 'cont') p1Anim = 'cont';
           if (finalTimeline[i].p2.continueAnim || p2Anim === 'cont') p2Anim = 'cont';
+          // For first tick (i===0), if animation is Idle, use cont to avoid restarting
+          if (i === 0 && p1Anim === 'Idle') p1Anim = 'cont';
+          if (i === 0 && p2Anim === 'Idle') p2Anim = 'cont';
           results.push({
             atkMove: finalTimeline[i].p1.move,
             defMove: finalTimeline[i].p2.move,
