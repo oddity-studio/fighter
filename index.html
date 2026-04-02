@@ -1712,9 +1712,10 @@
             if (moves[0] === entry.p1.move && moves[1] === entry.p2.move) {
               var changes = rule[1];
               if (changes.atkMove) newEntry.p1.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
-              if (changes.atkAnim) newEntry.p1.anim = changes.atkAnim;
+              // Only override anim if rule specifies one AND entry isn't explicitly 'cont'
+              if (changes.atkAnim && newEntry.p1.anim !== 'cont') newEntry.p1.anim = changes.atkAnim;
               if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
-              if (changes.defAnim) newEntry.p2.anim = changes.defAnim;
+              if (changes.defAnim && newEntry.p2.anim !== 'cont') newEntry.p2.anim = changes.defAnim;
               newEntry.p1.damage = changes.atkDamage || 0;
               newEntry.p2.damage = changes.defDamage || 0;
               ruleFound = true;
@@ -1724,9 +1725,9 @@
             if (moves[0] === entry.p2.move && moves[1] === entry.p1.move) {
               var changes = rule[1];
               if (changes.defMove) newEntry.p1.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
-              if (changes.defAnim) newEntry.p1.anim = changes.defAnim;
+              if (changes.defAnim && newEntry.p1.anim !== 'cont') newEntry.p1.anim = changes.defAnim;
               if (changes.atkMove) newEntry.p2.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
-              if (changes.atkAnim) newEntry.p2.anim = changes.atkAnim;
+              if (changes.atkAnim && newEntry.p2.anim !== 'cont') newEntry.p2.anim = changes.atkAnim;
               newEntry.p1.damage = changes.defDamage || 0;
               newEntry.p2.damage = changes.atkDamage || 0;
               ruleFound = true;
@@ -1832,11 +1833,16 @@
         // Convert to old format for now
         var results = [];
         for (var i = 0; i < finalTimeline.length; i++) {
+          var p1Anim = finalTimeline[i].p1.anim;
+          var p2Anim = finalTimeline[i].p2.anim;
+          // Check both continueAnim flag AND explicit 'cont' in anim
+          if (finalTimeline[i].p1.continueAnim || p1Anim === 'cont') p1Anim = 'cont';
+          if (finalTimeline[i].p2.continueAnim || p2Anim === 'cont') p2Anim = 'cont';
           results.push({
             atkMove: finalTimeline[i].p1.move,
             defMove: finalTimeline[i].p2.move,
-            atkAnim: finalTimeline[i].p1.continueAnim ? 'cont' : (finalTimeline[i].p1.anim),
-            defAnim: finalTimeline[i].p2.continueAnim ? 'cont' : (finalTimeline[i].p2.anim),
+            atkAnim: p1Anim,
+            defAnim: p2Anim,
             atkDamage: finalTimeline[i].p1.damage || 0,
             defDamage: finalTimeline[i].p2.damage || 0
           });
