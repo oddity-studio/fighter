@@ -1687,13 +1687,18 @@
           }
           
           // CONT vs Idle -> falls to Down (only CONT moves fall, not Idle+cont)
+          // BUT preserve 'cont' if explicitly set
           if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
-            newEntry.p1.move = 'Idle';
-            newEntry.p1.anim = 'Down';
+            if (newEntry.p1.anim !== 'cont') {
+              newEntry.p1.move = 'Idle';
+              newEntry.p1.anim = 'Down';
+            }
           }
           if (entry.p2.move === 'CONT' && entry.p1.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p2.move === 'CONT')) {
-            newEntry.p2.move = 'Idle';
-            newEntry.p2.anim = 'Down';
+            if (newEntry.p2.anim !== 'cont') {
+              newEntry.p2.move = 'Idle';
+              newEntry.p2.anim = 'Down';
+            }
           }
           
           // Find matching rule (check both directions)
