@@ -1817,18 +1817,16 @@
           var p2Anim = finalTimeline[i].p2.anim;
           var p1Move = finalTimeline[i].p1.move;
           var p2Move = finalTimeline[i].p2.move;
-          // Check both continueAnim flag AND explicit 'cont' or 'CONT' in anim
-          // Also check if move is CONT or move is IDLE with non-Idle previous (should continue)
+          // CONT or Idle following non-Idle should continue previous animation
           if (finalTimeline[i].p1.continueAnim || p1Anim === 'cont' || p1Anim === 'CONT' || p1Move === 'CONT') {
             p1Anim = 'cont';
-          } else if (i > 0 && p1Move === 'Idle' && finalTimeline[i-1].p1.move !== 'Idle' && finalTimeline[i-1].p1.move !== 'CONT') {
-            // IDLE following non-Idle should continue (but let previous play)
+          } else if (i > 0 && p1Move === 'Idle' && finalTimeline[i-1].p1.move !== 'Idle') {
             p1Anim = 'cont';
           }
           
           if (finalTimeline[i].p2.continueAnim || p2Anim === 'cont' || p2Anim === 'CONT' || p2Move === 'CONT') {
             p2Anim = 'cont';
-          } else if (i > 0 && p2Move === 'Idle' && finalTimeline[i-1].p2.move !== 'Idle' && finalTimeline[i-1].p2.move !== 'CONT') {
+          } else if (i > 0 && p2Move === 'Idle' && finalTimeline[i-1].p2.move !== 'Idle') {
             p2Anim = 'cont';
           }
           // For first tick (i===0), if animation is Idle, use cont to avoid restarting
