@@ -1630,6 +1630,7 @@
               if (result[back] && (result[back].p1.move === 'TAUNT' || result[back].p2.move === 'TAUNT')) {
                 newEntry.p1.move = 'PUNCH+';
                 newEntry.p1.anim = 'Punch+';
+                newEntry.p1.damage = 25; // PUNCH+ deals 25% damage
                 break;
               }
             }
@@ -1640,6 +1641,7 @@
               if (result[back] && (result[back].p2.move === 'TAUNT' || result[back].p1.move === 'TAUNT')) {
                 newEntry.p2.move = 'PUNCH+';
                 newEntry.p2.anim = 'Punch+';
+                newEntry.p2.damage = 25; // PUNCH+ deals 25% damage
                 break;
               }
             }
@@ -1818,21 +1820,29 @@
           var p2Move = finalTimeline[i].p2.move;
           var prevP1Move = i > 0 ? finalTimeline[i-1].p1.move : 'none';
           var prevP2Move = i > 0 ? finalTimeline[i-1].p2.move : 'none';
+          var prevP1Anim = i > 0 ? finalTimeline[i-1].p1.anim : 'none';
+          var prevP2Anim = i > 0 ? finalTimeline[i-1].p2.anim : 'none';
           
           // If move is CONT, set cont
           if (p1Move === 'CONT') {
             p1Anim = 'cont';
           }
           // If move is Idle (or IDLE) and previous was not Idle (and not CONT), set cont
+          // BUT don't continue after PUNCH+ - let it end and show actual Idle
           if ((p1Move === 'Idle' || p1Move === 'IDLE') && prevP1Move !== 'Idle' && prevP1Move !== 'IDLE' && prevP1Move !== 'CONT' && i > 0) {
-            p1Anim = 'cont';
+            // Don't continue if previous was PUNCH+ (let it end, show Idle)
+            if (prevP1Move !== 'PUNCH+') {
+              p1Anim = 'cont';
+            }
           }
           
           if (p2Move === 'CONT') {
             p2Anim = 'cont';
           }
           if ((p2Move === 'Idle' || p2Move === 'IDLE') && prevP2Move !== 'Idle' && prevP2Move !== 'IDLE' && prevP2Move !== 'CONT' && i > 0) {
-            p2Anim = 'cont';
+            if (prevP2Move !== 'PUNCH+') {
+              p2Anim = 'cont';
+            }
           }
           
           // For first tick (i===0), if animation is Idle, use cont to avoid restarting
