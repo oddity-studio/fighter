@@ -1900,12 +1900,12 @@
           normalized = afterRules.map(function(r, t) {
             var newP1 = Object.assign({}, r.p1);
             var newP2 = Object.assign({}, r.p2);
-            // First entry stays as IDLE
+            // First entry uses cont for Idle (matching actual combat behavior)
             if (t === 0) {
               newP1.move = 'Idle';
-              newP1.anim = 'Idle';
+              newP1.anim = 'cont';
               newP2.move = 'Idle';
-              newP2.anim = 'Idle';
+              newP2.anim = 'cont';
             } else {
               // Keep actual moves, only convert Idle to continue
               if (r.p1.move === 'Idle') {
