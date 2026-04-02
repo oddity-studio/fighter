@@ -1667,13 +1667,10 @@
             newEntry.p2.anim = 'Idle';
           }
           
-          // Idle+cont vs Idle -> falls to Down (only if no rule matched above)
-          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && entry.p2.move === 'Idle' && !entry.p2.continueAnim && t > 0 && (!ruleFound || newEntry.p1.move === 'Idle')) {
-            newEntry.p1.move = 'Idle';
+          // Idle+cont vs Idle -> falls to Down only if BOTH have continueAnim and no rule matched
+          // (i.e., both are continuing from previous, so they "fall" when nothing happens)
+          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && !ruleFound) {
             newEntry.p1.anim = 'Down';
-          }
-          if (entry.p2.move === 'Idle' && entry.p2.continueAnim && entry.p1.move === 'Idle' && !entry.p1.continueAnim && t > 0 && (!ruleFound || newEntry.p2.move === 'Idle')) {
-            newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Down';
           }
           
