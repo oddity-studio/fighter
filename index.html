@@ -2356,8 +2356,7 @@
         // After 10s intro, play sequences
         setTimeout(function() {
           var atkCards = getSortedCards(window.beat1Placements);
-          var shiftedAtkCards = atkCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
-          var atkTicks = generateTicks(shiftedAtkCards);
+          var atkTicks = generateTicks(atkCards);
           var defTicks = generateTicks(window.aiDefCards);
           var combat = processCombat(atkTicks, defTicks, 1);
           playCombat(maxx, hammer, combat, 1);
@@ -2391,8 +2390,7 @@
             // Build full round timeline for debug
             var atkTicks2 = generateTicks(window.aiAtkCards);
             var defCards2 = getSortedCards(window.beat2Placements);
-            var shiftedDefCards2 = defCards2.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
-            var defTicks2 = generateTicks(shiftedDefCards2);
+            var defTicks2 = generateTicks(defCards2);
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
             for (var t = 0; t < combat2.length; t++) {
@@ -2416,8 +2414,7 @@
             setTimeout(function() {
               var atkTicks = generateTicks(window.aiAtkCards);
               var defCards = getSortedCards(window.beat2Placements);
-              var shiftedDefCards = defCards.map(function(c) { return { moves: c.moves, onSpike: c.onSpike, time: c.time, tick: Math.max(1, c.tick - 10) }; });
-              var defTicks = generateTicks(shiftedDefCards);
+              var defTicks = generateTicks(defCards);
               var combat = processCombat(atkTicks, defTicks, 2);
               playCombat(hammer, maxx, combat, 2);
             }, 10000);
