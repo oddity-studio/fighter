@@ -1806,8 +1806,9 @@
           }
           
           // Determine animations based on moves
-          var atkAnim = atkTick.customAnim || rigAnimMap[atkTick.move] || 'Idle';
-          var defAnim = defTick.customAnim || rigAnimMap[defTick.move] || 'Idle';
+          // If continueAnim is true, use 'cont' to preserve the continue state
+          var atkAnim = atkTick.continueAnim ? 'cont' : (atkTick.customAnim || rigAnimMap[atkTick.move] || 'Idle');
+          var defAnim = defTick.continueAnim ? 'cont' : (defTick.customAnim || rigAnimMap[defTick.move] || 'Idle');
           
           // CONT/continue gets animation from previous tick later
           var fromTick = null;
