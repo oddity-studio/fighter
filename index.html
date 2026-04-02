@@ -2006,13 +2006,14 @@
           var r = combatResults[idx];
 
         // cont means continue previous animation - don't reset
-        // also skip if animation is same as last tick (allows looping animations to complete)
-        if (r.atkAnim !== 'cont' && r.atkAnim !== lastAtkAnim) {
+        // For Idle: skip if last was also Idle (allows Idle to loop)
+        // For non-Idle (Punch, Hit, etc.): always set (plays each tick)
+        if (r.atkAnim !== 'cont' && !(r.atkAnim === 'Idle' && lastAtkAnim === 'Idle')) {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
         }
         
-        if (r.defAnim !== 'cont' && r.defAnim !== lastDefAnim) {
+        if (r.defAnim !== 'cont' && !(r.defAnim === 'Idle' && lastDefAnim === 'Idle')) {
           defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
           lastDefAnim = r.defAnim;
         }
