@@ -1627,7 +1627,6 @@
             p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick, continueAnim: entry.p1.continueAnim },
             p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick, continueAnim: entry.p2.continueAnim }
           };
-          console.log('applyCombatRules tick', t, 'entry.p1.continueAnim:', entry.p1.continueAnim, 'entry.p1.anim:', entry.p1.anim);
           
           // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+
           if (entry.p1.move === 'PUNCH') {
@@ -1827,7 +1826,6 @@
             p1: { move: atkTick.move, anim: atkAnim, fromTick: fromTick, continueAnim: atkTick.continueAnim },
             p2: { move: defTick.move, anim: defAnim, fromTick: null, continueAnim: defTick.continueAnim }
           });
-          console.log('processCombat tick', t, 'p1:', atkTick.move, 'continueAnim:', atkTick.continueAnim, 'anim:', atkAnim);
         }
         
         // Apply combat rules
@@ -2006,7 +2004,6 @@
 
         // cont means continue previous animation - don't reset
         // also skip if animation is same as last tick (allows looping animations to complete)
-        console.log('Tick', idx, 'atkAnim:', r.atkAnim, 'defAnim:', r.defAnim, 'atkMove:', r.atkMove, 'defMove:', r.defMove);
         if (r.atkAnim !== 'cont' && r.atkAnim !== lastAtkAnim) {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
