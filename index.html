@@ -1647,6 +1647,34 @@
             }
           }
 
+          // SUPER deals 90% damage on the 2nd IDLE after SUPER (third tick)
+          // Check if current is IDLE and previous was SUPER (or CONT/CONT after SUPER)
+          var prevP1WasSuper = false;
+          var prevP2WasSuper = false;
+          
+          // Look back through CONTs to find SUPER
+          for (var superBack = t - 1; superBack >= 0 && superBack >= t - 3; superBack--) {
+            if (result[superBack]) {
+              if (result[superBack].p1.move === 'SUPER') {
+                prevP1WasSuper = true;
+              }
+              if (result[superBack].p2.move === 'SUPER') {
+                prevP2WasSuper = true;
+              }
+              // Stop if we hit something other than CONT
+              if (result[superBack].p1.move !== 'CONT') break;
+              if (result[superBack].p2.move !== 'CONT') break;
+            }
+          }
+          
+          // If current is IDLE (not CONT) and we found SUPER in last 3 ticks, deal 90% damage
+          if (entry.p1.move === 'Idle' && prevP1WasSuper) {
+            newEntry.p1.damage = 90;
+          }
+          if (entry.p2.move === 'Idle' && prevP2WasSuper) {
+            newEntry.p2.damage = 90;
+          }
+
           // Handle continueAnim flag FIRST - continue previous animation before any rules
           if (entry.p1.continueAnim && t > 0 && result[t-1]) {
             newEntry.p1.anim = 'cont';
