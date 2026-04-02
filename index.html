@@ -1697,8 +1697,9 @@
               if (changes.atkAnim && newEntry.p1.anim !== 'cont' && newEntry.p1.anim !== 'Punch+') newEntry.p1.anim = changes.atkAnim;
               if (changes.defMove) newEntry.p2.move = changes.defMove === 'REMOVE' ? 'Idle' : changes.defMove;
               if (changes.defAnim && newEntry.p2.anim !== 'cont' && newEntry.p2.anim !== 'Punch+') newEntry.p2.anim = changes.defAnim;
-              newEntry.p1.damage = changes.atkDamage || 0;
-              newEntry.p2.damage = changes.defDamage || 0;
+              // Only set damage if not already set (preserve 25 from PUNCH+)
+              if (!newEntry.p1.damage) newEntry.p1.damage = changes.atkDamage || 0;
+              if (!newEntry.p2.damage) newEntry.p2.damage = changes.defDamage || 0;
               ruleFound = true;
               break;
             }
@@ -1709,8 +1710,9 @@
               if (changes.defAnim && newEntry.p1.anim !== 'cont' && newEntry.p1.anim !== 'Punch+') newEntry.p1.anim = changes.defAnim;
               if (changes.atkMove) newEntry.p2.move = changes.atkMove === 'REMOVE' ? 'Idle' : changes.atkMove;
               if (changes.atkAnim && newEntry.p2.anim !== 'cont' && newEntry.p2.anim !== 'Punch+') newEntry.p2.anim = changes.atkAnim;
-              newEntry.p1.damage = changes.defDamage || 0;
-              newEntry.p2.damage = changes.atkDamage || 0;
+              // Only set damage if not already set (preserve 25 from PUNCH+)
+              if (!newEntry.p1.damage) newEntry.p1.damage = changes.defDamage || 0;
+              if (!newEntry.p2.damage) newEntry.p2.damage = changes.atkDamage || 0;
               ruleFound = true;
               break;
             }
