@@ -2005,13 +2005,14 @@
           var r = combatResults[idx];
 
         // cont means continue previous animation - don't reset
+        // also skip if animation is same as last tick (allows looping animations to complete)
         console.log('Tick', idx, 'atkAnim:', r.atkAnim, 'defAnim:', r.defAnim, 'atkMove:', r.atkMove, 'defMove:', r.defMove);
-        if (r.atkAnim !== 'cont') {
+        if (r.atkAnim !== 'cont' && r.atkAnim !== lastAtkAnim) {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
         }
         
-        if (r.defAnim !== 'cont') {
+        if (r.defAnim !== 'cont' && r.defAnim !== lastDefAnim) {
           defChar.state.setAnimation(0, r.defAnim, r.defAnim === 'Idle');
           lastDefAnim = r.defAnim;
         }
