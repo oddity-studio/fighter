@@ -2318,6 +2318,8 @@
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
 
+        resize();
+        
         window.dispatchEvent(new Event('resize'));
 
         var dur = window.getBeat1Duration();
@@ -3435,8 +3437,6 @@
       for (var i = 0; i < 14; i++) {
         hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: i * 2 + 1 });
       }
-      window.aiAtkCards = idleAtkCards.slice();
-      window.aiDefCards = idleDefCards.slice();
 
       var idleCards = [];
       for (var j = 0; j < 30; j++) {
@@ -3444,6 +3444,8 @@
       }
       window.idleAtkCards = idleCards.slice();
       window.idleDefCards = idleCards.slice();
+      window.aiAtkCards = idleAtkCards.slice();
+      window.aiDefCards = idleDefCards.slice();
 
       var hitBtn = document.getElementById('ai-mode-btn');
       var aiBtn = document.getElementById('ai-popup-btn');
