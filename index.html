@@ -1651,10 +1651,10 @@
 
           // Handle continueAnim flag FIRST - continue previous animation before any rules
           if (entry.p1.continueAnim && t > 0 && result[t-1]) {
-            newEntry.p1.anim = result[t-1].p1.anim;
+            newEntry.p1.anim = 'cont';
           }
           if (entry.p2.continueAnim && t > 0 && result[t-1]) {
-            newEntry.p2.anim = result[t-1].p2.anim;
+            newEntry.p2.anim = 'cont';
           }
 
           // Idle+cont after TAUNT (not matching any other rule) -> goes Idle
@@ -1996,7 +1996,6 @@
           var r = combatResults[idx];
 
         // cont means continue previous animation - don't reset
-        console.log('Tick', idx, 'atkAnim:', r.atkAnim, 'defAnim:', r.defAnim);
         if (r.atkAnim !== 'cont') {
           atkChar.state.setAnimation(0, r.atkAnim, r.atkAnim === 'Idle');
           lastAtkAnim = r.atkAnim;
