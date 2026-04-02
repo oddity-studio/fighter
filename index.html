@@ -1627,6 +1627,7 @@
             p1: { move: entry.p1.move, anim: entry.p1.anim, fromTick: entry.p1.fromTick, continueAnim: entry.p1.continueAnim },
             p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick, continueAnim: entry.p2.continueAnim }
           };
+          console.log('applyCombatRules tick', t, 'entry.p1.continueAnim:', entry.p1.continueAnim, 'entry.p1.anim:', entry.p1.anim);
           
           // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+
           if (entry.p1.move === 'PUNCH') {
@@ -1669,9 +1670,10 @@
           
           // Idle+cont vs Idle -> falls to Down only if BOTH have continueAnim and no rule matched
           // (i.e., both are continuing from previous, so they "fall" when nothing happens)
+          // BUT preserve 'cont' if explicitly set
           if (entry.p1.move === 'Idle' && entry.p1.continueAnim && entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && !ruleFound) {
-            newEntry.p1.anim = 'Down';
-            newEntry.p2.anim = 'Down';
+            if (newEntry.p1.anim !== 'cont') newEntry.p1.anim = 'Down';
+            if (newEntry.p2.anim !== 'cont') newEntry.p2.anim = 'Down';
           }
           
           // Also keep CONT rules for backwards compatibility with cards
@@ -1825,6 +1827,7 @@
             p1: { move: atkTick.move, anim: atkAnim, fromTick: fromTick, continueAnim: atkTick.continueAnim },
             p2: { move: defTick.move, anim: defAnim, fromTick: null, continueAnim: defTick.continueAnim }
           });
+          console.log('processCombat tick', t, 'p1:', atkTick.move, 'continueAnim:', atkTick.continueAnim, 'anim:', atkAnim);
         }
         
         // Apply combat rules
