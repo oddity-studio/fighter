@@ -1590,7 +1590,7 @@
         
         // PUNCH vs IDLE -> PUNCH hits, deals 10% damage
         [['PUNCH', 'Idle'], { atkAnim: 'Punch', defAnim: 'Hit', atkDamage: 10 }],
-        [['PUNCH+', 'Idle'], { atkAnim: 'Punch+', defAnim: 'Hit', atkDamage: 25 }],
+        [['PUNCH+', 'Idle'], { atkAnim: 'Punch+', defAnim: 'Hit', atkDamage: 34 }],
         
         // PUNCH vs TAUNT -> PUNCH hits, TAUNT gets hit and goes idle
         [['PUNCH', 'TAUNT'], { atkAnim: 'Punch', defMove: 'Idle', defAnim: 'Hit' }],
@@ -1630,7 +1630,7 @@
               if (result[back] && (result[back].p1.move === 'TAUNT' || result[back].p2.move === 'TAUNT')) {
                 newEntry.p1.move = 'PUNCH+';
                 newEntry.p1.anim = 'Punch+';
-                newEntry.p1.damage = 25; // PUNCH+ deals 25% damage
+                newEntry.p1.damage = 34; // PUNCH+ deals 34% damage
                 break;
               }
             }
@@ -1641,7 +1641,7 @@
               if (result[back] && (result[back].p2.move === 'TAUNT' || result[back].p1.move === 'TAUNT')) {
                 newEntry.p2.move = 'PUNCH+';
                 newEntry.p2.anim = 'Punch+';
-                newEntry.p2.damage = 25; // PUNCH+ deals 25% damage
+                newEntry.p2.damage = 34; // PUNCH+ deals 34% damage
                 break;
               }
             }
