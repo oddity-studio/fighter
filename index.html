@@ -2309,7 +2309,7 @@
 
       // Countdown timer — two 30s rounds
       var round = 1;
-      var countdown = 40; // 30 + 10s intro delay = 30 when combat starts
+      var countdown = 30;
       var countdownEl = document.getElementById('round-counter');
       var countdownInterval;
 
@@ -2360,7 +2360,7 @@
           var defTicks = generateTicks(window.aiDefCards);
           var combat = processCombat(atkTicks, defTicks, 1);
           playCombat(maxx, hammer, combat, 1);
-        }, 10000);
+        }, 0);
         countdownInterval = setInterval(function() {
         countdown--;
         if (countdown <= 2 && countdown > 0) {
@@ -2417,7 +2417,7 @@
               var defTicks = generateTicks(defCards);
               var combat = processCombat(atkTicks, defTicks, 2);
               playCombat(hammer, maxx, combat, 2);
-            }, 10000);
+            }, 0);
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
