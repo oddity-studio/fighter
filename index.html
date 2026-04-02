@@ -1610,9 +1610,6 @@
         // BLOCK vs SUPER -> defender down
         [['BLOCK', 'SUPER'], { defAnim: 'Down' }],
         
-        // Idle with continue vs Idle -> falls to Down
-        [['Idle', 'Idle'], { atkMove: 'Idle', atkAnim: 'Down' }],
-        
         // Idle with continue follows the animation of previous move
       ];
 
@@ -1667,14 +1664,6 @@
             newEntry.p2.anim = 'Idle';
           }
           
-          // Idle+cont vs Idle -> falls to Down only if BOTH have continueAnim and no rule matched
-          // (i.e., both are continuing from previous, so they "fall" when nothing happens)
-          // BUT preserve 'cont' if explicitly set
-          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && !ruleFound) {
-            if (newEntry.p1.anim !== 'cont') newEntry.p1.anim = 'Down';
-            if (newEntry.p2.anim !== 'cont') newEntry.p2.anim = 'Down';
-          }
-          
           // Also keep CONT rules for backwards compatibility with cards
           // CONT after TAUNT
           if (entry.p1.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
@@ -1684,21 +1673,6 @@
           if (entry.p2.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
             newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Idle';
-          }
-          
-          // CONT vs Idle -> falls to Down (only CONT moves fall, not Idle+cont)
-          // BUT preserve 'cont' if explicitly set
-          if (entry.p1.move === 'CONT' && entry.p2.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p1.move === 'CONT')) {
-            if (newEntry.p1.anim !== 'cont') {
-              newEntry.p1.move = 'Idle';
-              newEntry.p1.anim = 'Down';
-            }
-          }
-          if (entry.p2.move === 'CONT' && entry.p1.move === 'Idle' && t > 0 && (!ruleFound || newEntry.p2.move === 'CONT')) {
-            if (newEntry.p2.anim !== 'cont') {
-              newEntry.p2.move = 'Idle';
-              newEntry.p2.anim = 'Down';
-            }
           }
           
           // Find matching rule (check both directions)
