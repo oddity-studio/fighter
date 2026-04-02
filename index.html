@@ -1819,22 +1819,19 @@
           var prevP1Move = i > 0 ? finalTimeline[i-1].p1.move : 'none';
           var prevP2Move = i > 0 ? finalTimeline[i-1].p2.move : 'none';
           
-          console.log('tick', i, 'p1Move:', p1Move, 'prevP1Move:', prevP1Move, 'anim:', p1Anim);
-          
           // If move is CONT, set cont
           if (p1Move === 'CONT') {
             p1Anim = 'cont';
           }
-          // If move is Idle and previous was not Idle (and not CONT), set cont to continue previous animation
-          if (p1Move === 'Idle' && prevP1Move !== 'Idle' && prevP1Move !== 'CONT' && i > 0) {
-            console.log('-> setting cont for p1, prev was:', prevP1Move);
+          // If move is Idle (or IDLE) and previous was not Idle (and not CONT), set cont
+          if ((p1Move === 'Idle' || p1Move === 'IDLE') && prevP1Move !== 'Idle' && prevP1Move !== 'IDLE' && prevP1Move !== 'CONT' && i > 0) {
             p1Anim = 'cont';
           }
           
           if (p2Move === 'CONT') {
             p2Anim = 'cont';
           }
-          if (p2Move === 'Idle' && prevP2Move !== 'Idle' && prevP2Move !== 'CONT' && i > 0) {
+          if ((p2Move === 'Idle' || p2Move === 'IDLE') && prevP2Move !== 'Idle' && prevP2Move !== 'IDLE' && prevP2Move !== 'CONT' && i > 0) {
             p2Anim = 'cont';
           }
           
