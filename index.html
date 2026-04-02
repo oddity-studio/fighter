@@ -1817,22 +1817,17 @@
           var p1Move = finalTimeline[i].p1.move;
           var p2Move = finalTimeline[i].p2.move;
           var prevP1Move = finalTimeline[i-1] ? finalTimeline[i-1].p1.move : 'none';
-          var prevP1Anim = finalTimeline[i-1] ? finalTimeline[i-1].p1.anim : 'none';
-          console.log('tick', i, 'move:', p1Move, 'prevMove:', prevP1Move, 'prevAnim:', prevP1Anim, 'currAnim:', p1Anim);
+          var prevP2Move = finalTimeline[i-1] ? finalTimeline[i-1].p2.move : 'none';
           // CONT or Idle following non-Idle should continue previous animation
-          var firstCond = finalTimeline[i].p1.continueAnim || p1Anim === 'cont' || p1Anim === 'CONT' || p1Move === 'CONT';
-          console.log('  firstCond:', firstCond);
-          if (firstCond) {
+          if (finalTimeline[i].p1.continueAnim || p1Anim === 'cont' || p1Anim === 'CONT' || p1Move === 'CONT') {
             p1Anim = 'cont';
           } else if (i > 0 && p1Move === 'Idle' && prevP1Move !== 'Idle') {
-            console.log('  -> IDLE after non-Idle, setting to cont');
             p1Anim = 'cont';
           }
-          console.log('tick', i, 'FINAL p1Anim:', p1Anim);
           
           if (finalTimeline[i].p2.continueAnim || p2Anim === 'cont' || p2Anim === 'CONT' || p2Move === 'CONT') {
             p2Anim = 'cont';
-          } else if (i > 0 && p2Move === 'Idle' && finalTimeline[i-1].p2.move !== 'Idle') {
+          } else if (i > 0 && p2Move === 'Idle' && prevP2Move !== 'Idle') {
             p2Anim = 'cont';
           }
           // For first tick (i===0), if animation is Idle, use cont to avoid restarting
