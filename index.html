@@ -1627,7 +1627,13 @@
           // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+
           if (entry.p1.move === 'PUNCH') {
             for (var back = Math.max(0, t - 3); back < t; back++) {
+              // Check both P1's own TAUNT and P2's TAUNT
               if (result[back] && result[back].p1.move === 'TAUNT') {
+                newEntry.p1.move = 'PUNCH+';
+                newEntry.p1.anim = 'Hit';
+                break;
+              }
+              if (result[back] && result[back].p2.move === 'TAUNT') {
                 newEntry.p1.move = 'PUNCH+';
                 newEntry.p1.anim = 'Hit';
                 break;
@@ -1637,7 +1643,13 @@
           // TAUNT on P2 turns P2's own PUNCH 3 ticks later into PUNCH+
           if (entry.p2.move === 'PUNCH') {
             for (var back = Math.max(0, t - 3); back < t; back++) {
+              // Check both P2's own TAUNT and P1's TAUNT
               if (result[back] && result[back].p2.move === 'TAUNT') {
+                newEntry.p2.move = 'PUNCH+';
+                newEntry.p2.anim = 'Hit';
+                break;
+              }
+              if (result[back] && result[back].p1.move === 'TAUNT') {
                 newEntry.p2.move = 'PUNCH+';
                 newEntry.p2.anim = 'Hit';
                 break;
