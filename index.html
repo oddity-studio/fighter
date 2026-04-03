@@ -2245,9 +2245,9 @@
               flash.style.opacity = 0;
 
               if (btn.getAttribute("data-player") === "maxx") {
-                switchBackground("resources/arena_p1win.webm");
+                switchBackground("resources/arena_p1win.webm", true);
               } else {
-                switchBackground("resources/arena_p2win.webm");
+                switchBackground("resources/arena_p2win.webm", true);
               }
 
               var winner = btn.getAttribute("data-player");
