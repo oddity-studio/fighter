@@ -1648,32 +1648,17 @@
           }
 
           // SUPER deals 90% damage on tick 2 after SUPER (3rd tick)
-          // Find ALL SUPER ticks in the timeline and check if any was exactly 2 ticks ago
-          var p1SuperTick = -1;
-          var p2SuperTick = -1;
+          // Simple check - if current is IDLE and t >= 2, check if tick-2 was SUPER
+          var prev2P1 = t >= 2 && timeline[t-2] ? timeline[t-2].p1.move : 'none';
+          var prev2P2 = t >= 2 && timeline[t-2] ? timeline[t-2].p2.move : 'none';
           
-          // Look through ALL previous ticks in timeline
-          for (var superBack = 0; superBack < t; superBack++) {
-            if (timeline[superBack] && timeline[superBack].p1.move === 'SUPER') {
-              console.log('tick', t, 'found SUPER at', superBack, 'diff:', t - superBack);
-              if (t - superBack === 2) {
-                p1SuperTick = superBack;
-              }
-            }
-            if (timeline[superBack] && timeline[superBack].p2.move === 'SUPER') {
-              if (t - superBack === 2) {
-                p2SuperTick = superBack;
-              }
-            }
-          }
+          console.log('tick', t, 'prev2P1:', prev2P1, 'prev2P2:', prev2P2, 'current:', entry.p1.move);
           
-          console.log('tick', t, 'p1SuperTick:', p1SuperTick, 'move:', entry.p1.move);
-          
-          // If this is exactly 2 ticks after SUPER, deal 90% damage
-          if (window.superEnabled !== false && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0) {
+          // If this is 2 ticks after SUPER, deal 90% damage
+          if (window.superEnabled !== false && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 90;
           }
-          if (window.superEnabled !== false && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && p2SuperTick >= 0) {
+          if (window.superEnabled !== false && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 90;
           }
 
