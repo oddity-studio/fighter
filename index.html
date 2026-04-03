@@ -1661,11 +1661,13 @@
             }
           }
           
+          console.log('tick', t, 'p1SuperTick:', p1SuperTick, 'diff:', p1SuperTick >= 0 ? t - p1SuperTick : 'none', 'move:', entry.p1.move);
+          
           // If this is exactly 2 ticks after SUPER (the 3rd tick), deal 90% damage
-          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0 && t - p1SuperTick === 2) {
+          if (window.superEnabled !== false && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0 && t - p1SuperTick === 2) {
             newEntry.p1.damage = 90;
           }
-          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && p2SuperTick >= 0 && t - p2SuperTick === 2) {
+          if (window.superEnabled !== false && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && p2SuperTick >= 0 && t - p2SuperTick === 2) {
             newEntry.p2.damage = 90;
           }
 
