@@ -1651,19 +1651,31 @@
           // SUPER deals 100% damage on tick 2 after SUPER (3rd tick)
           var prev2P1 = 'none';
           var prev2P2 = 'none';
+          var p1SuperInterrupted = false;
+          var p2SuperInterrupted = false;
           if (t >= 2) {
             var checkTick = t - 2;
             var timelineEntry = timeline[checkTick];
             prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
             prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
+            
+            // Check if SUPER was interrupted (changed to Idle) before this tick
+            for (var check = checkTick + 1; check < t; check++) {
+              if (timeline[check] && timeline[check].p1.move === 'Idle' && timeline[check].p1.anim === 'Hit') {
+                p1SuperInterrupted = true;
+              }
+              if (timeline[check] && timeline[check].p2.move === 'Idle' && timeline[check].p2.anim === 'Hit') {
+                p2SuperInterrupted = true;
+              }
+            }
           }
           
-          // If this is 2 ticks after SUPER, deal 100% damage
-          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
+          // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted)
+          if (!p1SuperInterrupted && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
             console.log('-> Setting P1 damage to 100!');
           }
-          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
+          if (!p2SuperInterrupted && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 100;
             console.log('-> Setting P2 damage to 100!');
           }
