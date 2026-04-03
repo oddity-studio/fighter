@@ -1647,22 +1647,25 @@
             }
           }
 
-          // SUPER deals 90% damage on the 2nd IDLE after SUPER (third tick)
-          // Only apply on FIRST IDLE after SUPER, not subsequent IDs
-          var prevP1WasSuper = false;
-          var prevP2WasSuper = false;
+          // SUPER deals 90% damage on tick 3 after SUPER (2nd Idle tick)
+          // Find the tick where SUPER was used and check if this is 2 ticks later
+          var p1SuperTick = -1;
+          var p2SuperTick = -1;
           
-          // Check immediate previous tick only
-          if (t > 0 && timeline[t-1]) {
-            prevP1WasSuper = timeline[t-1].p1.move === 'SUPER';
-            prevP2WasSuper = timeline[t-1].p2.move === 'SUPER';
+          for (var superBack = Math.max(0, t - 3); superBack < t; superBack++) {
+            if (timeline[superBack] && timeline[superBack].p1.move === 'SUPER') {
+              p1SuperTick = superBack;
+            }
+            if (timeline[superBack] && timeline[superBack].p2.move === 'SUPER') {
+              p2SuperTick = superBack;
+            }
           }
           
-          // If current is IDLE and previous was SUPER (first IDLE after SUPER), deal 90% damage
-          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && prevP1WasSuper) {
+          // If this is exactly 2 ticks after SUPER (the 3rd tick), deal 90% damage
+          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0 && t - p1SuperTick === 2) {
             newEntry.p1.damage = 90;
           }
-          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && prevP2WasSuper) {
+          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && p2SuperTick >= 0 && t - p2SuperTick === 2) {
             newEntry.p2.damage = 90;
           }
 
