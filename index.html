@@ -2543,7 +2543,7 @@
               return parseInt((el && el.textContent.replace('x', '')) || '0') || 0;
             }
             var totalFlush = getCount('maxx', 'flush') + getCount('hammer', 'flush');
-            var flushBros = totalFlush > 20 && getCount('maxx', 'fyre') < 5 && getCount('hammer', 'fyre') < 5;
+            var flushBros = getCount('maxx', 'flush') >= 20 && getCount('hammer', 'flush') >= 20 && getCount('maxx', 'fyre') < 5 && getCount('hammer', 'fyre') < 5;
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
