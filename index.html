@@ -1242,6 +1242,7 @@
   <div id="flash"></div>
   <div id="round1-overlay" class="round-overlay"><span>ROUND 1</span></div>
   <div id="round2-overlay" class="round-overlay"><span>ROUND 2</span></div>
+  <div id="fight-overlay" class="round-overlay"><span>FIGHT</span></div>
   <div id="vote-overlay" class="round-overlay"><span>VOTE NOW</span></div>
   <div id="flush-brothers-overlay" class="round-overlay"><span>FLUSH BROTHERS</span></div>
   <div id="winner-overlay" class="round-overlay"><span></span></div>
@@ -2427,6 +2428,9 @@
 
         showRoundCaption('round1-overlay', 1000);
 
+        // Show FIGHT at 7 seconds
+        showRoundCaption('fight-overlay', 7000);
+
         // Build full round timeline for debug (same as menu debug)
         var atkCards = getSortedCards(window.beat1Placements);
         var atkTicks = generateTicks(atkCards);
@@ -2487,6 +2491,9 @@
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
+
+            // Show FIGHT at 7 seconds into round 2
+            showRoundCaption('fight-overlay', 7000);
 
             // Build full round timeline for debug
             var atkTicks2 = generateTicks(window.aiAtkCards);
