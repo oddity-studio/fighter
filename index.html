@@ -2142,10 +2142,10 @@
                 // Mess up audio when player takes damage
                 if (roundNum === 1) {
                   // Player1 takes damage -> mess with audio1
-                  audio1.volume = 0.3;
+                  audio1.volume = 0.2;
                   setTimeout(function() { audio1.volume = 1; }, 500);
                 } else {
-                  audio2.volume = 0.3;
+                  audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
                 if (newH <= 0) {
@@ -2164,10 +2164,10 @@
                 // Mess up audio when player takes damage
                 if (roundNum === 1) {
                   // Player2 takes damage -> mess with audio1 (but Player2 is on audio1 in round 1)
-                  audio1.volume = 0.3;
+                  audio1.volume = 0.2;
                   setTimeout(function() { audio1.volume = 1; }, 500);
                 } else {
-                  audio2.volume = 0.3;
+                  audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
                 if (newH2 <= 0) {
@@ -2571,7 +2571,7 @@
         if (countdown <= 2 && countdown > 0) {
           if (round === 2 && !beat2FadeStarted) {
             beat2FadeStarted = true;
-            audio2.volume = 0.3;
+            audio2.volume = 0.2;
           }
         }
         if (countdown <= 0) {
