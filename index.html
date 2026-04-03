@@ -2270,8 +2270,12 @@
             // Winner does Taunt, Loser does Flush (unless already Down)
             var loserCurrentAnim = loserChar.state.getCurrent(0);
             var loserIsDown = loserCurrentAnim && loserCurrentAnim.animation.name === 'Down';
+            var winnerCurrentAnim = winnerChar.state.getCurrent(0);
+            var winnerIsDown = winnerCurrentAnim && winnerCurrentAnim.animation.name === 'Down';
             
-            playAnimationThenIdle(winnerChar, "Taunt", function() {});
+            if (!winnerIsDown) {
+              playAnimationThenIdle(winnerChar, "Taunt", function() {});
+            }
             if (!loserIsDown) {
               playAnimationOnce(loserChar, "Flush");
             }
