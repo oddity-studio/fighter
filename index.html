@@ -1231,9 +1231,9 @@
     </div>
     <div id="move-seq-2" class="move-sequence"></div>
     <div id="mode-controls" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
-      <button id="ai-mode-btn" class="ai-btn" style="position:static">HIT</button>
-      <button id="ai-popup-btn" class="ai-btn" style="position:static">AI</button>
-      <button id="idle-mode-btn" class="ai-btn" style="position:static">IDLE</button>
+      <button id="ai-mode-btn" class="ai-btn" style="position:static;display:none">HIT</button>
+      <button id="ai-popup-btn" class="ai-btn" style="position:static;display:none">AI</button>
+      <button id="idle-mode-btn" class="ai-btn" style="position:static;display:none">IDLE</button>
       <button id="debug-btn" class="ai-btn" style="position:static">Debug</button>
       <button id="p2-edit-btn" class="ai-btn" style="position:static">Edit P2</button>
       <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
@@ -3764,6 +3764,16 @@
       idleBtn.addEventListener('click', function() {
         aiMode = 2;
         updateMode();
+      });
+      
+      // Show/hide AI buttons with backtick key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '`') {
+          var btns = document.querySelectorAll('#ai-mode-btn, #ai-popup-btn, #idle-mode-btn');
+          btns.forEach(function(btn) {
+            btn.style.display = btn.style.display === 'none' ? '' : 'none';
+          });
+        }
       });
       updateMode();
 
