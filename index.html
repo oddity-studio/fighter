@@ -1582,6 +1582,10 @@
       // null means no change, 'REMOVE' means set to idle
       window.punchDamageBase = 20;
       window.punchPlusDamageBase = 34;
+      window.p1PunchDamageModifier = 0;
+      window.p1PunchPlusDamageModifier = 0;
+      window.p2PunchDamageModifier = 0;
+      window.p2PunchPlusDamageModifier = 0;
       var combatRules = [
         // BLOCK vs PUNCH -> Defender deflects, attacker idles but keeps punch anim
         [['PUNCH', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch', defAnim: 'Deflect' }],
@@ -2114,8 +2118,26 @@
               var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
               var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
 
-              if (r.atkDamage > 0) {
-                var newH = Math.max(0, health[atkTarget] - r.atkDamage);
+              // Apply punch damage modifier based on attacker
+              var atkDamage = r.atkDamage;
+              var defDamage = r.defDamage;
+              
+              if (roundNum === 1) {
+                // maxx is attacking
+                if (r.atkAnim === 'Punch') atkDamage += window.p1PunchDamageModifier;
+                if (r.atkAnim === 'Punch+') atkDamage += window.p1PunchPlusDamageModifier;
+                if (r.defAnim === 'Punch') defDamage += window.p2PunchDamageModifier;
+                if (r.defAnim === 'Punch+') defDamage += window.p2PunchPlusDamageModifier;
+              } else {
+                // hammer is attacking
+                if (r.atkAnim === 'Punch') atkDamage += window.p2PunchDamageModifier;
+                if (r.atkAnim === 'Punch+') atkDamage += window.p2PunchPlusDamageModifier;
+                if (r.defAnim === 'Punch') defDamage += window.p1PunchDamageModifier;
+                if (r.defAnim === 'Punch+') defDamage += window.p1PunchPlusDamageModifier;
+              }
+
+              if (atkDamage > 0) {
+                var newH = Math.max(0, health[atkTarget] - atkDamage);
                 setHealth(atkTarget, newH);
                 if (newH <= 0) {
                   var loser = atkTarget === 'maxx' ? maxx : hammer;
@@ -2125,8 +2147,8 @@
                 }
               }
 
-              if (r.defDamage > 0) {
-                var newH2 = Math.max(0, health[defTarget] - r.defDamage);
+              if (defDamage > 0) {
+                var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
                 if (newH2 <= 0) {
                   var loser2 = defTarget === 'maxx' ? maxx : hammer;
@@ -2281,6 +2303,32 @@
             var counter = btn.querySelector('.btn-counter');
             var count = (parseInt(counter.textContent.replace('x', '')) || 0) + 1;
             counter.textContent = 'x' + count;
+            
+            // Update damage modifier based on button type
+            var player = btn.getAttribute('data-player');
+            var action = btn.getAttribute('data-action');
+            var isP1 = player === 'maxx';
+            
+            if (action === 'fyre') {
+              // +1 per click
+              if (isP1) {
+                window.p1PunchDamageModifier += 1;
+                window.p1PunchPlusDamageModifier += 1;
+              } else {
+                window.p2PunchDamageModifier += 1;
+                window.p2PunchPlusDamageModifier += 1;
+              }
+            } else if (action === 'mid') {
+              // -1 per click
+              if (isP1) {
+                window.p1PunchDamageModifier -= 1;
+                window.p1PunchPlusDamageModifier -= 1;
+              } else {
+                window.p2PunchDamageModifier -= 1;
+                window.p2PunchPlusDamageModifier -= 1;
+              }
+            }
+            // flush doesn't affect damage
           });
         });
 
@@ -2429,6 +2477,12 @@
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
+
+        // Reset damage modifiers for new battle
+        window.p1PunchDamageModifier = 0;
+        window.p1PunchPlusDamageModifier = 0;
+        window.p2PunchDamageModifier = 0;
+        window.p2PunchPlusDamageModifier = 0;
 
         resize();
         
