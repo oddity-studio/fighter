@@ -1655,7 +1655,8 @@
           var p2SuperInterrupted = false;
           if (t >= 2) {
             var checkTick = t - 2;
-            var timelineEntry = timeline[checkTick];
+            // Check result array (processed) not timeline for the SUPER position
+            var timelineEntry = result[checkTick];
             prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
             prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
             
