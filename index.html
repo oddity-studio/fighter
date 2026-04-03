@@ -1683,21 +1683,23 @@
           }
           
           // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted or hit next tick)
+          var p1SuperHitNextTickNow = entry.p1.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p2.move === 'PUNCH';
+          var p2SuperHitNextTickNow = entry.p2.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p1.move === 'PUNCH';
           console.log('SUPER check t=' + t + ' prev2P1=' + prev2P1 + ' interrupted=' + p1SuperInterrupted + ' hitNext=' + p1SuperHitNextTick);
-          if ((!p1SuperInterrupted && !p1SuperHitNextTick) && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
+          if ((!p1SuperInterrupted && !p1SuperHitNextTick && !p1SuperHitNextTickNow) && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
             console.log('-> Setting P1 damage to 100!');
           }
-          if ((!p2SuperInterrupted && !p2SuperHitNextTick) && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
+          if ((!p2SuperInterrupted && !p2SuperHitNextTick && !p2SuperHitNextTickNow) && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 100;
             console.log('-> Setting P2 damage to 100!');
           }
           
-          // If SUPER was hit on next tick, change animation to SuperInt
-          if (p1SuperHitNextTick && prev2P1 === 'SUPER') {
+          // If SUPER was hit on next tick, change animation to SuperInt (on the SUPER tick itself)
+          if (entry.p1.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p2.move === 'PUNCH') {
             newEntry.p1.anim = 'SuperInt';
           }
-          if (p2SuperHitNextTick && prev2P2 === 'SUPER') {
+          if (entry.p2.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p1.move === 'PUNCH') {
             newEntry.p2.anim = 'SuperInt';
           }
 
