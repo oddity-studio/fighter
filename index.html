@@ -941,11 +941,6 @@
       color: #ffcc00;
       border: 1px solid rgba(255, 170, 0, 0.5);
     }
-    .move-taunt-plus {
-      background: rgba(255, 85, 255, 0.3);
-      color: #ff55ff;
-      border: 1px solid rgba(255, 85, 255, 0.5);
-    }
 
     .ai-btn {
       position: absolute;
@@ -3011,10 +3006,7 @@
           });
           el.innerHTML = moves.map(function(item) {
             var cls = 'move-seq-item';
-            if (item.move === 'PUNCH+') {
-              cls += ' move-plus';
-              if (item.tauntCreated) cls += ' move-taunt-plus';
-            }
+            if (item.move === 'PUNCH+') cls += ' move-plus';
             return '<span class="' + cls + '">' + item.move + '</span>';
           }).join('');
 
