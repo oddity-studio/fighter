@@ -2552,13 +2552,10 @@
               document.getElementById('round-label').textContent = 'VOTE NOW';
               showRoundCaption('vote-overlay', 0);
             }
-            ['maxx', 'hammer'].forEach(function(player) {
-              if (health[player] === 0) {
-                var winner = player === 'maxx' ? 'hammer' : 'maxx';
-                var voteBtn = document.querySelector('.vote-btn[data-player="' + winner + '"]');
-                voteBtn.style.visibility = 'visible';
-                voteBtn.classList.add('vote-visible');
-              }
+            // Show both vote buttons at end of round 2
+            document.querySelectorAll('.vote-btn').forEach(function(btn) {
+              btn.style.visibility = 'visible';
+              btn.classList.add('vote-visible');
             });
           }
         } else {
