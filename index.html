@@ -1661,6 +1661,7 @@
             
             // Check if SUPER was interrupted (changed to Idle) in result before this tick
             for (var check = t - 1; check > checkTick; check--) {
+              console.log('Checking result[' + check + ']:', result[check]);
               if (result[check] && result[check].p1.move === 'Idle' && result[check].p1.anim === 'Hit') {
                 p1SuperInterrupted = true;
               }
@@ -1668,6 +1669,7 @@
                 p2SuperInterrupted = true;
               }
             }
+            console.log('After check: p1SuperInterrupted=' + p1SuperInterrupted);
           }
           
           // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted)
