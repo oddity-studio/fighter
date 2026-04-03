@@ -1659,12 +1659,12 @@
             prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
             prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
             
-            // Check if SUPER was interrupted (changed to Idle) before this tick
+            // Check if SUPER was interrupted (changed to Idle) in result before this tick
             for (var check = checkTick + 1; check < t; check++) {
-              if (timeline[check] && timeline[check].p1.move === 'Idle' && timeline[check].p1.anim === 'Hit') {
+              if (result[check] && result[check].p1.move === 'Idle' && result[check].p1.anim === 'Hit') {
                 p1SuperInterrupted = true;
               }
-              if (timeline[check] && timeline[check].p2.move === 'Idle' && timeline[check].p2.anim === 'Hit') {
+              if (result[check] && result[check].p2.move === 'Idle' && result[check].p2.anim === 'Hit') {
                 p2SuperInterrupted = true;
               }
             }
