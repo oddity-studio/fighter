@@ -3701,20 +3701,30 @@
       var aiAtk = generateAttacking();
       var aiDef = generateDefending();
 
-      // Add pos values to AI cards
-      var aiAtkPos = 0;
+      // Add pos values to AI cards - start from tick 8 (index 7)
+      var aiAtkPos = 7;
       aiAtk.forEach(function(c) { c.tick = aiAtkPos; aiAtkPos += c.time; });
-      var aiDefPos = 0;
+      var aiDefPos = 7;
       aiDef.forEach(function(c) { c.tick = aiDefPos; aiDefPos += c.time; });
 
       var hitCards = [];
+      // First 7 ticks are Idle
+      for (var k = 0; k < 7; k++) {
+        hitCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: k + 1 });
+      }
+      // Remaining ticks are Hit
       for (var i = 0; i < 14; i++) {
-        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: i * 2 + 1 });
+        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: (i + 7) * 2 + 1 });
       }
 
       var idleCards = [];
-      for (var j = 0; j < 30; j++) {
+      // First 7 ticks are Idle for both
+      for (var j = 0; j < 7; j++) {
         idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: j + 1 });
+      }
+      // Start actual idles from tick 8
+      for (var k = 7; k < 30; k++) {
+        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: k + 1 });
       }
       window.idleAtkCards = idleCards.slice();
       window.idleDefCards = idleCards.slice();
