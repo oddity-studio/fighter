@@ -2549,11 +2549,6 @@
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
-              // Only play Flush if not already Down
-              var p1Down = maxx.state.getCurrent(0) && maxx.state.getCurrent(0).animation.name === 'Down';
-              var p2Down = hammer.state.getCurrent(0) && hammer.state.getCurrent(0).animation.name === 'Down';
-              if (!p1Down) playAnimationThenIdle(maxx, 'Flush');
-              if (!p2Down) playAnimationThenIdle(hammer, 'Flush');
             } else {
               document.getElementById('round-label').textContent = 'VOTE NOW';
               showRoundCaption('vote-overlay', 0);
@@ -2568,6 +2563,11 @@
             var p2Dead = hammer.state.getCurrent(0) && hammer.state.getCurrent(0).animation.name === 'Down';
             if (!p1Dead) maxx.state.setAnimation(0, 'Idle', true);
             if (!p2Dead) hammer.state.setAnimation(0, 'Idle', true);
+            // Play Flush AFTER Idle for Flush Brothers (unless already Down)
+            if (flushBros) {
+              if (!p1Dead) setTimeout(function() { playAnimationThenIdle(maxx, 'Flush'); }, 100);
+              if (!p2Dead) setTimeout(function() { playAnimationThenIdle(hammer, 'Flush'); }, 100);
+            }
             // Update debug timeline to show Idle for remaining ticks
             var p1List = document.getElementById('debug-p1-list');
             var p2List = document.getElementById('debug-p2-list');
