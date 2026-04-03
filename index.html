@@ -1617,6 +1617,7 @@
         var result = [];
         
         for (var t = 0; t < timeline.length; t++) {
+          console.log('applyCombatRules tick', t);
           var entry = timeline[t];
           var newEntry = { 
             tick: entry.tick || (t + 1),
