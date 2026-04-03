@@ -2557,6 +2557,13 @@
               btn.style.visibility = 'visible';
               btn.classList.add('vote-visible');
             });
+            // Set all characters to Idle unless they're dead (DOWN animation)
+            [maxx, hammer].forEach(function(char) {
+              var currentAnim = char.state.getCurrent(0);
+              if (currentAnim && currentAnim.animation.name !== 'Down') {
+                char.state.setAnimation(0, 'Idle', true);
+              }
+            });
           }
         } else {
           countdownEl.textContent = String(countdown).padStart(2, '0');
