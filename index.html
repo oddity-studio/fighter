@@ -1655,6 +1655,7 @@
           // Look through ALL previous ticks in timeline
           for (var superBack = 0; superBack < t; superBack++) {
             if (timeline[superBack] && timeline[superBack].p1.move === 'SUPER') {
+              console.log('tick', t, 'found SUPER at', superBack, 'diff:', t - superBack);
               if (t - superBack === 2) {
                 p1SuperTick = superBack;
               }
@@ -1665,6 +1666,8 @@
               }
             }
           }
+          
+          console.log('tick', t, 'p1SuperTick:', p1SuperTick, 'move:', entry.p1.move);
           
           // If this is exactly 2 ticks after SUPER, deal 90% damage
           if (window.superEnabled !== false && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0) {
