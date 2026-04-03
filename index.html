@@ -1664,11 +1664,11 @@
           console.log('tick', t, 'prev2P1:', prev2P1, 'prev2P2:', prev2P2, 'current:', entry.p1.move);
           
           // If this is 2 ticks after SUPER, deal 90% damage
-          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && prev2P1 === 'SUPER') {
+          if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 90;
             console.log('-> Setting P1 damage to 90!');
           }
-          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE') && prev2P2 === 'SUPER') {
+          if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 90;
             console.log('-> Setting P2 damage to 90!');
           }
