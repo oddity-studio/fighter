@@ -1647,26 +1647,26 @@
             }
           }
 
-          // SUPER deals 90% damage on tick 3 after SUPER (2nd Idle tick)
-          // Find ALL SUPER ticks in the timeline and check if any was exactly 3 ticks ago
+          // SUPER deals 90% damage on tick 2 after SUPER (3rd tick)
+          // Find ALL SUPER ticks in the timeline and check if any was exactly 2 ticks ago
           var p1SuperTick = -1;
           var p2SuperTick = -1;
           
           // Look through ALL previous ticks in timeline
           for (var superBack = 0; superBack < t; superBack++) {
             if (timeline[superBack] && timeline[superBack].p1.move === 'SUPER') {
-              if (t - superBack === 3) {
+              if (t - superBack === 2) {
                 p1SuperTick = superBack;
               }
             }
             if (timeline[superBack] && timeline[superBack].p2.move === 'SUPER') {
-              if (t - superBack === 3) {
+              if (t - superBack === 2) {
                 p2SuperTick = superBack;
               }
             }
           }
           
-          // If this is exactly 3 ticks after SUPER (the 3rd tick = IDLE), deal 90% damage
+          // If this is exactly 2 ticks after SUPER, deal 90% damage
           if (window.superEnabled !== false && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE') && p1SuperTick >= 0) {
             newEntry.p1.damage = 90;
           }
