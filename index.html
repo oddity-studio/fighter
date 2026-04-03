@@ -2842,7 +2842,7 @@
             barHeights.push({ i: i, h: barH, x: x, y: y });
 
             var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
-            if (i < 10) {
+            if (i < 7) {
               grad.addColorStop(0, '#7a8f93');
               grad.addColorStop(1, '#6a7b80');
             } else {
@@ -2864,7 +2864,7 @@
             zmCtx.fill();
           }
 
-          var colored = barHeights.filter(function(b) { return b.i >= 10; });
+          var colored = barHeights.filter(function(b) { return b.i >= 7; });
           colored.sort(function(a, b) { return b.h - a.h; });
           var spikes = [];
           for (var si = 0; si < colored.length && spikes.length < 3; si++) {
@@ -3099,7 +3099,7 @@
             barHeights.push({ i: i, h: barH, x: x, y: y });
 
             var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
-            if (i < 10) {
+            if (i < 7) {
               grad.addColorStop(0, '#8a7a7d');
               grad.addColorStop(1, '#6e5f62');
             } else {
@@ -3121,7 +3121,7 @@
             b2Ctx.fill();
           }
 
-          var colored = barHeights.filter(function(b) { return b.i >= 10; });
+          var colored = barHeights.filter(function(b) { return b.i >= 7; });
           colored.sort(function(a, b) { return b.h - a.h; });
           var spikes = [];
           for (var si = 0; si < colored.length && spikes.length < 3; si++) {
