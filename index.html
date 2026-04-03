@@ -2534,6 +2534,7 @@
             audio2.volume = 1;
             countdownEl.textContent = '00';
             clearInterval(countdownInterval);
+            if (window.currentCombatInterval) clearInterval(window.currentCombatInterval);
             timersEnded = true;
             round = 0;
             updateRoundButtons();
@@ -2558,12 +2559,22 @@
               btn.classList.add('vote-visible');
             });
             // Set all characters to Idle unless they're dead (DOWN animation)
-            [maxx, hammer].forEach(function(char) {
-              var currentAnim = char.state.getCurrent(0);
-              if (currentAnim && currentAnim.animation.name !== 'Down') {
-                char.state.setAnimation(0, 'Idle', true);
+            var p1Dead = maxx.state.getCurrent(0) && maxx.state.getCurrent(0).animation.name === 'Down';
+            var p2Dead = hammer.state.getCurrent(0) && hammer.state.getCurrent(0).animation.name === 'Down';
+            if (!p1Dead) maxx.state.setAnimation(0, 'Idle', true);
+            if (!p2Dead) hammer.state.setAnimation(0, 'Idle', true);
+            // Update debug timeline to show Idle for remaining ticks
+            var p1List = document.getElementById('debug-p1-list');
+            var p2List = document.getElementById('debug-p2-list');
+            if (p1List && p2List) {
+              var p1Items = p1List.querySelectorAll('.debug-row');
+              var p2Items = p2List.querySelectorAll('.debug-row');
+              var currentTick = 30 - countdown;
+              for (var i = currentTick; i < p1Items.length; i++) {
+                p1Items[i].textContent = 'Idle(' + (i + 1) + ',Idle)';
+                p2Items[i].textContent = 'Idle(' + (i + 1) + ',Idle)';
               }
-            });
+            }
           }
         } else {
           countdownEl.textContent = String(countdown).padStart(2, '0');
