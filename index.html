@@ -2544,6 +2544,11 @@
         if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
         if (atkTicks[3]) atkTicks[3].move = 'IDLE';
         
+        // Player 2 (defender) shouldn't act before tick 8
+        for (var i = 0; i < 7 && defTicks[i]; i++) {
+          defTicks[i].move = 'IDLE';
+        }
+        
         var combat = processCombat(atkTicks, defTicks, 1);
 
         // Timeline shows tick numbers matching card positions (1-30)
@@ -2572,6 +2577,16 @@
           var atkCards = getSortedCards(window.beat1Placements);
           var atkTicks = generateTicks(atkCards);
           var defTicks = generateTicks(window.aiDefCards);
+          
+          // Attacker does Taunt on tick 3, then Idle on tick 4
+          if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+          if (atkTicks[3]) atkTicks[3].move = 'IDLE';
+          
+          // Player 2 (defender) shouldn't act before tick 8
+          for (var i = 0; i < 7 && defTicks[i]; i++) {
+            defTicks[i].move = 'IDLE';
+          }
+          
           var combat = processCombat(atkTicks, defTicks, 1);
           playCombat(maxx, hammer, combat, 1);
         }, 0);
@@ -2613,6 +2628,11 @@
             if (atkTicks2[2]) atkTicks2[2].move = 'TAUNT';
             if (atkTicks2[3]) atkTicks2[3].move = 'IDLE';
             
+            // Player 2 (attacker in round 2) shouldn't act before tick 8
+            for (var i = 0; i < 7 && atkTicks2[i]; i++) {
+              atkTicks2[i].move = 'IDLE';
+            }
+            
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
             for (var t = 0; t < combat2.length; t++) {
@@ -2637,6 +2657,16 @@
               var atkTicks = generateTicks(window.aiAtkCards);
               var defCards = getSortedCards(window.beat2Placements);
               var defTicks = generateTicks(defCards);
+              
+              // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
+              if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+              if (atkTicks[3]) atkTicks[3].move = 'IDLE';
+              
+              // Player 2 (attacker in round 2) shouldn't act before tick 8
+              for (var i = 0; i < 7 && atkTicks[i]; i++) {
+                atkTicks[i].move = 'IDLE';
+              }
+              
               var combat = processCombat(atkTicks, defTicks, 2);
               playCombat(hammer, maxx, combat, 2);
             }, 0);
