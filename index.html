@@ -2994,7 +2994,7 @@
           sorted.forEach(function(p) {
             if (p.moves) {
               p.moves.forEach(function(m, idx) {
-                var prevMove = idx > 0 ? p.moves[idx - 1] : null;
+                var prevMove = moves.length > 0 ? moves[moves.length - 1] : null;
                 if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
                 } else if (m === 'PUNCH' && prevMove === 'TAUNT') {
