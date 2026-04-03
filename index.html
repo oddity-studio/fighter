@@ -2539,6 +2539,11 @@
         var atkCards = getSortedCards(window.beat1Placements);
         var atkTicks = generateTicks(atkCards);
         var defTicks = generateTicks(window.aiDefCards);
+        
+        // Attacker does Taunt on tick 3, then Idle on tick 4
+        if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+        if (atkTicks[3]) atkTicks[3].move = 'IDLE';
+        
         var combat = processCombat(atkTicks, defTicks, 1);
 
         // Timeline shows tick numbers matching card positions (1-30)
@@ -2603,6 +2608,11 @@
             var atkTicks2 = generateTicks(window.aiAtkCards);
             var defCards2 = getSortedCards(window.beat2Placements);
             var defTicks2 = generateTicks(defCards2);
+            
+            // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
+            if (atkTicks2[2]) atkTicks2[2].move = 'TAUNT';
+            if (atkTicks2[3]) atkTicks2[3].move = 'IDLE';
+            
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
             var fullTimeline2 = [];
             for (var t = 0; t < combat2.length; t++) {
