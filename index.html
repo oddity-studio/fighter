@@ -1647,16 +1647,19 @@
               }
             }
           }
-
+ 
           // SUPER deals 90% damage on tick 2 after SUPER (3rd tick)
-          // Simple check - if current is IDLE and t >= 2, check if tick-2 was SUPER
-          console.log('Checking SUPER at tick', t, 'timeline length:', timeline.length);
+          // Debug what's in timeline
           if (t >= 2) {
-            console.log('  timeline[t-2]:', timeline[t-2]);
-            console.log('  timeline[t-2].p1:', timeline[t-2] ? timeline[t-2].p1 : 'undefined');
+            var checkTick = t - 2;
+            var timelineEntry = timeline[checkTick];
+            console.log('tick', t, 'checking tick', checkTick, 'timelineEntry:', timelineEntry, 'move:', timelineEntry ? timelineEntry.p1.move : 'N/A');
+            var prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
+            var prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
+          } else {
+            var prev2P1 = 'none';
+            var prev2P2 = 'none';
           }
-          var prev2P1 = t >= 2 && timeline[t-2] ? timeline[t-2].p1.move : 'none';
-          var prev2P2 = t >= 2 && timeline[t-2] ? timeline[t-2].p2.move : 'none';
           
           console.log('tick', t, 'prev2P1:', prev2P1, 'prev2P2:', prev2P2, 'current:', entry.p1.move);
           
