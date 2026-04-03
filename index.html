@@ -1851,9 +1851,9 @@
             p1Anim = 'cont';
           }
           // If move is Idle (or IDLE) and previous was not Idle (and not CONT), set cont
-          // BUT don't continue after PUNCH+ or PUNCH - let animation end naturally
+          // BUT don't continue after PUNCH+, PUNCH, or BLOCK - let animation end naturally
           if ((p1Move === 'Idle' || p1Move === 'IDLE') && prevP1Move !== 'Idle' && prevP1Move !== 'IDLE' && prevP1Move !== 'CONT' && i > 0) {
-            if (prevP1Move !== 'PUNCH+' && prevP1Move !== 'PUNCH') {
+            if (prevP1Move !== 'PUNCH+' && prevP1Move !== 'PUNCH' && prevP1Move !== 'BLOCK') {
               p1Anim = 'cont';
             }
           }
@@ -1862,7 +1862,7 @@
             p2Anim = 'cont';
           }
           if ((p2Move === 'Idle' || p2Move === 'IDLE') && prevP2Move !== 'Idle' && prevP2Move !== 'IDLE' && prevP2Move !== 'CONT' && i > 0) {
-            if (prevP2Move !== 'PUNCH+' && prevP2Move !== 'PUNCH') {
+            if (prevP2Move !== 'PUNCH+' && prevP2Move !== 'PUNCH' && prevP2Move !== 'BLOCK') {
               p2Anim = 'cont';
             }
           }
