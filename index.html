@@ -1650,6 +1650,11 @@
 
           // SUPER deals 90% damage on tick 2 after SUPER (3rd tick)
           // Simple check - if current is IDLE and t >= 2, check if tick-2 was SUPER
+          console.log('Checking SUPER at tick', t, 'timeline length:', timeline.length);
+          if (t >= 2) {
+            console.log('  timeline[t-2]:', timeline[t-2]);
+            console.log('  timeline[t-2].p1:', timeline[t-2] ? timeline[t-2].p1 : 'undefined');
+          }
           var prev2P1 = t >= 2 && timeline[t-2] ? timeline[t-2].p1.move : 'none';
           var prev2P2 = t >= 2 && timeline[t-2] ? timeline[t-2].p2.move : 'none';
           
