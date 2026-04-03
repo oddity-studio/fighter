@@ -1578,8 +1578,10 @@
       }
 
       // ===== COMBAT RULES =====
-      // Format: [atkMove, defMove] -> { atkMove: 'newMove', atkAnim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
+      // Format: [atkMove, defMove] -> { atkMove: 'newMove', anim: 'newAnim', defMove: 'newMove', defAnim: 'newAnim' }
       // null means no change, 'REMOVE' means set to idle
+      window.punchDamageBase = 20;
+      window.punchPlusDamageBase = 34;
       var combatRules = [
         // BLOCK vs PUNCH -> Defender deflects, attacker idles but keeps punch anim
         [['PUNCH', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch', defAnim: 'Deflect' }],
@@ -1589,9 +1591,9 @@
         [['PUNCH', 'PUNCH'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         [['PUNCH+', 'PUNCH+'], { atkAnim: 'Parry', defAnim: 'Parry' }],
         
-        // PUNCH vs IDLE -> PUNCH hits, deals 20% damage
-        [['PUNCH', 'Idle'], { atkAnim: 'Punch', defAnim: 'Hit', atkDamage: 20 }],
-        [['PUNCH+', 'Idle'], { atkAnim: 'Punch+', defAnim: 'Hit', atkDamage: 34 }],
+        // PUNCH vs IDLE -> PUNCH hits, deals damage
+        [['PUNCH', 'Idle'], { atkAnim: 'Punch', defAnim: 'Hit', atkDamage: window.punchDamageBase }],
+        [['PUNCH+', 'Idle'], { atkAnim: 'Punch+', defAnim: 'Hit', atkDamage: window.punchPlusDamageBase }],
         
         // PUNCH vs TAUNT -> PUNCH hits, TAUNT gets hit and goes idle
         [['PUNCH', 'TAUNT'], { atkAnim: 'Punch', defMove: 'Idle', defAnim: 'Hit' }],
@@ -1642,7 +1644,7 @@
                 if (!p1TauntUsed) {
                   newEntry.p1.move = 'PUNCH+';
                   newEntry.p1.anim = 'Punch+';
-                  newEntry.p1.damage = 34; // PUNCH+ deals 34% damage
+                  newEntry.p1.damage = window.punchPlusDamageBase;
                   break;
                 }
               }
@@ -1662,7 +1664,7 @@
                 if (!p2TauntUsed) {
                   newEntry.p2.move = 'PUNCH+';
                   newEntry.p2.anim = 'Punch+';
-                  newEntry.p2.damage = 34; // PUNCH+ deals 34% damage
+                  newEntry.p2.damage = window.punchPlusDamageBase;
                   break;
                 }
               }
