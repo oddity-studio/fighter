@@ -941,6 +941,11 @@
       color: #ffcc00;
       border: 1px solid rgba(255, 170, 0, 0.5);
     }
+    .move-taunt-plus {
+      background: rgba(255, 85, 255, 0.3);
+      color: #ff55ff;
+      border: 1px solid rgba(255, 85, 255, 0.5);
+    }
 
     .ai-btn {
       position: absolute;
@@ -2995,18 +3000,22 @@
             if (p.moves) {
               p.moves.forEach(function(m, idx) {
                 if (m === 'PUNCH' && p.onSpike && idx === 0) {
-                  moves.push('PUNCH+');
-                } else if (m === 'PUNCH' && idx > 0 && moves[moves.length - 1] === 'TAUNT') {
-                  moves.push('PUNCH+');
+                  moves.push({ move: 'PUNCH+', tauntCreated: false });
+                } else if (m === 'PUNCH' && idx > 0 && moves[moves.length - 1] && moves[moves.length - 1].move === 'TAUNT') {
+                  moves.push({ move: 'PUNCH+', tauntCreated: true });
                 } else if (m !== 'IDLE' && m !== 'CONT') {
-                  moves.push(m);
+                  moves.push({ move: m, tauntCreated: false });
                 }
               });
             }
           });
-          el.innerHTML = moves.map(function(m) {
-            var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';
-            return '<span class="' + cls + '">' + m + '</span>';
+          el.innerHTML = moves.map(function(item) {
+            var cls = 'move-seq-item';
+            if (item.move === 'PUNCH+') {
+              cls += ' move-plus';
+              if (item.tauntCreated) cls += ' move-taunt-plus';
+            }
+            return '<span class="' + cls + '">' + item.move + '</span>';
           }).join('');
 
           if (window.beat1Placements.length > 0 && window.beat2Placements.length > 0) {
