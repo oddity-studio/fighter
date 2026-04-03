@@ -2208,13 +2208,20 @@
               overlay.classList.remove('visible');
             });
             
-            if (btn.getAttribute("data-player") === "maxx") {
-              playAnimationThenIdle(maxx, "Win", function() {});
-              playAnimationOnce(hammer, "Lose");
-            } else {
-              playAnimationThenIdle(hammer, "Win", function() {});
-              playAnimationOnce(maxx, "Lose");
+            var winnerPlayer = btn.getAttribute("data-player");
+            var loserPlayer = winnerPlayer === 'maxx' ? 'hammer' : 'maxx';
+            var winnerChar = winnerPlayer === 'maxx' ? maxx : hammer;
+            var loserChar = loserPlayer === 'maxx' ? maxx : hammer;
+            
+            // Winner does Taunt, Loser does Lose (unless already Down)
+            var loserCurrentAnim = loserChar.state.getCurrent(0);
+            var loserIsDown = loserCurrentAnim && loserCurrentAnim.animation.name === 'Down';
+            
+            playAnimationThenIdle(winnerChar, "Taunt", function() {});
+            if (!loserIsDown) {
+              playAnimationOnce(loserChar, "Lose");
             }
+            
             clearInterval(countdownInterval);
             (round === 1 ? audio1 : audio2).pause();
             setTimeout(function() {
