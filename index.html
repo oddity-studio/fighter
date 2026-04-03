@@ -2049,7 +2049,8 @@
             lastDefAnim = r.defAnim;
           }
 
-          // Apply damage at end of second
+          // Apply damage at end of second - delayed for punch attacks
+          var damageDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+' || r.defAnim === 'Punch' || r.defAnim === 'Punch+') ? 200 : 0;
           setTimeout(function() {
             if (r.atkDamage > 0 || r.defDamage > 0) {
               var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
@@ -2081,7 +2082,7 @@
                 }
               }
             }
-          }, 150);
+          }, 150 + damageDelay);
           idx++;
         }, 1000);
         window.currentCombatInterval = combatInterval;
