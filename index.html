@@ -1671,6 +1671,7 @@
           }
           
           // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted)
+          console.log('SUPER check t=' + t + ' prev2P1=' + prev2P1 + ' interrupted=' + p1SuperInterrupted);
           if (!p1SuperInterrupted && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
             console.log('-> Setting P1 damage to 100!');
