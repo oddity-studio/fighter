@@ -2211,10 +2211,6 @@
             setButtonsDisabled(true);
             // Hide vote overlay
             document.getElementById('vote-overlay').classList.remove('visible');
-            // Hide background videos
-            document.querySelectorAll('.bg-video').forEach(function(vid) {
-              vid.style.display = 'none';
-            });
             // Clear any visible overlays
             document.querySelectorAll('.round-overlay').forEach(function(overlay) {
               overlay.classList.remove('visible');
