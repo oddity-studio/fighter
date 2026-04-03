@@ -2027,19 +2027,22 @@
 
         // cont = skip setAnimation entirely (continue previous animation)
         // Same animation as last tick = skip (allows looping)
-        if (r.atkAnim === 'cont') {
-          // skip - let previous animation continue
-        } else if (r.atkAnim !== lastAtkAnim) {
-          atkChar.state.setAnimation(0, r.atkAnim, true);
-          lastAtkAnim = r.atkAnim;
-        }
-        
-        if (r.defAnim === 'cont') {
-          // skip - let previous animation continue
-        } else if (r.defAnim !== lastDefAnim) {
-          defChar.state.setAnimation(0, r.defAnim, true);
-          lastDefAnim = r.defAnim;
-        }
+        var animDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+') ? 200 : 0;
+        setTimeout(function() {
+          if (r.atkAnim === 'cont') {
+            // skip - let previous animation continue
+          } else if (r.atkAnim !== lastAtkAnim) {
+            atkChar.state.setAnimation(0, r.atkAnim, true);
+            lastAtkAnim = r.atkAnim;
+          }
+          
+          if (r.defAnim === 'cont') {
+            // skip - let previous animation continue
+          } else if (r.defAnim !== lastDefAnim) {
+            defChar.state.setAnimation(0, r.defAnim, true);
+            lastDefAnim = r.defAnim;
+          }
+        }, animDelay);
 
           // Apply damage at end of second
           setTimeout(function() {
