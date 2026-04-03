@@ -1625,25 +1625,45 @@
             p2: { move: entry.p2.move, anim: entry.p2.anim, fromTick: entry.p2.fromTick, continueAnim: entry.p2.continueAnim }
           };
           
-          // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+
+          // TAUNT on P1 turns P1's own PUNCH 3 ticks later into PUNCH+ (only first one)
           if (entry.p1.move === 'PUNCH') {
+            // Check if there's a TAUNT in the window AND we haven't already converted a PUNCH from this TAUNT
+            var p1TauntUsed = false;
             for (var back = Math.max(0, t - 5); back < t; back++) {
               if (result[back] && (result[back].p1.move === 'TAUNT' || result[back].p2.move === 'TAUNT')) {
-                newEntry.p1.move = 'PUNCH+';
-                newEntry.p1.anim = 'Punch+';
-                newEntry.p1.damage = 34; // PUNCH+ deals 34% damage
-                break;
+                // Check if this TAUNT already converted a PUNCH
+                for (var check = back + 1; check < t; check++) {
+                  if (result[check] && result[check].p1.move === 'PUNCH+') {
+                    p1TauntUsed = true;
+                    break;
+                  }
+                }
+                if (!p1TauntUsed) {
+                  newEntry.p1.move = 'PUNCH+';
+                  newEntry.p1.anim = 'Punch+';
+                  newEntry.p1.damage = 34; // PUNCH+ deals 34% damage
+                  break;
+                }
               }
             }
           }
-          // TAUNT on P2 turns P2's own PUNCH 3 ticks later into PUNCH+
+          // TAUNT on P2 turns P2's own PUNCH 3 ticks later into PUNCH+ (only first one)
           if (entry.p2.move === 'PUNCH') {
+            var p2TauntUsed = false;
             for (var back = Math.max(0, t - 5); back < t; back++) {
               if (result[back] && (result[back].p2.move === 'TAUNT' || result[back].p1.move === 'TAUNT')) {
-                newEntry.p2.move = 'PUNCH+';
-                newEntry.p2.anim = 'Punch+';
-                newEntry.p2.damage = 34; // PUNCH+ deals 34% damage
-                break;
+                for (var check = back + 1; check < t; check++) {
+                  if (result[check] && result[check].p2.move === 'PUNCH+') {
+                    p2TauntUsed = true;
+                    break;
+                  }
+                }
+                if (!p2TauntUsed) {
+                  newEntry.p2.move = 'PUNCH+';
+                  newEntry.p2.anim = 'Punch+';
+                  newEntry.p2.damage = 34; // PUNCH+ deals 34% damage
+                  break;
+                }
               }
             }
           }
