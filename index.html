@@ -2991,16 +2991,19 @@
           var el = document.getElementById(elId);
           var sorted = placements.slice().sort(function(a, b) { return a.tick - b.tick; });
           var moves = [];
+          var prevMove = null;
           sorted.forEach(function(p) {
             if (p.moves) {
               p.moves.forEach(function(m, idx) {
-                var prevMove = moves.length > 0 ? moves[moves.length - 1] : null;
                 if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
+                  prevMove = 'PUNCH+';
                 } else if (m === 'PUNCH' && prevMove === 'TAUNT') {
                   moves.push('PUNCH+');
+                  prevMove = 'PUNCH+';
                 } else if (m !== 'IDLE' && m !== 'CONT') {
                   moves.push(m);
+                  prevMove = m;
                 }
               });
             }
