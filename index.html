@@ -2429,6 +2429,10 @@
         maxx.skeleton.y = groundY;
         maxx.skeleton.scaleX = charScale;
         maxx.skeleton.scaleY = charScale;
+        // Apply hue/brightness tint to maxx (cyan/blue direction)
+        var p1Hue = (window.p1HueModifier || 0) * 0.01;
+        var p1Bright = (window.p1BrightnessModifier || 0) * 0.01;
+        maxx.skeleton.setColor(true, 0.2 + p1Hue, 0.8 + p1Bright, 0.9 + p1Bright, 1);
         maxx.state.update(delta);
         maxx.state.apply(maxx.skeleton);
         maxx.skeleton.updateWorldTransform();
@@ -2438,6 +2442,10 @@
         hammer.skeleton.y = groundY;
         hammer.skeleton.scaleX = -charScale;
         hammer.skeleton.scaleY = charScale;
+        // Apply hue/brightness tint to hammer (purple/magenta direction)
+        var p2Hue = (window.p2HueModifier || 0) * 0.01;
+        var p2Bright = (window.p2BrightnessModifier || 0) * 0.01;
+        hammer.skeleton.setColor(true, 0.7 + p2Hue, 0.2 + p2Bright, 0.6 + p2Bright, 1);
         hammer.state.update(delta);
         hammer.state.apply(hammer.skeleton);
         hammer.skeleton.updateWorldTransform();
