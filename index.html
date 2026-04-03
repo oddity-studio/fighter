@@ -1660,7 +1660,7 @@
             prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
             
             // Check if SUPER was interrupted (changed to Idle) in result before this tick
-            for (var check = checkTick + 1; check < t; check++) {
+            for (var check = t - 1; check > checkTick; check--) {
               if (result[check] && result[check].p1.move === 'Idle' && result[check].p1.anim === 'Hit') {
                 p1SuperInterrupted = true;
               }
