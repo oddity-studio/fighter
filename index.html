@@ -2140,10 +2140,12 @@
                 var newH = Math.max(0, health[atkTarget] - atkDamage);
                 setHealth(atkTarget, newH);
                 if (newH <= 0) {
+                  clearInterval(combatInterval);
                   var loser = atkTarget === 'maxx' ? maxx : hammer;
                   var winner = atkTarget === 'maxx' ? hammer : maxx;
                   loser.state.setAnimation(0, 'Down', false);
                   winner.state.setAnimation(0, 'Idle', true);
+                  return;
                 }
               }
 
@@ -2151,10 +2153,12 @@
                 var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
                 if (newH2 <= 0) {
+                  clearInterval(combatInterval);
                   var loser2 = defTarget === 'maxx' ? maxx : hammer;
                   var winner2 = defTarget === 'maxx' ? hammer : maxx;
                   loser2.state.setAnimation(0, 'Down', false);
                   winner2.state.setAnimation(0, 'Idle', true);
+                  return;
                 }
               }
             }
