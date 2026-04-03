@@ -2036,22 +2036,20 @@
 
           // cont = skip setAnimation entirely (continue previous animation)
           // Same animation as last tick = skip (allows looping)
-          var animDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+') ? 200 : 0;
-          var currentIdx = idx;
-          var currentR = r;
+          var animDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+') ? 50 : 0;
           setTimeout(function() {
-            if (currentR.atkAnim === 'cont') {
+            if (r.atkAnim === 'cont') {
               // skip - let previous animation continue
-            } else if (currentR.atkAnim !== lastAtkAnim) {
-              atkChar.state.setAnimation(0, currentR.atkAnim, true);
-              lastAtkAnim = currentR.atkAnim;
+            } else if (r.atkAnim !== lastAtkAnim) {
+              atkChar.state.setAnimation(0, r.atkAnim, true);
+              lastAtkAnim = r.atkAnim;
             }
             
-            if (currentR.defAnim === 'cont') {
+            if (r.defAnim === 'cont') {
               // skip - let previous animation continue
-            } else if (currentR.defAnim !== lastDefAnim) {
-              defChar.state.setAnimation(0, currentR.defAnim, true);
-              lastDefAnim = currentR.defAnim;
+            } else if (r.defAnim !== lastDefAnim) {
+              defChar.state.setAnimation(0, r.defAnim, true);
+              lastDefAnim = r.defAnim;
             }
           }, animDelay);
 
