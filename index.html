@@ -1231,6 +1231,7 @@
     </div>
     <div id="move-seq-2" class="move-sequence"></div>
     <div id="mode-controls" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+      <button id="confirm-btn" class="ai-btn" style="position:static;font-size:18px;padding:10px 24px;">Confirm Beat</button>
       <button id="ai-mode-btn" class="ai-btn" style="position:static;display:none">HIT</button>
       <button id="ai-popup-btn" class="ai-btn" style="position:static;display:none">AI</button>
       <button id="idle-mode-btn" class="ai-btn" style="position:static;display:none">IDLE</button>
@@ -2748,6 +2749,34 @@
         console.log('Start button clicked');
         startBattle();
       });
+
+      // Confirm Beat button - transitions to card placement mode
+      document.getElementById('confirm-btn').addEventListener('click', function() {
+        // Hide first waveform, show cards and second waveform
+        document.getElementById('waveform-canvas').style.display = 'none';
+        document.querySelectorAll('.snippet-label')[0].style.display = 'none';
+        document.querySelectorAll('.waveform-container')[0].style.display = 'none';
+        document.getElementById('move-seq-1').style.display = 'none';
+        document.getElementById('info-box').style.display = '';
+        document.querySelectorAll('.snippet-label')[1].style.display = '';
+        document.querySelectorAll('.waveform-container')[1].style.display = '';
+        document.getElementById('move-seq-2').style.display = '';
+        document.getElementById('start-btn').style.display = '';
+        // Hide confirm button after clicking
+        document.getElementById('confirm-btn').style.display = 'none';
+      });
+
+      // Initially hide info-box, second waveform, and start button (pre-confirm state)
+      document.getElementById('info-box').style.display = 'none';
+      document.querySelectorAll('.snippet-label')[1].style.display = 'none';
+      document.querySelectorAll('.waveform-container')[1].style.display = 'none';
+      document.getElementById('move-seq-2').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'none';
+      // Ensure first waveform is visible
+      document.getElementById('waveform-canvas').style.display = '';
+      document.querySelectorAll('.snippet-label')[0].style.display = '';
+      document.querySelectorAll('.waveform-container')[0].style.display = '';
+      document.getElementById('move-seq-1').style.display = '';
 
       document.getElementById('debug-btn').addEventListener('click', function() {
         console.log('Debug button clicked');
