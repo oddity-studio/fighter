@@ -2549,8 +2549,11 @@
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
-              playAnimationThenIdle(maxx, 'Flush');
-              playAnimationThenIdle(hammer, 'Flush');
+              // Only play Flush if not already Down
+              var p1Down = maxx.state.getCurrent(0) && maxx.state.getCurrent(0).animation.name === 'Down';
+              var p2Down = hammer.state.getCurrent(0) && hammer.state.getCurrent(0).animation.name === 'Down';
+              if (!p1Down) playAnimationThenIdle(maxx, 'Flush');
+              if (!p2Down) playAnimationThenIdle(hammer, 'Flush');
             } else {
               document.getElementById('round-label').textContent = 'VOTE NOW';
               showRoundCaption('vote-overlay', 0);
