@@ -1648,28 +1648,14 @@
             }
           }
  
-          // SUPER deals 90% damage on tick 2 after SUPER (3rd tick)
-          // Debug what's in timeline
-          if (t >= 2) {
-            var checkTick = t - 2;
-            var timelineEntry = timeline[checkTick];
-            console.log('tick', t, 'checking tick', checkTick, 'timelineEntry:', timelineEntry, 'move:', timelineEntry ? timelineEntry.p1.move : 'N/A');
-            var prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
-            var prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
-          } else {
-            var prev2P1 = 'none';
-            var prev2P2 = 'none';
-          }
-          
-          console.log('tick', t, 'prev2P1:', prev2P1, 'prev2P2:', prev2P2, 'current:', entry.p1.move);
-          
-          // If this is 2 ticks after SUPER, deal 90% damage
+          // SUPER deals 100% damage on tick 2 after SUPER (3rd tick)
+          // If this is 2 ticks after SUPER, deal 100% damage
           if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
-            newEntry.p1.damage = 90;
+            newEntry.p1.damage = 100;
             console.log('-> Setting P1 damage to 90!');
           }
           if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
-            newEntry.p2.damage = 90;
+            newEntry.p2.damage = 100;
             console.log('-> Setting P2 damage to 90!');
           }
 
