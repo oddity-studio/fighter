@@ -1649,14 +1649,23 @@
           }
  
           // SUPER deals 100% damage on tick 2 after SUPER (3rd tick)
+          var prev2P1 = 'none';
+          var prev2P2 = 'none';
+          if (t >= 2) {
+            var checkTick = t - 2;
+            var timelineEntry = timeline[checkTick];
+            prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
+            prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
+          }
+          
           // If this is 2 ticks after SUPER, deal 100% damage
           if ((entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
-            console.log('-> Setting P1 damage to 90!');
+            console.log('-> Setting P1 damage to 100!');
           }
           if ((entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 100;
-            console.log('-> Setting P2 damage to 90!');
+            console.log('-> Setting P2 damage to 100!');
           }
 
           // Handle continueAnim flag FIRST - continue previous animation before any rules
@@ -2025,24 +2034,26 @@
           }
           var r = combatResults[idx];
 
-        // cont = skip setAnimation entirely (continue previous animation)
-        // Same animation as last tick = skip (allows looping)
-        var animDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+') ? 200 : 0;
-        setTimeout(function() {
-          if (r.atkAnim === 'cont') {
-            // skip - let previous animation continue
-          } else if (r.atkAnim !== lastAtkAnim) {
-            atkChar.state.setAnimation(0, r.atkAnim, true);
-            lastAtkAnim = r.atkAnim;
-          }
-          
-          if (r.defAnim === 'cont') {
-            // skip - let previous animation continue
-          } else if (r.defAnim !== lastDefAnim) {
-            defChar.state.setAnimation(0, r.defAnim, true);
-            lastDefAnim = r.defAnim;
-          }
-        }, animDelay);
+          // cont = skip setAnimation entirely (continue previous animation)
+          // Same animation as last tick = skip (allows looping)
+          var animDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+') ? 200 : 0;
+          var currentIdx = idx;
+          var currentR = r;
+          setTimeout(function() {
+            if (currentR.atkAnim === 'cont') {
+              // skip - let previous animation continue
+            } else if (currentR.atkAnim !== lastAtkAnim) {
+              atkChar.state.setAnimation(0, currentR.atkAnim, true);
+              lastAtkAnim = currentR.atkAnim;
+            }
+            
+            if (currentR.defAnim === 'cont') {
+              // skip - let previous animation continue
+            } else if (currentR.defAnim !== lastDefAnim) {
+              defChar.state.setAnimation(0, currentR.defAnim, true);
+              lastDefAnim = currentR.defAnim;
+            }
+          }, animDelay);
 
           // Apply damage at end of second
           setTimeout(function() {
