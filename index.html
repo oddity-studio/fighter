@@ -1266,7 +1266,7 @@
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">attacking</span>
     <div class="waveform-container">
-      <button class="play-btn play-btn-cyan" id="play-btn-1" style="display:none">
+      <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
       </button>
       <canvas id="waveform-zoom"></canvas>
@@ -2829,7 +2829,6 @@
         document.querySelectorAll('.waveform-container')[1].style.display = '';
         document.getElementById('move-seq-2').style.display = '';
         document.getElementById('start-btn').style.display = '';
-        document.getElementById('play-btn-1').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
         // Play lobby music
