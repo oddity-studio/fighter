@@ -2752,11 +2752,9 @@
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
-        // Hide first waveform, show cards and second waveform
+        // Hide only the full waveform
         document.getElementById('waveform-canvas').style.display = 'none';
-        document.querySelectorAll('.snippet-label')[0].style.display = 'none';
-        document.querySelectorAll('.waveform-container')[0].style.display = 'none';
-        document.getElementById('move-seq-1').style.display = 'none';
+        // Show cards and second waveform
         document.getElementById('info-box').style.display = '';
         document.querySelectorAll('.snippet-label')[1].style.display = '';
         document.querySelectorAll('.waveform-container')[1].style.display = '';
@@ -2772,11 +2770,6 @@
       document.querySelectorAll('.waveform-container')[1].style.display = 'none';
       document.getElementById('move-seq-2').style.display = 'none';
       document.getElementById('start-btn').style.display = 'none';
-      // Ensure first waveform is visible
-      document.getElementById('waveform-canvas').style.display = '';
-      document.querySelectorAll('.snippet-label')[0].style.display = '';
-      document.querySelectorAll('.waveform-container')[0].style.display = '';
-      document.getElementById('move-seq-1').style.display = '';
 
       document.getElementById('debug-btn').addEventListener('click', function() {
         console.log('Debug button clicked');
