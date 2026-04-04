@@ -1020,6 +1020,28 @@
       background: rgba(255,255,255,0.08);
     }
 
+    #confirm-btn {
+      position: relative;
+      z-index: 1;
+      font-family: 'Norwester', sans-serif;
+      font-size: clamp(22px, 4vw, 56px);
+      letter-spacing: 0.18em;
+      color: #fff;
+      background: transparent;
+      border: 3px solid #fff;
+      padding: 0.35em 1.1em;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(255,255,255,0.9), 0 0 60px rgba(255,200,80,0.5);
+      box-shadow: 0 0 32px rgba(255,255,255,0.25), inset 0 0 32px rgba(255,255,255,0.04);
+      animation: start-btn-pulse 1.4s ease-in-out infinite;
+      transition: background 0.15s;
+    }
+
+    #confirm-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
     @keyframes start-btn-pulse {
       0%, 100% {
         box-shadow: 0 0 24px rgba(255,255,255,0.25), inset 0 0 24px rgba(255,255,255,0.04);
@@ -1231,7 +1253,7 @@
     </div>
     <div id="move-seq-2" class="move-sequence"></div>
     <div id="mode-controls" style="display:flex;gap:8px;align-items:center;margin-top:8px;">
-      <button id="confirm-btn" class="ai-btn" style="position:static;font-size:18px;padding:10px 24px;">Confirm Beat</button>
+      <button id="confirm-btn">Confirm Beat</button>
       <button id="ai-mode-btn" class="ai-btn" style="position:static;display:none">HIT</button>
       <button id="ai-popup-btn" class="ai-btn" style="position:static;display:none">AI</button>
       <button id="idle-mode-btn" class="ai-btn" style="position:static;display:none">IDLE</button>
