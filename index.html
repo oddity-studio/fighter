@@ -2184,6 +2184,12 @@
                   var winner = atkTarget === 'maxx' ? hammer : maxx;
                   loser.state.setAnimation(0, 'Down', false);
                   winner.state.setAnimation(0, 'Idle', true);
+                  // Show K.O. when health reaches 0
+                  var ko = document.getElementById('ko-overlay');
+                  koAudio.play().catch(function() {});
+                  ko.classList.add('visible');
+                  setTimeout(function() { ko.classList.add('blink-out'); }, 1500);
+                  setTimeout(function() { ko.classList.remove('visible', 'blink-out'); }, 1800);
                   return;
                 }
               }
@@ -2208,6 +2214,12 @@
                   var winner2 = defTarget === 'maxx' ? hammer : maxx;
                   loser2.state.setAnimation(0, 'Down', false);
                   winner2.state.setAnimation(0, 'Idle', true);
+                  // Show K.O. when health reaches 0
+                  var ko = document.getElementById('ko-overlay');
+                  koAudio.play().catch(function() {});
+                  ko.classList.add('visible');
+                  setTimeout(function() { ko.classList.add('blink-out'); }, 1500);
+                  setTimeout(function() { ko.classList.remove('visible', 'blink-out'); }, 1800);
                   return;
                 }
               }
@@ -2333,23 +2345,14 @@
               var winner = btn.getAttribute("data-player");
               var winnerName = winner === 'maxx' ? 'MAXX' : 'HAMMER';
 
-              var ko = document.getElementById('ko-overlay');
-              koAudio.play().catch(function() {});
-              ko.classList.add('visible');
+              var wo = document.getElementById('winner-overlay');
+              wo.querySelector('span').textContent = winnerName + ' WINS';
+              wo.classList.add('visible');
               setTimeout(function() {
-                ko.classList.add('blink-out');
+                wo.classList.add('blink-out');
                 setTimeout(function() {
-                  ko.classList.remove('visible');
-                  ko.classList.remove('blink-out');
-                  setTimeout(function() {
-                    var wo = document.getElementById('winner-overlay');
-                    wo.querySelector('span').textContent = winnerName + ' WINS';
-                    wo.classList.add('visible');
-                    setTimeout(function() {
-                      wo.classList.add('blink-out');
-                      setTimeout(function() {
-                        wo.classList.remove('visible');
-                        wo.classList.remove('blink-out');
+                  wo.classList.remove('visible');
+                  wo.classList.remove('blink-out');
                       }, 300);
                     }, 2500);
                   }, 600);
