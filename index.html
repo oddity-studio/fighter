@@ -2762,6 +2762,8 @@
         document.getElementById('start-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
+        // Redraw second waveform
+        if (window.redrawBeat2) window.redrawBeat2();
       });
 
       // Initially hide info-box, second waveform, and start button (pre-confirm state)
