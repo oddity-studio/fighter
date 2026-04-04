@@ -1267,7 +1267,8 @@
     <span class="snippet-label">attacking</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
-        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+        <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
       </button>
       <canvas id="waveform-zoom"></canvas>
     </div>
@@ -3729,6 +3730,16 @@
       var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
       var lobbyAudio = new Audio('resources/lobby.mp3');
+      var audio1Playing = false;
+
+      audio1.addEventListener('ended', function() {
+        audio1Playing = false;
+        var btn = document.getElementById('play-btn-1');
+        if (btn) {
+          btn.querySelector('.play-icon').style.display = '';
+          btn.querySelector('.pause-icon').style.display = 'none';
+        }
+      });
       lobbyAudio.loop = true;
       lobbyAudio.volume = 0.7;
 
@@ -3754,10 +3765,26 @@
         }, (duration || 2000) / 20);
       };
 
+      var audio1Playing = false;
+
       document.getElementById('play-btn-1').addEventListener('click', function() {
-        audio2.pause();
-        audio1.currentTime = window.getBeat1WindowPos() * (window.getBeat1Duration() - 30);
-        audio1.play();
+        var btn = this;
+        var playIcon = btn.querySelector('.play-icon');
+        var pauseIcon = btn.querySelector('.pause-icon');
+        
+        if (audio1Playing) {
+          audio1.pause();
+          audio1Playing = false;
+          playIcon.style.display = '';
+          pauseIcon.style.display = 'none';
+        } else {
+          audio1.pause();
+          audio1.currentTime = window.getBeat1WindowPos() * (window.getBeat1Duration() - 30);
+          audio1.play();
+          audio1Playing = true;
+          playIcon.style.display = 'none';
+          pauseIcon.style.display = '';
+        }
       });
 
       document.getElementById('play-btn-2').addEventListener('click', function() {
