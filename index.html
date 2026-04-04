@@ -1264,7 +1264,7 @@
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
-    <span class="snippet-label">attacking</span>
+    <span class="snippet-label">select a 30 second bit</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -2824,6 +2824,8 @@
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
+        // Change label from "select a 30 second bit" to "attacking"
+        document.querySelectorAll('.snippet-label')[0].textContent = 'attacking';
         // Show cards and second waveform
         document.getElementById('info-box').style.display = '';
         document.querySelectorAll('.snippet-label')[1].style.display = '';
