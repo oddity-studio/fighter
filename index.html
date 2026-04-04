@@ -2322,14 +2322,17 @@
 
               if (btn.getAttribute("data-player") === "maxx") {
                 switchBackground("resources/arena_p1win.webm", true);
+                (new Audio('resources/winnerP1.mp3')).play().catch(function() {});
               } else {
                 switchBackground("resources/arena_p2win.webm", true);
+                (new Audio('resources/winnerP2.mp3')).play().catch(function() {});
               }
 
               var winner = btn.getAttribute("data-player");
               var winnerName = winner === 'maxx' ? 'MAXX' : 'HAMMER';
 
               var ko = document.getElementById('ko-overlay');
+              koAudio.play().catch(function() {});
               ko.classList.add('visible');
               setTimeout(function() {
                 ko.classList.add('blink-out');
@@ -2564,6 +2567,7 @@
         audio1.play();
 
         showRoundCaption('round1-overlay', 1000);
+        startAudio.play().catch(function() {});
 
         // Show FIGHT at 7 seconds
         showRoundCaption('fight-overlay', 7000);
@@ -2724,9 +2728,11 @@
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
+              flushAudio.play().catch(function() {});
             } else {
               document.getElementById('round-label').textContent = 'VOTE NOW';
               showRoundCaption('vote-overlay', 0);
+              votingAudio.play().catch(function() {});
             }
             // Show both vote buttons at end of round 2
             document.querySelectorAll('.vote-btn').forEach(function(btn) {
@@ -3694,6 +3700,11 @@
       var lobbyAudio = new Audio('resources/lobby.mp3');
       lobbyAudio.loop = true;
       lobbyAudio.volume = 0.7;
+
+      var startAudio = new Audio('resources/start.mp3');
+      var votingAudio = new Audio('resources/voting.mp3');
+      var koAudio = new Audio('resources/KO.mp3');
+      var flushAudio = new Audio('resources/flush.mp3');
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
