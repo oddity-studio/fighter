@@ -3252,6 +3252,7 @@
           b2Canvas.height = b2Canvas.offsetHeight * (window.devicePixelRatio || 1);
           console.log('resizeB2 called, width:', b2Canvas.width, 'height:', b2Canvas.height);
         }
+        window.resizeB2 = resizeB2;
         resizeB2();
         window.addEventListener('resize', function() { 
           resizeB2(); 
@@ -3422,18 +3423,22 @@
             console.log('Beat2 audio loaded!');
             window.b2Data = audioBuffer.getChannelData(0);
             window.b2Duration = audioBuffer.duration;
+            window.b2Start = Math.floor(Math.random() * maxStart);
             window.beat2Buffer = audioBuffer;
-            console.log('b2Data now:', window.b2Data ? 'loaded' : 'null', 'b2Duration:', window.b2Duration);
+            console.log('Setting window.b2Start:', window.b2Start);
             var maxStart = window.b2Data.length - Math.floor(30 / window.b2Duration * window.b2Data.length);
-            b2Start = Math.floor(Math.random() * maxStart);
             drawBeat2(window.b2Data, b2Start);
           });
 
         window.beat2Placements = [];
         window.redrawBeat2 = function() { 
+          console.log('redrawBeat2 called, b2Data:', window.b2Data ? 'exists' : 'null', 'b2Duration:', window.b2Duration);
           var useData = window.b2Data;
           var useDuration = window.b2Duration;
-          if (useData && useDuration) drawBeat2(useData, b2Start); 
+          if (useData && useDuration) {
+            resizeB2();
+            drawBeat2(useData, window.b2Start || b2Start); 
+          }
           updateMoveSeq('move-seq-2', window.beat2Placements); 
         };
         window.getBeat2Start = function() { return b2Start; };
