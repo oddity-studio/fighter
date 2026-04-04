@@ -2513,6 +2513,9 @@
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
 
+        // Fade out lobby music
+        window.fadeLobbyMusic(3000);
+
         // Reset damage modifiers for new battle
         window.p1PunchDamageModifier = 0;
         window.p1PunchPlusDamageModifier = 0;
@@ -2762,6 +2765,8 @@
         document.getElementById('start-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
+        // Play lobby music
+        window.playLobbyMusic();
         // Force redraw using globals
         if (window.resizeB2) window.resizeB2();
         setTimeout(function() {
@@ -3657,6 +3662,26 @@
 
       var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
+      var lobbyAudio = new Audio('resources/lobby.mp3');
+      lobbyAudio.loop = true;
+      lobbyAudio.volume = 0.7;
+
+      window.playLobbyMusic = function() {
+        lobbyAudio.currentTime = 0;
+        lobbyAudio.play().catch(function() {});
+      };
+
+      window.fadeLobbyMusic = function(duration) {
+        var fadeInterval = setInterval(function() {
+          if (lobbyAudio.volume > 0.05) {
+            lobbyAudio.volume -= 0.05;
+          } else {
+            lobbyAudio.pause();
+            lobbyAudio.volume = 0.7;
+            clearInterval(fadeInterval);
+          }
+        }, (duration || 2000) / 20);
+      };
 
       document.getElementById('play-btn-1').addEventListener('click', function() {
         audio2.pause();
