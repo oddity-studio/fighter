@@ -2762,9 +2762,11 @@
         document.getElementById('start-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
-        // Resize and redraw second waveform (needs to happen after canvas becomes visible)
-        if (window.resizeB2) window.resizeB2();
-        if (window.redrawBeat2) window.redrawBeat2();
+        // Delay resize/draw to let browser calculate layout after display change
+        setTimeout(function() {
+          if (window.resizeB2) window.resizeB2();
+          if (window.redrawBeat2) window.redrawBeat2();
+        }, 50);
       });
 
       // Initially hide info-box, second waveform, and start button (pre-confirm state)
