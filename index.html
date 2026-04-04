@@ -2163,9 +2163,9 @@
                 var newH = Math.max(0, health[atkTarget] - atkDamage);
                 setHealth(atkTarget, newH);
                 // Mess up audio when specific player takes damage
-                // Round 1: only when maxx (player1) loses health (defTarget === 'maxx')
+                // Round 1: only when maxx (player1) loses health (atkTarget === 'maxx')
                 // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
-                if (roundNum === 1 && defTarget === 'maxx') {
+                if (roundNum === 1 && atkTarget === 'maxx') {
                   audio1.volume = 0.2;
                   setTimeout(function() { audio1.volume = 1; }, 500);
                 } else if (roundNum === 2 && atkTarget === 'hammer') {
