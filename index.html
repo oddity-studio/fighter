@@ -2174,9 +2174,6 @@
                 }
                 if (newH <= 0) {
                   clearInterval(combatInterval);
-                  // Restore volume immediately on death
-                  if (roundNum === 1 && atkTarget === 'maxx') audio1.volume = 1;
-                  if (roundNum === 2 && atkTarget === 'hammer') audio2.volume = 1;
                   var loser = atkTarget === 'maxx' ? maxx : hammer;
                   var winner = atkTarget === 'maxx' ? hammer : maxx;
                   loser.state.setAnimation(0, 'Down', false);
@@ -2197,9 +2194,6 @@
                 }
                 if (newH2 <= 0) {
                   clearInterval(combatInterval);
-                  // Restore volume immediately on death
-                  if (roundNum === 1 && defTarget === 'maxx') audio1.volume = 1;
-                  if (roundNum === 2 && defTarget === 'hammer') audio2.volume = 1;
                   var loser2 = defTarget === 'maxx' ? maxx : hammer;
                   var winner2 = defTarget === 'maxx' ? hammer : maxx;
                   loser2.state.setAnimation(0, 'Down', false);
