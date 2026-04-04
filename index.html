@@ -2762,7 +2762,8 @@
         document.getElementById('start-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
-        // Redraw second waveform
+        // Resize and redraw second waveform (needs to happen after canvas becomes visible)
+        if (window.resizeB2) window.resizeB2();
         if (window.redrawBeat2) window.redrawBeat2();
       });
 
