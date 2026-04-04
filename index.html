@@ -2762,11 +2762,9 @@
         document.getElementById('start-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
-        // Force redraw
-        console.log('Confirm clicked, b2Data:', window.b2Data, 'b2Duration:', window.b2Duration);
+        // Force redraw using globals
         if (window.resizeB2) window.resizeB2();
         setTimeout(function() {
-          console.log('After timeout, canvas size:', document.getElementById('waveform-beat2').width, document.getElementById('waveform-beat2').height);
           if (window.redrawBeat2) window.redrawBeat2();
         }, 100);
       });
@@ -3261,14 +3259,16 @@
         var b2Duration = 0;
 
         function drawBeat2(data, startSample) {
-          if (!data || !b2Duration) return;
+          var useData = data || window.b2Data;
+          var useDuration = window.b2Duration;
+          if (!useData || !useDuration) return;
           var w = b2Canvas.width;
           var h = b2Canvas.height;
           var dpr = window.devicePixelRatio || 1;
           b2Ctx.clearRect(0, 0, w, h);
 
-          var len = data.length;
-          var sampleRange = Math.floor(30 / b2Duration * len);
+          var len = useData.length;
+          var sampleRange = Math.floor(30 / useDuration * len);
           var endSample = Math.min(startSample + sampleRange, len);
 
           var totalBars = 30;
@@ -3288,7 +3288,7 @@
             var sum = 0;
             var count = 0;
             for (var j = s; j < e; j++) {
-              sum += data[j] * data[j];
+              sum += useData[j] * useData[j];
               count++;
             }
             var rms = count > 0 ? Math.sqrt(sum / count) : 0;
@@ -3414,16 +3414,21 @@
           .then(function(r) { return r.arrayBuffer(); })
           .then(function(buf) { return window.sharedAudioCtx.decodeAudioData(buf); })
           .then(function(audioBuffer) {
-            b2Data = audioBuffer.getChannelData(0);
-            b2Duration = audioBuffer.duration;
+            window.b2Data = audioBuffer.getChannelData(0);
+            window.b2Duration = audioBuffer.duration;
             window.beat2Buffer = audioBuffer;
-            var maxStart = b2Data.length - Math.floor(30 / b2Duration * b2Data.length);
+            var maxStart = window.b2Data.length - Math.floor(30 / window.b2Duration * window.b2Data.length);
             b2Start = Math.floor(Math.random() * maxStart);
-            drawBeat2(b2Data, b2Start);
+            drawBeat2(window.b2Data, b2Start);
           });
 
         window.beat2Placements = [];
-        window.redrawBeat2 = function() { drawBeat2(b2Data, b2Start); updateMoveSeq('move-seq-2', window.beat2Placements); };
+        window.redrawBeat2 = function() { 
+          var useData = window.b2Data;
+          var useDuration = window.b2Duration;
+          if (useData && useDuration) drawBeat2(useData, b2Start); 
+          updateMoveSeq('move-seq-2', window.beat2Placements); 
+        };
         window.getBeat2Start = function() { return b2Start; };
       })();
 
