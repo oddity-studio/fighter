@@ -3415,9 +3415,11 @@
           .then(function(r) { return r.arrayBuffer(); })
           .then(function(buf) { return window.sharedAudioCtx.decodeAudioData(buf); })
           .then(function(audioBuffer) {
+            console.log('Beat2 audio loaded!');
             window.b2Data = audioBuffer.getChannelData(0);
             window.b2Duration = audioBuffer.duration;
             window.beat2Buffer = audioBuffer;
+            console.log('b2Data now:', window.b2Data ? 'loaded' : 'null', 'b2Duration:', window.b2Duration);
             var maxStart = window.b2Data.length - Math.floor(30 / window.b2Duration * window.b2Data.length);
             b2Start = Math.floor(Math.random() * maxStart);
             drawBeat2(window.b2Data, b2Start);
