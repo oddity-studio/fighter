@@ -2167,7 +2167,11 @@
                 // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
                 if (roundNum === 1 && atkTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  setTimeout(function() { audio1.volume = 1; }, 500);
+                  console.log('Setting audio1 to 0.2, will restore in 500ms');
+                  setTimeout(function() { 
+                    audio1.volume = 1; 
+                    console.log('Restored audio1 to 1');
+                  }, 500);
                 } else if (roundNum === 2 && atkTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
@@ -2190,7 +2194,11 @@
                 // Round 2: only when hammer (player2) loses health (defTarget === 'hammer')
                 if (roundNum === 1 && defTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  setTimeout(function() { audio1.volume = 1; }, 500);
+                  console.log('Setting audio1 to 0.2 (def), will restore in 500ms');
+                  setTimeout(function() { 
+                    audio1.volume = 1; 
+                    console.log('Restored audio1 to 1 (def)');
+                  }, 500);
                 } else if (roundNum === 2 && defTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
