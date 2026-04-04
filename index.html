@@ -2838,9 +2838,13 @@
         
         if (isVisible) {
           debugBoxes.style.display = 'none';
+          document.getElementById('play-btn-1').style.display = '';
+          document.getElementById('play-btn-2').style.display = '';
           window.debugEnabled = false;
         } else {
           updateDebugTimeline();
+          document.getElementById('play-btn-1').style.display = 'none';
+          document.getElementById('play-btn-2').style.display = 'none';
           window.debugEnabled = true;
         }
       });
