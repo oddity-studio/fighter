@@ -857,7 +857,7 @@
       z-index: 1;
       width: 60vw;
       max-width: 700px;
-      height: 200px;
+      height: 170px;
     }
 
     #debug-boxes {
@@ -3353,7 +3353,7 @@
               count++;
             }
             var rms = count > 0 ? Math.sqrt(sum / count) : 0;
-            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 1.8);
             var y = mid - barH / 2;
             barHeights.push({ i: i, h: barH, x: x, y: y });
 
