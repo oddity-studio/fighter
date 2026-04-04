@@ -3779,6 +3779,14 @@
           audio1Playing = false;
           playIcon.style.display = '';
           pauseIcon.style.display = 'none';
+          var restoreInterval = setInterval(function() {
+            if (lobbyAudio.volume < 0.65) {
+              lobbyAudio.volume += 0.05;
+            } else {
+              lobbyAudio.volume = 0.7;
+              clearInterval(restoreInterval);
+            }
+          }, 100);
         } else {
           audio1.pause();
           audio1.currentTime = window.getBeat1WindowPos() * (window.getBeat1Duration() - 30);
@@ -3786,6 +3794,14 @@
           audio1Playing = true;
           playIcon.style.display = 'none';
           pauseIcon.style.display = '';
+          var fadeInterval = setInterval(function() {
+            if (lobbyAudio.volume > 0.05) {
+              lobbyAudio.volume -= 0.05;
+            } else {
+              lobbyAudio.volume = 0;
+              clearInterval(fadeInterval);
+            }
+          }, 100);
         }
       });
 
