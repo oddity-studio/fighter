@@ -2167,10 +2167,14 @@
                 // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
                 if (roundNum === 1 && atkTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  setTimeout(function() { audio1.volume = 1; }, 500);
+                  if (newH > 0) {
+                    setTimeout(function() { audio1.volume = 1; }, 500);
+                  }
                 } else if (roundNum === 2 && atkTarget === 'hammer') {
                   audio2.volume = 0.2;
-                  setTimeout(function() { audio2.volume = 1; }, 500);
+                  if (newH > 0) {
+                    setTimeout(function() { audio2.volume = 1; }, 500);
+                  }
                 }
                 if (newH <= 0) {
                   clearInterval(combatInterval);
@@ -2187,10 +2191,14 @@
                 setHealth(defTarget, newH2);
                 if (roundNum === 1 && defTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  setTimeout(function() { audio1.volume = 1; }, 500);
+                  if (newH2 > 0) {
+                    setTimeout(function() { audio1.volume = 1; }, 500);
+                  }
                 } else if (roundNum === 2 && defTarget === 'hammer') {
                   audio2.volume = 0.2;
-                  setTimeout(function() { audio2.volume = 1; }, 500);
+                  if (newH2 > 0) {
+                    setTimeout(function() { audio2.volume = 1; }, 500);
+                  }
                 }
                 if (newH2 <= 0) {
                   clearInterval(combatInterval);
