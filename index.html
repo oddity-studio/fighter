@@ -634,6 +634,15 @@
       margin-bottom: 48px;
     }
 
+    #logo {
+      display: block;
+      position: relative;
+      z-index: 1;
+      margin: 0 auto 24px auto;
+      width: 30%;
+      max-width: 300px;
+    }
+
     #vs-caption span {
       font-family: 'Norwester', sans-serif;
       font-size: 12.5vw;
@@ -1236,6 +1245,7 @@
     <img id="picker-hammer" class="picker-slide" src="resources/picker_hammer.webp" alt="">
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
+    <img id="logo" src="resources/logo.webp" alt="">
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">attacking</span>
     <div class="waveform-container">
@@ -2792,7 +2802,8 @@
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
-        // Hide only the full waveform
+        // Hide logo and full waveform
+        document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
         // Show cards and second waveform
         document.getElementById('info-box').style.display = '';
