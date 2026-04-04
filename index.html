@@ -2162,12 +2162,13 @@
               if (atkDamage > 0) {
                 var newH = Math.max(0, health[atkTarget] - atkDamage);
                 setHealth(atkTarget, newH);
-                // Mess up audio when player takes damage
-                if (roundNum === 1) {
-                  // Player1 takes damage -> mess with audio1
+                // Mess up audio when specific player takes damage
+                // Round 1: only when maxx (player1) loses health (defTarget === 'maxx')
+                // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
+                if (roundNum === 1 && defTarget === 'maxx') {
                   audio1.volume = 0.2;
                   setTimeout(function() { audio1.volume = 1; }, 500);
-                } else {
+                } else if (roundNum === 2 && atkTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
@@ -2184,12 +2185,13 @@
               if (defDamage > 0) {
                 var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
-                // Mess up audio when player takes damage
-                if (roundNum === 1) {
-                  // Player2 takes damage -> mess with audio1 (but Player2 is on audio1 in round 1)
+                // Mess up audio when specific player takes damage
+                // Round 1: only when maxx (player1) loses health (defTarget === 'maxx')
+                // Round 2: only when hammer (player2) loses health (defTarget === 'hammer')
+                if (roundNum === 1 && defTarget === 'maxx') {
                   audio1.volume = 0.2;
                   setTimeout(function() { audio1.volume = 1; }, 500);
-                } else {
+                } else if (roundNum === 2 && defTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
