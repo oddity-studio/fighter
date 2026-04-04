@@ -636,9 +636,11 @@
 
     #logo {
       display: block;
-      position: relative;
-      z-index: 1;
-      margin: 0 auto 24px auto;
+      position: fixed;
+      top: 5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 201;
       width: 30%;
       max-width: 300px;
     }
@@ -1245,7 +1247,6 @@
     <img id="picker-hammer" class="picker-slide" src="resources/picker_hammer.webp" alt="">
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
-    <img id="logo" src="resources/logo.webp" alt="">
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">attacking</span>
     <div class="waveform-container">
@@ -1274,6 +1275,7 @@
       <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
     </div>
   </div>
+  <img id="logo" src="resources/logo.webp" alt="">
   <div id="flash"></div>
   <div id="round1-overlay" class="round-overlay"><span>ROUND 1</span></div>
   <div id="round2-overlay" class="round-overlay"><span>ROUND 2</span></div>
