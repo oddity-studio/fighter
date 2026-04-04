@@ -3253,7 +3253,11 @@
           console.log('resizeB2 called, width:', b2Canvas.width, 'height:', b2Canvas.height);
         }
         resizeB2();
-        window.addEventListener('resize', function() { resizeB2(); console.log('resize event, calling drawBeat2 with b2Data:', b2Data ? 'exists' : 'null'); drawBeat2(b2Data, b2Start); });
+        window.addEventListener('resize', function() { 
+          resizeB2(); 
+          console.log('resize, using window.b2Data:', window.b2Data ? 'exists' : 'null');
+          drawBeat2(window.b2Data, b2Start); 
+        });
 
         var b2Data = null;
         var b2Start = 0;
