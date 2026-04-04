@@ -2167,17 +2167,16 @@
                 // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
                 if (roundNum === 1 && atkTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  console.log('Setting audio1 to 0.2, will restore in 500ms');
-                  setTimeout(function() { 
-                    audio1.volume = 1; 
-                    console.log('Restored audio1 to 1');
-                  }, 500);
+                  setTimeout(function() { audio1.volume = 1; }, 500);
                 } else if (roundNum === 2 && atkTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
                 if (newH <= 0) {
                   clearInterval(combatInterval);
+                  // Restore volume immediately on death
+                  if (roundNum === 1 && atkTarget === 'maxx') audio1.volume = 1;
+                  if (roundNum === 2 && atkTarget === 'hammer') audio2.volume = 1;
                   var loser = atkTarget === 'maxx' ? maxx : hammer;
                   var winner = atkTarget === 'maxx' ? hammer : maxx;
                   loser.state.setAnimation(0, 'Down', false);
@@ -2189,22 +2188,18 @@
               if (defDamage > 0) {
                 var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
-                // Mess up audio when specific player takes damage
-                // Round 1: only when maxx (player1) loses health (defTarget === 'maxx')
-                // Round 2: only when hammer (player2) loses health (defTarget === 'hammer')
                 if (roundNum === 1 && defTarget === 'maxx') {
                   audio1.volume = 0.2;
-                  console.log('Setting audio1 to 0.2 (def), will restore in 500ms');
-                  setTimeout(function() { 
-                    audio1.volume = 1; 
-                    console.log('Restored audio1 to 1 (def)');
-                  }, 500);
+                  setTimeout(function() { audio1.volume = 1; }, 500);
                 } else if (roundNum === 2 && defTarget === 'hammer') {
                   audio2.volume = 0.2;
                   setTimeout(function() { audio2.volume = 1; }, 500);
                 }
                 if (newH2 <= 0) {
                   clearInterval(combatInterval);
+                  // Restore volume immediately on death
+                  if (roundNum === 1 && defTarget === 'maxx') audio1.volume = 1;
+                  if (roundNum === 2 && defTarget === 'hammer') audio2.volume = 1;
                   var loser2 = defTarget === 'maxx' ? maxx : hammer;
                   var winner2 = defTarget === 'maxx' ? hammer : maxx;
                   loser2.state.setAnimation(0, 'Down', false);
