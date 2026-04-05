@@ -3531,6 +3531,12 @@
         ];
 
         var box = document.getElementById('info-box');
+        box.addEventListener('wheel', function(e) {
+          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault();
+            box.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
         var wfCanvas = document.getElementById('waveform-canvas');
         var zmCanvas = document.getElementById('waveform-zoom');
         var b2Canvas = document.getElementById('waveform-beat2');
