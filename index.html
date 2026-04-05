@@ -792,6 +792,7 @@
       padding: 8px;
       display: flex;
       flex-direction: column;
+      position: relative;
       align-items: center;
       gap: 6px;
       cursor: pointer;
@@ -866,6 +867,39 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .card-time-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      z-index: 2;
+    }
+
+    .card.type-ATTACK .card-time-badge {
+      background: linear-gradient(135deg, rgba(140, 50, 200, 0.9), rgba(80, 20, 140, 0.9));
+      box-shadow: 0 2px 8px rgba(140, 50, 200, 0.5);
+    }
+
+    .card.type-DEFENSE .card-time-badge {
+      background: linear-gradient(135deg, rgba(120, 120, 120, 0.9), rgba(60, 60, 60, 0.9));
+      box-shadow: 0 2px 8px rgba(120, 120, 120, 0.5);
+    }
+
+    .card.type-SKILL .card-time-badge {
+      background: linear-gradient(135deg, rgba(200, 170, 50, 0.9), rgba(140, 110, 20, 0.9));
+      box-shadow: 0 2px 8px rgba(200, 170, 50, 0.5);
     }
     .card.type-ATTACK .card-type { color: #d8a0ff; }
     .card.type-DEFENSE .card-type { color: #aaa; }
@@ -3641,10 +3675,10 @@
           var el = document.createElement('div');
           el.className = 'card type-' + c.type;
           el.innerHTML =
+            '<div class="card-time-badge">' + c.time + '</div>' +
             '<div class="card-img"><img src="resources/cards/' + imgFile + '.webp" alt="' + c.name + '"></div>' +
             '<div class="card-name">' + c.name + '</div>' +
             '<div class="card-type">' + c.type + '</div>' +
-            '<div class="card-time">' + c.time + 's</div>' +
             '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
