@@ -3579,34 +3579,15 @@
           }
         }, { passive: false });
 
-        var scrollInterval = null;
-        var scrollSpeed = 8;
+        var cardJump = 130; // 120px card + 10px gap
 
-        function startScroll(direction) {
-          if (scrollInterval) return;
-          scrollInterval = setInterval(function() {
-            box.scrollLeft += direction * scrollSpeed;
-          }, 16);
-        }
+        document.getElementById('scroll-left-btn').addEventListener('click', function() {
+          box.scrollLeft = Math.max(0, box.scrollLeft - cardJump);
+        });
 
-        function stopScroll() {
-          if (scrollInterval) {
-            clearInterval(scrollInterval);
-            scrollInterval = null;
-          }
-        }
-
-        document.getElementById('scroll-left-btn').addEventListener('mousedown', function() { startScroll(-1); });
-        document.getElementById('scroll-left-btn').addEventListener('mouseup', stopScroll);
-        document.getElementById('scroll-left-btn').addEventListener('mouseleave', stopScroll);
-        document.getElementById('scroll-left-btn').addEventListener('touchstart', function(e) { e.preventDefault(); startScroll(-1); });
-        document.getElementById('scroll-left-btn').addEventListener('touchend', stopScroll);
-
-        document.getElementById('scroll-right-btn').addEventListener('mousedown', function() { startScroll(1); });
-        document.getElementById('scroll-right-btn').addEventListener('mouseup', stopScroll);
-        document.getElementById('scroll-right-btn').addEventListener('mouseleave', stopScroll);
-        document.getElementById('scroll-right-btn').addEventListener('touchstart', function(e) { e.preventDefault(); startScroll(1); });
-        document.getElementById('scroll-right-btn').addEventListener('touchend', stopScroll);
+        document.getElementById('scroll-right-btn').addEventListener('click', function() {
+          box.scrollLeft += cardJump;
+        });
 
         var wfCanvas = document.getElementById('waveform-canvas');
         var zmCanvas = document.getElementById('waveform-zoom');
