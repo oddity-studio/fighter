@@ -1597,7 +1597,7 @@
         character.state.addListener(listener);
       }
 
-      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', CONT: 'SuperInt' };
+      var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', TAUNT_DEFAULT: 'Taunt', CONT: 'SuperInt' };
 
       var animLookup = {
         'PUNCH:Idle':    'PUNCH:HIT',
@@ -2696,7 +2696,7 @@
         var defTicks = generateTicks(window.aiDefCards);
         
         // Attacker does Taunt on tick 3, then Idle on tick 4
-        if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+        if (atkTicks[2]) atkTicks[2].move = 'TAUNT_DEFAULT';
         if (atkTicks[3]) atkTicks[3].move = 'IDLE';
         
         // Player 2 (defender) shouldn't act before tick 8
@@ -2734,7 +2734,7 @@
           var defTicks = generateTicks(window.aiDefCards);
           
           // Attacker does Taunt on tick 3, then Idle on tick 4
-          if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+          if (atkTicks[2]) atkTicks[2].move = 'TAUNT_DEFAULT';
           if (atkTicks[3]) atkTicks[3].move = 'IDLE';
           
           // Player 2 (defender) shouldn't act before tick 8
@@ -2814,7 +2814,7 @@
               var defTicks = generateTicks(defCards);
               
               // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
-              if (atkTicks[2]) atkTicks[2].move = 'TAUNT';
+              if (atkTicks[2]) atkTicks[2].move = 'TAUNT_DEFAULT';
               if (atkTicks[3]) atkTicks[3].move = 'IDLE';
               
               // Player 2 (attacker in round 2) shouldn't act before tick 8
