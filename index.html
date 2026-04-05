@@ -1602,28 +1602,35 @@
       var animLookup = {
         'PUNCH:Idle':    'PUNCH:HIT',
         'PUNCH:TAUNT':   'PUNCH:HIT',
+        'PUNCH:TAUNT_DEFAULT': 'PUNCH:HIT',
         'PUNCH:SUPER':   'PUNCH:HIT',
         'PUNCH:PUNCH':   'PARRY:PARRY',
         'PUNCH+:Idle':   'PUNCH+:HIT',
         'PUNCH+:Block':  'PUNCH+:HIT',
         'PUNCH+:PUNCH':  'PUNCH+:HIT',
         'PUNCH+:TAUNT':  'PUNCH+:HIT',
+        'PUNCH+:TAUNT_DEFAULT': 'PUNCH+:HIT',
         'PUNCH+:SUPER':  'PUNCH+:HIT',
         'PUNCH+:PUNCH+': 'PARRY:PARRY',
         'BLOCK:Idle':    'BLOCK:IDLE',
         'BLOCK:TAUNT':   'BLOCK:TAUNT',
+        'BLOCK:TAUNT_DEFAULT': 'BLOCK:TAUNT',
         'BLOCK:PUNCH':   'DEFLECT:PUNCH',
         'BLOCK:PUNCH+':  'HIT:PUNCH+',
         'BLOCK:SUPER':   'DOWN:SUPER',
         'SUPER:Idle':    'SUPER:HIT',
         'SUPER:Block':   'SUPER:DOWN',
         'SUPER:TAUNT':   'SUPER:DOWN',
+        'SUPER:TAUNT_DEFAULT': 'SUPER:DOWN',
         'CONT:Idle':     'CONT:HIT',
         'CONT:Block':    'CONT:HIT',
         'CONT:TAUNT':    'CONT:HIT',
+        'CONT:TAUNT_DEFAULT': 'CONT:HIT',
         'CONT:PUNCH':    'CONT:HIT',
         'TAUNT:PUNCH':   'TAUNT:HIT',
         'TAUNT:SUPER':   'TAUNT:HIT',
+        'TAUNT_DEFAULT:PUNCH': 'TAUNT:HIT',
+        'TAUNT_DEFAULT:SUPER': 'TAUNT:HIT',
         'Idle:PUNCH':    'HIT:PUNCH',
         'Idle:PUNCH+':   'HIT:PUNCH+'
       };
@@ -1880,22 +1887,22 @@
           }
 
           // Idle+cont after TAUNT (not matching any other rule) -> goes Idle
-          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
+          if (entry.p1.move === 'Idle' && entry.p1.continueAnim && t > 0 && result[t-1] && (result[t-1].p1.move === 'TAUNT' || result[t-1].p1.move === 'TAUNT_DEFAULT')) {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Idle';
           }
-          if (entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
+          if (entry.p2.move === 'Idle' && entry.p2.continueAnim && t > 0 && result[t-1] && (result[t-1].p2.move === 'TAUNT' || result[t-1].p2.move === 'TAUNT_DEFAULT')) {
             newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Idle';
           }
           
           // Also keep CONT rules for backwards compatibility with cards
           // CONT after TAUNT
-          if (entry.p1.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p1.move === 'TAUNT') {
+          if (entry.p1.move === 'CONT' && t > 0 && result[t-1] && (result[t-1].p1.move === 'TAUNT' || result[t-1].p1.move === 'TAUNT_DEFAULT')) {
             newEntry.p1.move = 'Idle';
             newEntry.p1.anim = 'Idle';
           }
-          if (entry.p2.move === 'CONT' && t > 0 && result[t-1] && result[t-1].p2.move === 'TAUNT') {
+          if (entry.p2.move === 'CONT' && t > 0 && result[t-1] && (result[t-1].p2.move === 'TAUNT' || result[t-1].p2.move === 'TAUNT_DEFAULT')) {
             newEntry.p2.move = 'Idle';
             newEntry.p2.anim = 'Idle';
           }
@@ -2780,7 +2787,7 @@
             var defTicks2 = generateTicks(defCards2);
             
             // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
-            if (atkTicks2[2]) atkTicks2[2].move = 'TAUNT';
+            if (atkTicks2[2]) atkTicks2[2].move = 'TAUNT_DEFAULT';
             if (atkTicks2[3]) atkTicks2[3].move = 'IDLE';
             
             // Player 2 (attacker in round 2) shouldn't act before tick 8
