@@ -1118,6 +1118,17 @@
       background: rgba(255,255,255,0.08);
     }
 
+    #start-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      animation: none;
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    #start-btn:disabled:hover {
+      background: transparent;
+    }
+
     #confirm-btn {
       position: relative;
       z-index: 1;
@@ -1362,7 +1373,7 @@
       <button id="idle-mode-btn" class="ai-btn" style="position:static;display:none">IDLE</button>
       <button id="debug-btn" class="ai-btn" style="position:static;display:none">Debug</button>
       <button id="p2-edit-btn" class="ai-btn" style="position:static;display:none">Edit P2</button>
-      <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;">Start Battle</button>
+      <button id="start-btn" class="ai-btn" style="display:none;position:static;font-size:18px;padding:10px 24px;" disabled>Start Battle</button>
     </div>
   </div>
   <img id="logo" src="resources/logo.webp" alt="">
@@ -3381,9 +3392,9 @@
           }).join('');
 
           if (window.beat1Placements.length > 0 && window.beat2Placements.length > 0) {
-            document.getElementById('start-btn').style.display = '';
+            document.getElementById('start-btn').disabled = false;
           } else {
-            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('start-btn').disabled = true;
           }
         };
         window.getBeat1WindowPos = function() { return windowPos; };
