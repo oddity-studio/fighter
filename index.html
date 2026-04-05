@@ -2708,7 +2708,7 @@
         
         // Player 2 (defender) shouldn't act before tick 8
         for (var i = 0; i < 7 && defTicks[i]; i++) {
-          defTicks[i].move = 'IDLE';
+          if (i !== 2) defTicks[i].move = 'IDLE';
         }
         
         var combat = processCombat(atkTicks, defTicks, 1);
@@ -2746,7 +2746,7 @@
           
           // Player 2 (defender) shouldn't act before tick 8
           for (var i = 0; i < 7 && defTicks[i]; i++) {
-            defTicks[i].move = 'IDLE';
+            if (i !== 2) defTicks[i].move = 'IDLE';
           }
           
           var combat = processCombat(atkTicks, defTicks, 1);
@@ -2792,7 +2792,7 @@
             
             // Player 2 (attacker in round 2) shouldn't act before tick 8
             for (var i = 0; i < 7 && atkTicks2[i]; i++) {
-              atkTicks2[i].move = 'IDLE';
+              if (i !== 2) atkTicks2[i].move = 'IDLE';
             }
             
             var combat2 = processCombat(atkTicks2, defTicks2, 2);
@@ -2826,7 +2826,7 @@
               
               // Player 2 (attacker in round 2) shouldn't act before tick 8
               for (var i = 0; i < 7 && atkTicks[i]; i++) {
-                atkTicks[i].move = 'IDLE';
+                if (i !== 2) atkTicks[i].move = 'IDLE';
               }
               
               var combat = processCombat(atkTicks, defTicks, 2);
