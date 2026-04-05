@@ -3581,12 +3581,31 @@
 
         var cardJump = 130; // 120px card + 10px gap
 
+        function smoothScrollTo(targetScroll) {
+          var startScroll = box.scrollLeft;
+          var distance = targetScroll - startScroll;
+          var duration = 300;
+          var startTime = null;
+
+          function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            var elapsed = currentTime - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var easeProgress = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            box.scrollLeft = startScroll + distance * easeProgress;
+            if (progress < 1) {
+              requestAnimationFrame(animation);
+            }
+          }
+          requestAnimationFrame(animation);
+        }
+
         document.getElementById('scroll-left-btn').addEventListener('click', function() {
-          box.scrollLeft = Math.max(0, box.scrollLeft - cardJump);
+          smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
         });
 
         document.getElementById('scroll-right-btn').addEventListener('click', function() {
-          box.scrollLeft += cardJump;
+          smoothScrollTo(box.scrollLeft + cardJump);
         });
 
         var wfCanvas = document.getElementById('waveform-canvas');
