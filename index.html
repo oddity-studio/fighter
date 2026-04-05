@@ -754,6 +754,36 @@
       display: none;
     }
 
+    .scroll-arrow-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 60px;
+      height: 200px;
+      background: rgba(0, 0, 0, 0.3);
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 80px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .scroll-arrow-btn:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    #scroll-left-btn {
+      left: 0;
+    }
+
+    #scroll-right-btn {
+      right: 0;
+    }
+
     .card {
       flex-shrink: 0;
       width: 120px;
@@ -1279,6 +1309,8 @@
     </div>
     <div id="move-seq-1" class="move-sequence"></div>
     <div id="info-box"></div>
+    <button id="scroll-left-btn" class="scroll-arrow-btn" style="display:none">&#8249;</button>
+    <button id="scroll-right-btn" class="scroll-arrow-btn" style="display:none">&#8250;</button>
     <span class="snippet-label">defending</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
@@ -2837,6 +2869,8 @@
         document.querySelectorAll('.waveform-container')[1].style.display = '';
         document.getElementById('move-seq-2').style.display = '';
         document.getElementById('start-btn').style.display = '';
+        document.getElementById('scroll-left-btn').style.display = '';
+        document.getElementById('scroll-right-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
         // Play lobby music
@@ -3544,6 +3578,36 @@
             box.scrollLeft += e.deltaY;
           }
         }, { passive: false });
+
+        var scrollInterval = null;
+        var scrollSpeed = 8;
+
+        function startScroll(direction) {
+          if (scrollInterval) return;
+          scrollInterval = setInterval(function() {
+            box.scrollLeft += direction * scrollSpeed;
+          }, 16);
+        }
+
+        function stopScroll() {
+          if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+          }
+        }
+
+        document.getElementById('scroll-left-btn').addEventListener('mousedown', function() { startScroll(-1); });
+        document.getElementById('scroll-left-btn').addEventListener('mouseup', stopScroll);
+        document.getElementById('scroll-left-btn').addEventListener('mouseleave', stopScroll);
+        document.getElementById('scroll-left-btn').addEventListener('touchstart', function(e) { e.preventDefault(); startScroll(-1); });
+        document.getElementById('scroll-left-btn').addEventListener('touchend', stopScroll);
+
+        document.getElementById('scroll-right-btn').addEventListener('mousedown', function() { startScroll(1); });
+        document.getElementById('scroll-right-btn').addEventListener('mouseup', stopScroll);
+        document.getElementById('scroll-right-btn').addEventListener('mouseleave', stopScroll);
+        document.getElementById('scroll-right-btn').addEventListener('touchstart', function(e) { e.preventDefault(); startScroll(1); });
+        document.getElementById('scroll-right-btn').addEventListener('touchend', stopScroll);
+
         var wfCanvas = document.getElementById('waveform-canvas');
         var zmCanvas = document.getElementById('waveform-zoom');
         var b2Canvas = document.getElementById('waveform-beat2');
