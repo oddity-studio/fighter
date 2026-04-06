@@ -667,12 +667,6 @@
     #drag-ghost-info .info-type.DEFENSE { color: #aaa; }
     #drag-ghost-info .info-type.SKILL { color: #ffd700; }
 
-    #drag-ghost-info .info-moves-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
     #drag-ghost-info .info-move-item {
       margin-bottom: 4px;
       padding-left: 8px;
@@ -3794,16 +3788,14 @@
             var typeDesc = typeDescriptions[dragCard.type] || '';
             var movesHtml = '';
             if (dragCard.moves) {
-              dragCard.moves.forEach(function(m) {
-                if (m !== 'IDLE' && m !== 'CONT') {
-                  var desc = moveDescriptions[m] || '';
-                  movesHtml += '<div class="info-move-item"><span class="info-move-name">' + m + '</span><br><span class="info-move-desc">' + desc + '</span></div>';
-                }
+              var uniqueMoves = [...new Set(dragCard.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }))];
+              uniqueMoves.forEach(function(m) {
+                var desc = moveDescriptions[m] || '';
+                movesHtml += '<div class="info-move-item"><span class="info-move-name">' + m + '</span><br><span class="info-move-desc">' + desc + '</span></div>';
               });
             }
             infoBox.innerHTML = '<div class="info-type ' + dragCard.type + '">' + dragCard.type + '</div>' +
-              '<div style="color:rgba(255,255,255,0.7);margin-bottom:8px;font-size:11px;">' + typeDesc + '</div>' +
-              '<div class="info-moves-title">Moves:</div>' + movesHtml;
+              '<div style="color:rgba(255,255,255,0.7);margin-bottom:8px;font-size:11px;">' + typeDesc + '</div>' + movesHtml;
             infoBox.style.display = 'block';
             infoBox.style.left = (e.clientX - 140) + 'px';
             infoBox.style.top = (e.clientY + 120) + 'px';
