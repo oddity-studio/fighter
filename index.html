@@ -1038,17 +1038,7 @@
       letter-spacing: 0.05em;
     }
 
-    .punch-plus-desc {
-      font-family: 'Exo 2', sans-serif;
-      font-size: 7px;
-      font-weight: 700;
-      color: #ffd700;
-      text-align: center;
-      margin-top: 4px;
-      padding: 2px 4px;
-      background: rgba(255, 215, 0, 0.15);
-      border-radius: 3px;
-    }
+
 
     #drag-ghost {
       position: fixed;
@@ -3753,15 +3743,18 @@
 
         var box = document.getElementById('info-box');
         box.addEventListener('wheel', function(e) {
-          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            e.preventDefault();
-            box.scrollLeft += e.deltaY;
-          }
+          e.preventDefault();
+          var step = e.deltaY > 0 ? cardJump : -cardJump;
+          smoothScrollTo(box.scrollLeft + step);
+          selectAudio.currentTime = 0;
+          selectAudio.play().catch(function() {});
         }, { passive: false });
 
         var cardJump = 130; // 120px card + 10px gap
 
         function smoothScrollTo(targetScroll) {
+          selectAudio.currentTime = 0;
+          selectAudio.play().catch(function() {});
           var startScroll = box.scrollLeft;
           var distance = targetScroll - startScroll;
           var duration = 150;
@@ -3791,8 +3784,12 @@
         document.addEventListener('keydown', function(e) {
           if (e.key === 'ArrowLeft') {
             smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
+            selectAudio.currentTime = 0;
+            selectAudio.play().catch(function() {});
           } else if (e.key === 'ArrowRight') {
             smoothScrollTo(box.scrollLeft + cardJump);
+            selectAudio.currentTime = 0;
+            selectAudio.play().catch(function() {});
           }
         });
 
@@ -3825,8 +3822,8 @@
             '<div class="card-img"><img src="resources/cards/' + imgFile + '.webp" alt="' + c.name + '"></div>' +
             '<div class="card-name">' + c.name + '</div>' +
             '<div class="card-type">' + c.type + '</div>' +
-            '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>' +
-            (c.moves.includes('PUNCH') ? '<div class="punch-plus-desc">BOOSTED. Deals more damage and can\'t be blocked.</div>' : '');
+            '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
+            
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
             dragCard = c;
@@ -4042,8 +4039,8 @@
 
       var showCardInfo = false;
       var moveDescriptions = {
-        'PUNCH': 'Basic attack',
-        'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
+        'PUNCH': 'Basic light attack. BOOSTED: Deals more damage and can\'t be blocked',
+        'PUNCH+': '',
         'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
         'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
         'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
@@ -4069,6 +4066,7 @@
       var votingAudio = new Audio('resources/voting.mp3');
       var koAudio = new Audio('resources/KO.mp3');
       var flushAudio = new Audio('resources/flush.mp3');
+      var selectAudio = new Audio('resources/select.mp3');
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
