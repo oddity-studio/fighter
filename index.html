@@ -613,6 +613,29 @@
       pointer-events: none;
       transition: opacity 0.05s ease-out;
     }
+
+    .mute-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 300;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mute-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
     #start-screen {
       position: fixed;
       inset: 0;
@@ -1381,6 +1404,7 @@
   </div>
   <img id="logo" src="resources/logo.webp" alt="">
   <div id="flash"></div>
+  <button id="mute-btn" class="mute-btn" style="display:none">🔊</button>
   <div id="round1-overlay" class="round-overlay"><span>ROUND 1</span></div>
   <div id="round2-overlay" class="round-overlay"><span>ROUND 2</span></div>
   <div id="fight-overlay" class="round-overlay"><span>FIGHT</span></div>
@@ -2928,6 +2952,7 @@
         document.getElementById('start-btn').style.display = '';
         document.getElementById('scroll-left-btn').style.display = '';
         document.getElementById('scroll-right-btn').style.display = '';
+        document.getElementById('mute-btn').style.display = '';
         // Hide confirm button after clicking
         document.getElementById('confirm-btn').style.display = 'none';
         // Play lobby music
@@ -3855,7 +3880,7 @@
 
       var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
-      var lobbyAudio = new Audio('resources/lobby.mp3');
+      var lobbyAudio = new Audio('resources/sydosys.mp3');
       var audio1Playing = false;
 
       audio1.addEventListener('ended', function() {
@@ -3868,6 +3893,18 @@
       });
       lobbyAudio.loop = true;
       lobbyAudio.volume = 0.7;
+
+      var audioMuted = false;
+
+      document.getElementById('mute-btn').addEventListener('click', function() {
+        audioMuted = !audioMuted;
+        this.textContent = audioMuted ? '🔇' : '🔊';
+        if (audioMuted) {
+          lobbyAudio.volume = 0;
+        } else {
+          lobbyAudio.volume = 0.7;
+        }
+      });
 
       var startAudio = new Audio('resources/start.mp3');
       var votingAudio = new Audio('resources/voting.mp3');
