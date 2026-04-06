@@ -1281,9 +1281,19 @@
       }
     }
     @media (orientation: portrait) {
-      #picker-maxx   { left:  -80vw; }
-      #picker-hammer { right: -80vw; }
-      #vs-caption span { font-size: 25vw; }
+      #waveform-zoom { width: 90vw; }
+      .snippet-label { width: calc(90vw * 0.8); }
+      .intro-label { width: calc(90vw * 0.2); }
+      .move-sequence { width: 90vw; }
+
+      #info-box {
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 10%, black 17.5%, black 82.5%, transparent 90%, transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0%, transparent 10%, black 17.5%, black 82.5%, transparent 90%, transparent 100%);
+      }
+
+      .scroll-arrow-btn { width: 10vw; }
+      #scroll-left-btn { left: 0; }
+      #scroll-right-btn { right: 0; }
     }
     @media (orientation: portrait) {
       /* Let hud columns share available width and shrink to fit */
@@ -3319,7 +3329,8 @@
           var sampleRange = endSample - startSample;
 
           var totalBars = 30;
-          var gap = 5 * dpr;
+          var isPortrait = window.innerHeight > window.innerWidth;
+          var gap = (isPortrait ? 2.5 : 5) * dpr;
           var barW = Math.max(2 * dpr, (zw - gap * (totalBars - 1)) / totalBars);
           var step = Math.ceil(sampleRange / totalBars);
           var mid = zh / 2;
@@ -3750,6 +3761,7 @@
 
         var box = document.getElementById('info-box');
         box.addEventListener('wheel', function(e) {
+          if (window.innerHeight > window.innerWidth) return;
           e.preventDefault();
           var step = e.deltaY > 0 ? cardJump : -cardJump;
           smoothScrollTo(box.scrollLeft + step);
