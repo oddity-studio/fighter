@@ -3066,8 +3066,8 @@
         document.getElementById('start-btn').addEventListener('click', function() {
           console.log('Start button clicked');
           if (window.confirmAudio) {
-            confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            window.confirmAudio.currentTime = 0;
+            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
           }
           startBattle();
         });
@@ -3076,8 +3076,18 @@
         document.getElementById('confirm-btn').addEventListener('click', function() {
           console.log('Confirm button clicked inside DOMContentLoaded listener');
           if (window.confirmAudio) {
-            confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            window.confirmAudio.currentTime = 0;
+            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+          }
+          startBattle();
+        });
+
+        // Confirm Beat button - transitions to card placement mode
+        document.getElementById('confirm-btn').addEventListener('click', function() {
+          console.log('Confirm button clicked');
+          if (window.confirmAudio) {
+            window.confirmAudio.currentTime = 0;
+            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
           }
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
@@ -3107,6 +3117,39 @@
             window.redrawBeat2();
           }, 100);
         });
+      });
+
+      // Confirm Beat button - transitions to card placement mode
+      document.getElementById('confirm-btn').addEventListener('click', function() {
+        console.log('Confirm button clicked');
+        confirmAudio.currentTime = 0;
+        confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+        // Hide logo and full waveform
+        document.getElementById('logo').style.display = 'none';
+        document.getElementById('waveform-canvas').style.display = 'none';
+        document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });
+        // Change label from "select a 30 second bit" to "attacking"
+        // Show cards and second waveform
+        document.getElementById('info-box').style.display = '';
+        document.querySelectorAll('.snippet-label')[1].style.display = '';
+        document.querySelectorAll('.snippet-label')[0].style.display = '';
+        document.querySelectorAll('.intro-label').forEach(function(el) { el.style.display = ''; });
+        document.querySelectorAll('.waveform-container')[1].style.display = '';
+        document.getElementById('move-seq-2').style.display = '';
+        document.getElementById('start-btn').style.display = '';
+        document.getElementById('scroll-left-btn').style.display = '';
+        document.getElementById('scroll-right-btn').style.display = '';
+        document.getElementById('mute-btn').style.display = '';
+        document.getElementById('info-toggle-btn').style.display = '';
+        // Hide confirm button after clicking
+        document.getElementById('confirm-btn').style.display = 'none';
+        // Play lobby music
+        window.playLobbyMusic();
+        // Force redraw using globals
+        if (window.resizeB2) window.resizeB2();
+        setTimeout(function() {
+          if (window.redrawBeat2) window.redrawBeat2();
+        }, 100);
       });
 
       // Initially hide info-box, second waveform, and start button (pre-confirm state)
@@ -3210,6 +3253,939 @@
         }
       });
       
+      window.debugEnabled = false;
+
+      window.updateDebugTimeline = function() {
+        if (!window.beat1Placements || window.beat1Placements.length === 0) {
+          document.getElementById('debug-boxes').style.display = 'none';
+          return;
+        }
+        
+        var atkCards = getSortedCards(window.beat1Placements);
+        var atkTicks = generateTicks(atkCards);
+        var defTicks = generateTicks(window.aiDefCards || []);
+        var combat = processCombat(atkTicks, defTicks, 1);
+
+        // Timeline shows tick numbers matching card positions
+        var fullTimeline = [];
+        for (var t = 0; t < combat.length; t++) {
+          fullTimeline.push({
+            atkMove: combat[t].atkMove,
+            defMove: combat[t].defMove,
+            atkAnim: combat[t].atkAnim,
+            defAnim: combat[t].defAnim,
+            atkDamage: combat[t].atkDamage,
+            defDamage: combat[t].defDamage,
+            tick: t + 1
+          });
+        }
+
+        document.getElementById('debug-boxes').style.display = 'flex';
+        showDebugTimeline(fullTimeline.slice(0, 30), 1);
+      };
+
+      (function() {
+        var wfCanvas = document.getElementById('waveform-canvas');
+        var wfCtx = wfCanvas.getContext('2d');
+        var zmCanvas = document.getElementById('waveform-zoom');
+        var zmCtx = zmCanvas.getContext('2d');
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        window.sharedAudioCtx = audioCtx;
+
+        function resizeWf() {
+          wfCanvas.width = wfCanvas.offsetWidth * (window.devicePixelRatio || 1);
+          wfCanvas.height = wfCanvas.offsetHeight * (window.devicePixelRatio || 1);
+          zmCanvas.width = zmCanvas.offsetWidth * (window.devicePixelRatio || 1);
+          zmCanvas.height = zmCanvas.offsetHeight * (window.devicePixelRatio || 1);
+        }
+        resizeWf();
+        window.addEventListener('resize', function() { resizeWf(); drawWaveform(wfData); });
+
+        var wfData = null;
+        var wfDuration = 0;
+        var windowPos = 0;
+
+        function roundRect(ctx, x, y, w, h, r) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.arcTo(x + w, y, x + w, y + r, r);
+          ctx.lineTo(x + w, y + h - r);
+          ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+          ctx.lineTo(x + r, y + h);
+          ctx.arcTo(x, y + h, x, y + h - r, r);
+          ctx.lineTo(x, y + r);
+          ctx.arcTo(x, y, x + r, y, r);
+          ctx.closePath();
+        }
+        window.roundRect = roundRect;
+
+        function drawWaveform(data) {
+          if (!data || !wfDuration) return;
+          var w = wfCanvas.width;
+          var h = wfCanvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          wfCtx.clearRect(0, 0, w, h);
+
+          var len = data.length;
+          var barW = 4 * dpr;
+          var gap = 4 * dpr;
+          var totalBars = Math.floor(w / (barW + gap));
+          var step = Math.ceil(len / totalBars);
+          var mid = h / 2;
+          var barRadius = barW / 2;
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var start = i * step;
+            var end = Math.min(start + step, len);
+            var sum = 0;
+            for (var j = start; j < end; j++) {
+              sum += data[j] * data[j];
+            }
+            var rms = Math.sqrt(sum / (end - start));
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.5) * mid * 0.9);
+            var y = mid - barH / 2;
+
+            var grad = wfCtx.createLinearGradient(0, y, 0, y + barH);
+            grad.addColorStop(0, '#00e5ff');
+            grad.addColorStop(1, '#007aad');
+            wfCtx.fillStyle = grad;
+            wfCtx.beginPath();
+            wfCtx.moveTo(x + barRadius, y);
+            wfCtx.lineTo(x + barW - barRadius, y);
+            wfCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            wfCtx.lineTo(x + barW, y + barH - barRadius);
+            wfCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            wfCtx.lineTo(x + barRadius, y + barH);
+            wfCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            wfCtx.lineTo(x, y + barRadius);
+            wfCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            wfCtx.closePath();
+            wfCtx.fill();
+          }
+
+          if (wfDuration > 0) {
+            var windowW = (30 / wfDuration) * w;
+            var windowX = windowPos * (w - windowW);
+            var radius = 10 * dpr;
+
+            wfCtx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+            roundRect(wfCtx, windowX, 0, windowW, h, radius);
+            wfCtx.fill();
+
+            wfCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            wfCtx.lineWidth = 2 * dpr;
+            roundRect(wfCtx, windowX, 0, windowW, h, radius);
+            wfCtx.stroke();
+          }
+
+          drawZoom(data);
+        }
+
+        function drawZoom(data) {
+          if (!data || wfDuration === 0) return;
+          var zw = zmCanvas.width;
+          var zh = zmCanvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          zmCtx.clearRect(0, 0, zw, zh);
+
+          var len = data.length;
+          var startSample = Math.floor((windowPos * (wfDuration - 30)) / wfDuration * len);
+          var endSample = Math.floor(((windowPos * (wfDuration - 30)) + 30) / wfDuration * len);
+          var sampleRange = endSample - startSample;
+
+          var totalBars = 30;
+          var isPortrait = window.innerHeight > window.innerWidth;
+          var gap = (isPortrait ? 2.5 : 5) * dpr;
+          var barW = Math.max(2 * dpr, (zw - gap * (totalBars - 1)) / totalBars);
+          var step = Math.ceil(sampleRange / totalBars);
+          var mid = zh / 2;
+          var barRadius = barW / 2;
+
+          var barHeights = [];
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var s = startSample + i * step;
+            var e = Math.min(s + step, endSample, len);
+            if (s >= len) break;
+            var sum = 0;
+            var count = 0;
+            for (var j = s; j < e; j++) {
+              sum += data[j] * data[j];
+              count++;
+            }
+            var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.7) * mid * 2.2);
+            var y = mid - barH / 2;
+            barHeights.push({ i: i, h: barH, x: x, y: y });
+
+            var grad = zmCtx.createLinearGradient(0, y, 0, y + barH);
+            if (i < 7) {
+              grad.addColorStop(0, '#7a8f93');
+              grad.addColorStop(1, '#6a7b80');
+            } else {
+              grad.addColorStop(0, '#00e5ff');
+              grad.addColorStop(1, '#007aad');
+            }
+            zmCtx.fillStyle = grad;
+            zmCtx.beginPath();
+            zmCtx.moveTo(x + barRadius, y);
+            zmCtx.lineTo(x + barW - barRadius, y);
+            zmCtx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            zmCtx.lineTo(x + barW, y + barH - barRadius);
+            zmCtx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            zmCtx.lineTo(x + barRadius, y + barH);
+            zmCtx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            zmCtx.lineTo(x, y + barRadius);
+            zmCtx.arcTo(x, y, x + barRadius, y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
+          }
+
+          var colored = barHeights.filter(function(b) { return b.i >= 7; });
+          colored.sort(function(a, b) { return b.h - a.h; });
+          var spikes = [];
+          for (var si = 0; si < colored.length && spikes.length < 3; si++) {
+            var candidate = colored[si];
+            var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
+            if (!tooClose) spikes.push(candidate);
+          }
+          window.beat1Spikes = spikes.map(function(s) { return s.i; });
+          zmCtx.shadowColor = '#00ffff';
+          zmCtx.shadowBlur = 14 * dpr;
+          spikes.forEach(function(sp) {
+            var grad2 = zmCtx.createLinearGradient(0, sp.y, 0, sp.y + sp.h);
+            grad2.addColorStop(0, '#80ffff');
+            grad2.addColorStop(1, '#33d6ff');
+            zmCtx.fillStyle = grad2;
+            zmCtx.beginPath();
+            zmCtx.moveTo(sp.x + barRadius, sp.y);
+            zmCtx.lineTo(sp.x + barW - barRadius, sp.y);
+            zmCtx.arcTo(sp.x + barW, sp.y, sp.x + barW, sp.y + barRadius, barRadius);
+            zmCtx.lineTo(sp.x + barW, sp.y + sp.h - barRadius);
+            zmCtx.arcTo(sp.x + barW, sp.y + sp.h, sp.x + barW - barRadius, sp.y + sp.h, barRadius);
+            zmCtx.lineTo(sp.x + barRadius, sp.y + sp.h);
+            zmCtx.arcTo(sp.x, sp.y + sp.h, sp.x, sp.y + sp.h - barRadius, barRadius);
+            zmCtx.lineTo(sp.x, sp.y + barRadius);
+            zmCtx.arcTo(sp.x, sp.y, sp.x + barRadius, sp.y, barRadius);
+            zmCtx.closePath();
+            zmCtx.fill();
+          });
+          zmCtx.shadowBlur = 0;
+
+          if (window.beat1Placements) {
+            var zWindowStart = windowPos * (wfDuration - 30);
+            var zWindowEnd = zWindowStart + 30;
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat1Placements.forEach(function(p) {
+              var px = ((p.tick - 1) / 30) * zw;
+              var pw = (p.time / 30) * zw;
+              var pr = 6 * dpr;
+              var blockH = zh * 0.8;
+              var blockY = (zh - blockH) / 2;
+              zmCtx.fillStyle = typeColors[p.type];
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
+              zmCtx.fill();
+              zmCtx.strokeStyle = typeBorders[p.type];
+              zmCtx.lineWidth = 2 * dpr;
+              window.roundRect(zmCtx, px, blockY, pw, blockH, pr);
+              zmCtx.stroke();
+
+              zmCtx.fillStyle = 'rgba(255,255,255,0.9)';
+              zmCtx.font = '500 ' + (10 * dpr) + 'px "Exo 2", sans-serif';
+              zmCtx.textAlign = 'center';
+              zmCtx.textBaseline = 'middle';
+              zmCtx.fillText(p.name, px + pw / 2, zh / 2);
+            });
+          }
+
+          if (window.dragPreview && window.dragPreview.canvas === 'zoom') {
+            var dp = window.dragPreview;
+            var dpx = dp.bar * zw;
+            var dpw = (dp.time / 30) * zw;
+            var dpr2 = 6 * dpr;
+            var dpH = zh * 0.8;
+            var dpY = (zh - dpH) / 2;
+            if (dp.overlap) {
+              zmCtx.fillStyle = 'rgba(220, 40, 40, 0.35)';
+              zmCtx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
+            } else {
+              var colors = { ATTACK: 'rgba(140, 50, 200, 0.35)', DEFENSE: 'rgba(120, 120, 120, 0.35)', SKILL: 'rgba(200, 170, 50, 0.35)' };
+              zmCtx.fillStyle = colors[dp.type];
+              zmCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+            }
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
+            zmCtx.fill();
+            zmCtx.setLineDash([4 * dpr, 4 * dpr]);
+            zmCtx.lineWidth = 2 * dpr;
+            window.roundRect(zmCtx, dpx, dpY, dpw, dpH, dpr2);
+            zmCtx.stroke();
+            zmCtx.setLineDash([]);
+          }
+        }
+
+        fetch('resources/Beat1.mp3')
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) { return audioCtx.decodeAudioData(buf); })
+          .then(function(audioBuffer) {
+            wfData = audioBuffer.getChannelData(0);
+            wfDuration = audioBuffer.duration;
+            window.beat1Buffer = audioBuffer;
+            drawWaveform(wfData);
+          });
+
+        var dragging = false;
+
+        function getCanvasX(e) {
+          var rect = wfCanvas.getBoundingClientRect();
+          var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          return (clientX - rect.left) / rect.width;
+        }
+
+        wfCanvas.style.cursor = 'pointer';
+        var snippetLocked = false;
+
+        wfCanvas.addEventListener('mousedown', function(e) {
+          if (snippetLocked) return;
+          dragging = true;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        });
+        window.addEventListener('mousemove', function(e) {
+          if (!dragging || snippetLocked) return;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        });
+        window.addEventListener('mouseup', function() { dragging = false; });
+
+        wfCanvas.addEventListener('touchstart', function(e) {
+          if (snippetLocked) return;
+          dragging = true;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        }, { passive: true });
+        window.addEventListener('touchmove', function(e) {
+          if (!dragging || snippetLocked) return;
+          windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
+          drawWaveform(wfData);
+        }, { passive: true });
+        window.addEventListener('touchend', function() { dragging = false; });
+
+      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 1, TAUNT: 1, TAUNT_DEFAULT: 1, CONT: 1 };
+
+        window.beat1Placements = [];
+        window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); if (window.debugEnabled) { window.updateDebugTimeline(); } };
+
+        window.updateMoveSeq = function(elId, placements) {
+          var el = document.getElementById(elId);
+          var sorted = placements.slice().sort(function(a, b) { return a.tick - b.tick; });
+          var moves = [];
+          var prevMove = null;
+          sorted.forEach(function(p) {
+            if (p.moves) {
+              p.moves.forEach(function(m, idx) {
+                console.log('move:', m, 'prevMove:', prevMove, 'onSpike:', p.onSpike, 'idx:', idx);
+                if (m === 'PUNCH' && p.onSpike && idx === 0) {
+                  moves.push('PUNCH+');
+                  prevMove = 'PUNCH+';
+                } else if (m === 'PUNCH' && prevMove === 'TAUNT') {
+                  moves.push('PUNCH+');
+                  prevMove = 'PUNCH+';
+                } else if (m !== 'IDLE' && m !== 'CONT') {
+                  moves.push(m);
+                  prevMove = m;
+                }
+              });
+            }
+          });
+          console.log('final moves:', moves);
+          el.innerHTML = moves.map(function(m) {
+            var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';
+            return '<span class="' + cls + '">' + m + '</span>';
+          }).join('');
+
+          if (window.beat1Placements.length > 0 && window.beat2Placements.length > 0) {
+            document.getElementById('start-btn').disabled = false;
+          } else {
+            document.getElementById('start-btn').disabled = true;
+          }
+        };
+        window.getBeat1WindowPos = function() { return windowPos; };
+        window.getBeat1Duration = function() { return wfDuration; };
+        window.lockSnippet = function() { snippetLocked = true; wfCanvas.style.cursor = 'default'; };
+      })();
+
+      (function() {
+        var b2Canvas = document.getElementById('waveform-beat2');
+        var b2Ctx = b2Canvas.getContext('2d');
+        var b2AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function resizeB2() {
+          b2Canvas.width = b2Canvas.offsetWidth * (window.devicePixelRatio || 1);
+          b2Canvas.height = b2Canvas.offsetHeight * (window.devicePixelRatio || 1);
+          console.log('resizeB2 called, width:', b2Canvas.width, 'height:', b2Canvas.height);
+        }
+        window.resizeB2 = resizeB2;
+        resizeB2();
+        window.addEventListener('resize', function() { 
+          resizeB2(); 
+          console.log('resize, using window.b2Data:', window.b2Data ? 'exists' : 'null');
+          drawBeat2(window.b2Data, b2Start); 
+        });
+
+        var b2Data = null;
+        var b2Start = 0;
+        var b2Duration = 0;
+
+        function drawBeat2(data, startSample) {
+          var useData = data || window.b2Data;
+          var useDuration = window.b2Duration;
+          if (!useData || !useDuration) return;
+          var w = b2Canvas.width;
+          var h = b2Canvas.height;
+          var dpr = window.devicePixelRatio || 1;
+          b2Ctx.clearRect(0, 0, w, h);
+
+          var len = useData.length;
+          var sampleRange = Math.floor(30 / useDuration * len);
+          var endSample = Math.min(startSample + sampleRange, len);
+
+          var totalBars = 30;
+          var isPortrait = window.innerHeight > window.innerWidth;
+          var gap = (isPortrait ? 2.5 : 5) * dpr;
+          var barW = Math.max(2 * dpr, (w - gap * (totalBars - 1)) / totalBars);
+          var step = Math.ceil(sampleRange / totalBars);
+          var mid = h / 2;
+          var barRadius = barW / 2;
+
+          var barHeights = [];
+
+          for (var i = 0; i < totalBars; i++) {
+            var x = i * (barW + gap);
+            var s = startSample + i * step;
+            var e = Math.min(s + step, endSample, len);
+            if (s >= len) break;
+            var sum = 0;
+            var count = 0;
+            for (var j = s; j < e; j++) {
+              sum += useData[j] * useData[j];
+              count++;
+            }
+            var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+            var barH = Math.max(2 * dpr, Math.pow(rms, 0.7) * mid * 2.2);
+            var y = mid - barH / 2;
+            barHeights.push({ i: i, h: barH, x: x, y: y });
+
+            var grad = b2Ctx.createLinearGradient(0, y, 0, y + barH);
+            if (i < 7) {
+              grad.addColorStop(0, '#8a7a7d');
+              grad.addColorStop(1, '#6e5f62');
+            } else {
+              grad.addColorStop(0, '#fc6c85');
+              grad.addColorStop(1, '#7a1a3a');
+            }
+            b2Ctx.fillStyle = grad;
+            b2Ctx.beginPath();
+            b2Ctx.moveTo(x + barRadius, y);
+            b2Ctx.lineTo(x + barW - barRadius, y);
+            b2Ctx.arcTo(x + barW, y, x + barW, y + barRadius, barRadius);
+            b2Ctx.lineTo(x + barW, y + barH - barRadius);
+            b2Ctx.arcTo(x + barW, y + barH, x + barW - barRadius, y + barH, barRadius);
+            b2Ctx.lineTo(x + barRadius, y + barH);
+            b2Ctx.arcTo(x, y + barH, x, y + barH - barRadius, barRadius);
+            b2Ctx.lineTo(x, y + barRadius);
+            b2Ctx.arcTo(x, y, x + barRadius, y, barRadius);
+            b2Ctx.closePath();
+            b2Ctx.fill();
+          }
+
+          var colored = barHeights.filter(function(b) { return b.i >= 7; });
+          colored.sort(function(a, b) { return b.h - a.h; });
+          var spikes = [];
+          for (var si = 0; si < colored.length && spikes.length < 3; si++) {
+            var candidate = colored[si];
+            var tooClose = spikes.some(function(s) { return Math.abs(s.i - candidate.i) < 4; });
+            if (!tooClose) spikes.push(candidate);
+          }
+          window.beat2Spikes = spikes.map(function(s) { return s.i; });
+          b2Ctx.shadowColor = '#ff80a0';
+          b2Ctx.shadowBlur = 14 * dpr;
+          spikes.forEach(function(sp) {
+            var grad2 = b2Ctx.createLinearGradient(0, sp.y, 0, sp.y + sp.h);
+            grad2.addColorStop(0, '#ffa0b8');
+            grad2.addColorStop(1, '#d63366');
+            b2Ctx.fillStyle = grad2;
+            b2Ctx.beginPath();
+            b2Ctx.moveTo(sp.x + barRadius, sp.y);
+            b2Ctx.lineTo(sp.x + barW - barRadius, sp.y);
+            b2Ctx.arcTo(sp.x + barW, sp.y, sp.x + barW, sp.y + barRadius, barRadius);
+            b2Ctx.lineTo(sp.x + barW, sp.y + sp.h - barRadius);
+            b2Ctx.arcTo(sp.x + barW, sp.y + sp.h, sp.x + barW - barRadius, sp.y + sp.h, barRadius);
+            b2Ctx.lineTo(sp.x + barRadius, sp.y + sp.h);
+            b2Ctx.arcTo(sp.x, sp.y + sp.h, sp.x, sp.y + sp.h - barRadius, barRadius);
+            b2Ctx.lineTo(sp.x, sp.y + barRadius);
+            b2Ctx.arcTo(sp.x, sp.y, sp.x + barRadius, sp.y, barRadius);
+            b2Ctx.closePath();
+            b2Ctx.fill();
+          });
+          b2Ctx.shadowBlur = 0;
+
+          if (window.beat2Placements) {
+            var b2WindowStart = b2Start / len * b2Duration;
+            var b2WindowEnd = b2WindowStart + 30;
+            var typeColors = { ATTACK: 'rgba(140, 50, 200, 0.6)', DEFENSE: 'rgba(120, 120, 120, 0.6)', SKILL: 'rgba(200, 170, 50, 0.6)' };
+            var typeBorders = { ATTACK: 'rgba(180, 80, 240, 0.8)', DEFENSE: 'rgba(160, 160, 160, 0.8)', SKILL: 'rgba(230, 200, 60, 0.8)' };
+            window.beat2Placements.forEach(function(p) {
+              var px = ((p.tick - 1) / 30) * w;
+              var pw = (p.time / 30) * w;
+              var pr = 6 * dpr;
+              var blockH = h * 0.8;
+              var blockY = (h - blockH) / 2;
+              b2Ctx.fillStyle = typeColors[p.type];
+              window.roundRect(b2Ctx, px, blockY, pw, blockH, pr);
+              b2Ctx.fill();
+              b2Ctx.strokeStyle = typeBorders[p.type];
+              b2Ctx.lineWidth = 2 * dpr;
+              window.roundRect(b2Ctx, px, blockY, pw, blockH, pr);
+              b2Ctx.stroke();
+
+              b2Ctx.fillStyle = 'rgba(255,255,255,0.9)';
+              b2Ctx.font = '500 ' + (10 * dpr) + 'px "Exo 2", sans-serif';
+              b2Ctx.textAlign = 'center';
+              b2Ctx.textBaseline = 'middle';
+              b2Ctx.fillText(p.name, px + pw / 2, h / 2);
+            });
+          }
+
+          if (window.dragPreview && window.dragPreview.canvas === 'beat2') {
+            var dp = window.dragPreview;
+            var dpx = dp.bar * w;
+            var dpw = (dp.time / 30) * w;
+            var dpr2 = 6 * dpr;
+            var dpH = h * 0.8;
+            var dpY = (h - dpH) / 2;
+            if (dp.overlap) {
+              b2Ctx.fillStyle = 'rgba(220, 40, 40, 0.35)';
+              b2Ctx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
+            } else {
+              var colors = { ATTACK: 'rgba(140, 50, 200, 0.35)', DEFENSE: 'rgba(120, 120, 120, 0.35)', SKILL: 'rgba(200, 170, 50, 0.35)' };
+              b2Ctx.fillStyle = colors[dp.type];
+              b2Ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            }
+            window.roundRect(b2Ctx, dpx, dpY, dpw, dpH, dpr2);
+            b2Ctx.fill();
+            b2Ctx.setLineDash([4 * dpr, 4 * dpr]);
+            b2Ctx.lineWidth = 2 * dpr;
+            window.roundRect(b2Ctx, dpx, dpY, dpw, dpH, dpr2);
+            b2Ctx.stroke();
+            b2Ctx.setLineDash([]);
+          }
+        }
+
+        fetch('resources/Beat2.mp3')
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) { return window.sharedAudioCtx.decodeAudioData(buf); })
+          .then(function(audioBuffer) {
+            console.log('Beat2 audio loaded!');
+            window.b2Data = audioBuffer.getChannelData(0);
+            window.b2Duration = audioBuffer.duration;
+            var maxStart = window.b2Data.length - Math.floor(30 / window.b2Duration * window.b2Data.length);
+            window.b2Start = Math.floor(Math.random() * maxStart);
+            window.beat2Buffer = audioBuffer;
+            console.log('Setting window.b2Start:', window.b2Start);
+            drawBeat2(window.b2Data, window.b2Start);
+          });
+
+        window.beat2Placements = [];
+        window.redrawBeat2 = function() { 
+          console.log('redrawBeat2 called, b2Data:', window.b2Data ? 'exists' : 'null', 'b2Duration:', window.b2Duration);
+          var useData = window.b2Data;
+          var useDuration = window.b2Duration;
+          if (useData && useDuration) {
+            resizeB2();
+            drawBeat2(useData, window.b2Start); 
+          }
+          updateMoveSeq('move-seq-2', window.beat2Placements); 
+        };
+        window.getBeat2Start = function() { return b2Start; };
+      })();
+
+      (function() {
+        var cards = [
+          { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH', 'IDLE'] },
+          { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH', 'IDLE', 'IDLE'] },
+          { name: 'Sucker Punch',   type: 'ATTACK',  time: 3, moves: ['BLOCK', 'PUNCH', 'IDLE'] },
+          { name: 'Power Glove',    type: 'ATTACK',  time: 5, moves: ['SUPER', 'CONT', 'CONT', 'IDLE', 'CONT'] },
+          { name: 'Doom',           type: 'ATTACK',  time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
+          { name: 'Deflect',        type: 'DEFENSE', time: 2, moves: ['BLOCK', 'IDLE'] },
+          { name: 'Turtle',         type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK', 'IDLE', 'CONT'] },
+          { name: 'Smartass',       type: 'DEFENSE', time: 5, moves: ['BLOCK', 'TAUNT', 'CONT', 'IDLE'] },
+          { name: 'Wait For It', type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
+          { name: 'Boost Morale',   type: 'SKILL',   time: 3, moves: ['TAUNT', 'IDLE', 'IDLE'] }
+        ];
+
+        var box = document.getElementById('info-box');
+        box.addEventListener('wheel', function(e) {
+          if (window.innerHeight > window.innerWidth) return;
+          e.preventDefault();
+          var step = e.deltaY > 0 ? cardJump : -cardJump;
+          smoothScrollTo(box.scrollLeft + step);
+          window.selectAudio.currentTime = 0;
+          window.selectAudio.play().catch(function() {});
+        }, { passive: false });
+
+        var cardJump = 130; // 120px card + 10px gap
+
+        function smoothScrollTo(targetScroll) {
+          window.selectAudio.currentTime = 0;
+          window.selectAudio.play().catch(function() {});
+          var startScroll = box.scrollLeft;
+          var distance = targetScroll - startScroll;
+          var duration = 150;
+          var startTime = null;
+
+          function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            var elapsed = currentTime - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var easeProgress = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            box.scrollLeft = startScroll + distance * easeProgress;
+            if (progress < 1) {
+              requestAnimationFrame(animation);
+            }
+          }
+          requestAnimationFrame(animation);
+        }
+
+        document.getElementById('scroll-left-btn').addEventListener('click', function() {
+          smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
+        });
+
+        document.getElementById('scroll-right-btn').addEventListener('click', function() {
+          smoothScrollTo(box.scrollLeft + cardJump);
+        });
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowLeft') {
+            smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
+            window.selectAudio.currentTime = 0;
+            window.selectAudio.play().catch(function() {});
+          } else if (e.key === 'ArrowRight') {
+            smoothScrollTo(box.scrollLeft + cardJump);
+            window.selectAudio.currentTime = 0;
+            window.selectAudio.play().catch(function() {});
+          }
+        });
+
+        var wfCanvas = document.getElementById('waveform-canvas');
+        var zmCanvas = document.getElementById('waveform-zoom');
+        var b2Canvas = document.getElementById('waveform-beat2');
+        var ghost = document.getElementById('drag-ghost');
+        var dragCard = null;
+        var dragEl = null;
+
+        var cardImages = {
+          'Hit': 'hit',
+          'Triple Hit': 'triple_hit',
+          'Sucker Punch': 'sucker_punch',
+          'Power Glove': 'power_glove',
+          'Doom': 'doom',
+          'Deflect': 'deflect',
+          'Turtle': 'turtle',
+          'Smartass': 'smartass',
+          'Wait For It': 'wait_your_moment',
+          'Boost Morale': 'boost_morale'
+        };
+
+        function createCardEl(c) {
+          var imgFile = cardImages[c.name] || 'hit';
+          var el = document.createElement('div');
+          el.className = 'card type-' + c.type;
+          el.innerHTML =
+            '<div class="card-time-badge">' + c.time + '</div>' +
+            '<div class="card-img"><img src="resources/cards/' + imgFile + '.webp" alt="' + c.name + '"></div>' +
+            '<div class="card-name">' + c.name + '</div>' +
+            '<div class="card-type">' + c.type + '</div>' +
+            '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
+            
+          el.addEventListener('pointerdown', function(e) {
+            e.preventDefault();
+            window.pickAudio.currentTime = 0;
+            window.pickAudio.play().catch(function() {});
+            dragCard = c;
+            dragEl = el;
+            ghost.innerHTML = el.outerHTML;
+            ghost.style.display = 'block';
+            ghost.style.width = el.offsetWidth + 'px';
+            ghost.style.left = e.clientX + 'px';
+            ghost.style.top = e.clientY + 'px';
+            el.style.opacity = '0.3';
+          });
+          return el;
+        }
+
+        cards.forEach(function(c) {
+          box.appendChild(createCardEl(c));
+        });
+
+        window.addEventListener('pointermove', function(e) {
+          if (!dragCard) return;
+          ghost.style.left = e.clientX + 'px';
+          ghost.style.top = e.clientY + 'px';
+
+          if (showCardInfo && dragCard) {
+            var infoBox = document.getElementById('drag-ghost-info');
+            var typeDesc = typeDescriptions[dragCard.type] || '';
+            var movesHtml = '';
+            if (dragCard.moves) {
+              var uniqueMoves = [...new Set(dragCard.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }))];
+              uniqueMoves.forEach(function(m) {
+                var desc = moveDescriptions[m] || '';
+                movesHtml += '<div class="info-move-item"><span class="info-move-name">' + m + '</span><br><span class="info-move-desc">' + desc + '</span></div>';
+              });
+            }
+            infoBox.innerHTML = '<div class="info-type ' + dragCard.type + '">' + dragCard.type + '</div>' +
+              '<div style="color:rgba(255,255,255,0.7);margin-bottom:8px;font-size:11px;">' + typeDesc + '</div>' + movesHtml;
+            infoBox.style.display = 'block';
+            infoBox.style.left = (e.clientX - 140) + 'px';
+            infoBox.style.top = (e.clientY + 120) + 'px';
+          }
+
+          var zmRect = zmCanvas.getBoundingClientRect();
+          var b2Rect = b2Canvas.getBoundingClientRect();
+          window.dragPreview = null;
+
+          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
+              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
+            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+            var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
+            var visualBar = (snappedTick - 1) / 30;
+            var restricted = snappedTick < 8 && dragCard.type !== 'SKILL';
+            var overflows = snappedTick + dragCard.time > 31;
+            var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
+              var pEnd = p.tick + p.time;
+              return snappedTick < pEnd && snappedTick + dragCard.time > p.tick;
+            });
+            window.dragPreview = { canvas: 'zoom', bar: visualBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
+            window.redrawWaveforms();
+          } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
+                     e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
+            var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
+            var snappedTick2 = Math.max(1, Math.min(30, Math.round(localPos2 * 30) + 1));
+            var snappedBar2 = (snappedTick2 - 1) / 30;
+            var overflows2 = snappedTick2 + dragCard.time > 31;
+            var restricted2 = snappedTick2 < 8 && dragCard.type !== 'SKILL';
+            var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
+              var pEnd2 = p.tick + p.time;
+              return snappedTick2 < pEnd2 && snappedTick2 + dragCard.time > p.tick;
+            });
+            window.dragPreview = { canvas: 'beat2', bar: snappedBar2, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps2 };
+            window.redrawBeat2();
+          } else {
+            window.redrawWaveforms();
+            window.redrawBeat2();
+          }
+        });
+
+        window.addEventListener('pointerup', function(e) {
+          if (!dragCard) return;
+
+          var ghostCard = ghost.querySelector('.card');
+          if (ghostCard) ghostCard.style.transform = '';
+
+          ghost.style.display = 'none';
+          document.getElementById('drag-ghost-info').style.display = 'none';
+          window.dragPreview = null;
+          window.redrawWaveforms();
+          window.redrawBeat2();
+
+          var zmRect = zmCanvas.getBoundingClientRect();
+          var b2Rect = b2Canvas.getBoundingClientRect();
+
+          var dropped = false;
+
+          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
+              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
+            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+            var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
+            var restricted = snappedTick < 8 && dragCard.type !== 'SKILL';
+            var overflows = snappedTick + dragCard.time > 31;
+            var overlaps = overflows || restricted || window.beat1Placements.some(function(p) {
+              var pEnd = p.tick + p.time;
+              return snappedTick < pEnd && snappedTick + dragCard.time > p.tick;
+            });
+            if (!overlaps) {
+              var onSpike = window.beat1Spikes && window.beat1Spikes.indexOf(snappedTick - 1) !== -1;
+              var isFirst = window.beat1Placements.length === 0;
+              window.beat1Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, tick: snappedTick, moves: dragCard.moves, onSpike: onSpike });
+              window.redrawWaveforms();
+              if (isFirst) window.lockSnippet();
+              dropped = true;
+            }
+          }
+
+          if (!dropped &&
+              e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
+              e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
+            var localPos2 = (e.clientX - b2Rect.left) / b2Rect.width;
+            var snappedTick2 = Math.max(1, Math.min(30, Math.round(localPos2 * 30) + 1));
+            var overflows2 = snappedTick2 + dragCard.time > 31;
+            var restricted2 = snappedTick2 < 8 && dragCard.type !== 'SKILL';
+            var overlaps2 = overflows2 || restricted2 || window.beat2Placements.some(function(p) {
+              var pEnd2 = p.tick + p.time;
+              return snappedTick2 < pEnd2 && snappedTick2 + dragCard.time > p.tick;
+            });
+            if (!overlaps2) {
+              var onSpike2 = window.beat2Spikes && window.beat2Spikes.indexOf(snappedTick2 - 1) !== -1;
+              window.beat2Placements.push({ name: dragCard.name, type: dragCard.type, time: dragCard.time, tick: snappedTick2, moves: dragCard.moves, onSpike: onSpike2 });
+              window.redrawBeat2();
+              dropped = true;
+            }
+          }
+
+          if (dropped) {
+            window.dropAudio.currentTime = 0;
+            window.dropAudio.play().catch(function() {});
+            dragEl.remove();
+          } else {
+            dragEl.style.opacity = '1';
+          }
+
+          dragCard = null;
+          dragEl = null;
+        });
+
+        function addCardToBox(c) {
+          box.appendChild(createCardEl(c));
+        }
+
+        zmCanvas.addEventListener('click', function(e) {
+          if (window.beat1Placements.length === 0) return;
+          var rect = zmCanvas.getBoundingClientRect();
+          var localPos = (e.clientX - rect.left) / rect.width;
+          var clickTick = Math.round(localPos * 30) + 1;
+
+          for (var i = window.beat1Placements.length - 1; i >= 0; i--) {
+            var p = window.beat1Placements[i];
+            var pEnd = p.tick + p.time;
+            if (clickTick >= p.tick && clickTick < pEnd) {
+              window.beat1Placements.splice(i, 1);
+              window.redrawWaveforms();
+              addCardToBox({ name: p.name, type: p.type, time: p.time, moves: cards.find(function(c) { return c.name === p.name; }).moves });
+              break;
+            }
+          }
+        });
+
+        b2Canvas.addEventListener('click', function(e) {
+          if (window.beat2Placements.length === 0) return;
+          var rect = b2Canvas.getBoundingClientRect();
+          var clickTick = Math.round((e.clientX - rect.left) / rect.width * 30) + 1;
+
+          for (var i = window.beat2Placements.length - 1; i >= 0; i--) {
+            var p = window.beat2Placements[i];
+            var pEnd = p.tick + p.time;
+            if (clickTick >= p.tick && clickTick < pEnd) {
+              window.beat2Placements.splice(i, 1);
+              window.redrawBeat2();
+              addCardToBox({ name: p.name, type: p.type, time: p.time, moves: cards.find(function(c) { return c.name === p.name; }).moves });
+              break;
+            }
+          }
+        });
+      })();
+
+      var currentSource = null;
+
+      var audio1 = new Audio('resources/Beat1.mp3');
+      var audio2 = new Audio('resources/Beat2.mp3');
+      var lobbyAudio = new Audio('resources/sydosys.mp3');
+      var audio1Playing = false;
+
+      audio1.addEventListener('ended', function() {
+        audio1Playing = false;
+        var btn = document.getElementById('play-btn-1');
+        if (btn) {
+          btn.querySelector('.play-icon').style.display = '';
+          btn.querySelector('.pause-icon').style.display = 'none';
+        }
+      });
+      lobbyAudio.loop = true;
+      lobbyAudio.volume = 0.7;
+
+      var audioMuted = false;
+
+      document.getElementById('mute-btn').addEventListener('click', function() {
+        audioMuted = !audioMuted;
+        this.textContent = audioMuted ? '🔇' : '🔊';
+        if (audioMuted) {
+          lobbyAudio.volume = 0;
+        } else {
+          lobbyAudio.volume = 0.7;
+        }
+      });
+
+      var showCardInfo = false;
+      var moveDescriptions = {
+        'PUNCH': 'Basic light attack. BOOSTED: Deals more damage and can\'t be blocked',
+        'PUNCH+': '',
+        'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
+        'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
+        'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
+        'CONT': 'Super continues'
+      };
+      
+      // Card Tooltips
+      var moveDescriptions = {
+        'PUNCH': 'Basic attack',
+        'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
+        'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
+        'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
+        'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
+        'CONT': 'Super continues'
+      };
+      var typeDescriptions = {
+        'ATTACK': 'Attacking BOOSTERS will turn the first PUNCH of the card into PUNCH+. Sequence only.',
+        'DEFENSE': 'Avoid Defending BOOSTERS. Sequence only.',
+        'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
+      };
+      // Audio Initialization
+      // ... (already defined globally)
+
+      var buttonDescriptions = {
+        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
+        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
+        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
+      };
+
+      var actionBtns = document.querySelectorAll('.action-btn');
+      console.log('Found action buttons:', actionBtns.length);
+      actionBtns.forEach(function(btn) {
+        btn.addEventListener('pointerenter', function() {
+          console.log('Pointer enter on:', this.getAttribute('data-action'));
+          if (!showCardInfo) return;
+          var action = this.getAttribute('data-action');
+          var desc = buttonDescriptions[action];
+          if (desc) {
+            var infoBox = document.getElementById('drag-ghost-info');
+            // Show title bigger and description below
+            var title = action.toUpperCase();
+            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
+            infoBox.style.display = 'block';
+            var rect = this.getBoundingClientRect();
+            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
+          }
+        });
+        btn.addEventListener('pointerleave', function() {
+          document.getElementById('drag-ghost-info').style.display = 'none';
+        });
+      });
+
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         showCardInfo = !showCardInfo;
         this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
