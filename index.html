@@ -3050,14 +3050,14 @@
       document.getElementById('start-btn').addEventListener('click', function() {
         console.log('Start button clicked');
         confirmAudio.currentTime = 0;
-        confirmAudio.play().catch(function() {});
+        confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
         startBattle();
       });
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
         confirmAudio.currentTime = 0;
-        confirmAudio.play().catch(function() {});
+        confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
@@ -4071,57 +4071,33 @@
         'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
         'CONT': 'Super continues'
       };
+      
+      // Card Tooltips
+      var moveDescriptions = {
+        'PUNCH': 'Basic attack',
+        'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
+        'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
+        'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
+        'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
+        'CONT': 'Super continues'
+      };
       var typeDescriptions = {
         'ATTACK': 'Attacking BOOSTERS will turn the first PUNCH of the card into PUNCH+. Sequence only.',
         'DEFENSE': 'Avoid Defending BOOSTERS. Sequence only.',
         'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
-      var typeDescriptions = {
-        'ATTACK': 'Boost Slots of the Attacking Seq turns opening PUNCH into PUNCH+. Sequence only.',
-        'DEFENSE': 'Block based. Avoid Defending Seq Boost Slots. Sequence only.',
-        'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
-      };
-
       var buttonDescriptions = {
         'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
         'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
         'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
       };
-
-      var buttonDescriptions = {
-        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
-        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
-        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
-      };
-
-      var actionBtns = document.querySelectorAll('.action-btn');
-      actionBtns.forEach(function(btn) {
-        btn.addEventListener('pointerenter', function() {
-          if (!showCardInfo) return;
-          var action = this.getAttribute('data-action');
-          var desc = buttonDescriptions[action];
-          if (desc) {
-            var infoBox = document.getElementById('drag-ghost-info');
-            // Show title bigger and description below
-            var title = action.toUpperCase();
-            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
-                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
-            infoBox.style.display = 'block';
-            var rect = this.getBoundingClientRect();
-            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
-            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
-          }
-        });
-        btn.addEventListener('pointerleave', function() {
-          document.getElementById('drag-ghost-info').style.display = 'none';
-        });
-      });
 
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         showCardInfo = !showCardInfo;
         this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
       });
 
+      // Audio Initialization
       var startAudio = new Audio('resources/start.mp3');
       var votingAudio = new Audio('resources/voting.mp3');
       var koAudio = new Audio('resources/KO.mp3');
