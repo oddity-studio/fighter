@@ -748,6 +748,22 @@
       text-align: center;
     }
 
+    .intro-label {
+      position: relative;
+      z-index: 1;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: -4px;
+      width: calc(60vw * 0.333);
+      max-width: calc(700px * 0.333);
+      text-align: center;
+      display: none;
+    }
+
     .play-btn {
       position: absolute;
       left: -60px;
@@ -1422,6 +1438,7 @@
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">select a 30 second bit</span>
+    <span class="intro-label" style="display:none">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -1434,6 +1451,7 @@
     <button id="scroll-left-btn" class="scroll-arrow-btn" style="display:none">&#8249;</button>
     <button id="scroll-right-btn" class="scroll-arrow-btn" style="display:none">&#8250;</button>
     <span class="snippet-label">defending sequence</span>
+    <span class="intro-label" style="display:none">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -2998,6 +3016,7 @@
         document.getElementById('info-box').style.display = '';
         document.querySelectorAll('.snippet-label')[1].style.display = '';
         document.querySelectorAll('.snippet-label')[0].style.display = '';
+        document.querySelectorAll('.intro-label').forEach(function(el) { el.style.display = ''; });
         document.querySelectorAll('.waveform-container')[1].style.display = '';
         document.getElementById('move-seq-2').style.display = '';
         document.getElementById('start-btn').style.display = '';
