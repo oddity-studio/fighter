@@ -4065,6 +4065,38 @@
         'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
 
+      var buttonDescriptions = {
+        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
+        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
+        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
+      };
+
+      var buttonDescriptions = {
+        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
+        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
+        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
+      };
+
+      var actionBtns = document.querySelectorAll('.action-btn');
+      actionBtns.forEach(function(btn) {
+        btn.addEventListener('pointerenter', function() {
+          if (!showCardInfo) return;
+          var action = this.getAttribute('data-action');
+          var desc = buttonDescriptions[action];
+          if (desc) {
+            var infoBox = document.getElementById('drag-ghost-info');
+            infoBox.innerHTML = '<div class="info-move-desc">' + desc + '</div>';
+            infoBox.style.display = 'block';
+            var rect = this.getBoundingClientRect();
+            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+            infoBox.style.top = (rect.top - 60) + 'px';
+          }
+        });
+        btn.addEventListener('pointerleave', function() {
+          document.getElementById('drag-ghost-info').style.display = 'none';
+        });
+      });
+
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         showCardInfo = !showCardInfo;
         this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
