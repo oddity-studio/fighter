@@ -3062,6 +3062,7 @@
       }
 
       window.addEventListener('DOMContentLoaded', function() {
+        setupTooltips();
         document.getElementById('start-btn').addEventListener('click', function() {
           console.log('Start button clicked');
           if (window.confirmAudio) {
@@ -4179,6 +4180,40 @@
         showCardInfo = !showCardInfo;
         this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
       });
+      
+      function setupTooltips() {
+        var buttonDescriptions = {
+          'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
+          'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
+          'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
+        };
+        var actionBtns = document.querySelectorAll('.action-btn');
+        console.log('Found action buttons:', actionBtns.length);
+        actionBtns.forEach(function(btn) {
+          btn.addEventListener('pointerenter', function() {
+            console.log('Pointer enter on:', this.getAttribute('data-action'));
+            if (!showCardInfo) return;
+            var action = this.getAttribute('data-action');
+            var desc = buttonDescriptions[action];
+            if (desc) {
+              var infoBox = document.getElementById('drag-ghost-info');
+              // Show title bigger and description below
+              var title = action.toUpperCase();
+              infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                  '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
+              infoBox.style.display = 'block';
+              var rect = this.getBoundingClientRect();
+              infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+              infoBox.style.top = (rect.top + rect.height + 10) + 'px';
+            }
+          });
+          btn.addEventListener('pointerleave', function() {
+            document.getElementById('drag-ghost-info').style.display = 'none';
+          });
+        });
+      }
+
+      setupTooltips();
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
