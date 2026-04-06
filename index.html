@@ -3830,6 +3830,8 @@
             
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
+            pickAudio.currentTime = 0;
+            pickAudio.play().catch(function() {});
             dragCard = c;
             dragEl = el;
             ghost.innerHTML = el.outerHTML;
@@ -3962,6 +3964,8 @@
           }
 
           if (dropped) {
+            dropAudio.currentTime = 0;
+            dropAudio.play().catch(function() {});
             dragEl.remove();
           } else {
             dragEl.style.opacity = '1';
@@ -4072,6 +4076,8 @@
       var flushAudio = new Audio('resources/flush.mp3');
       var selectAudio = new Audio('resources/select.mp3');
       var confirmAudio = new Audio('resources/confirm.wav');
+      var pickAudio = new Audio('resources/pick.wav');
+      var dropAudio = new Audio('resources/drop.wav');
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
