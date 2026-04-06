@@ -691,7 +691,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 23px;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%);
       overflow: hidden;
@@ -1180,7 +1180,7 @@
 
     #mode-controls {
       padding: 30px;
-      z-index: 300;
+      border: 5px solid red;
     }
 
     .picker-slide {
@@ -3058,6 +3058,7 @@
 
       document.getElementById('start-btn').addEventListener('click', function() {
         console.log('Start button clicked');
+        console.log('confirmAudio is:', confirmAudio);
         confirmAudio.currentTime = 0;
         confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
         startBattle();
@@ -3065,6 +3066,7 @@
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
+        console.log('Confirm button clicked');
         confirmAudio.currentTime = 0;
         confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
         // Hide logo and full waveform
@@ -4097,6 +4099,35 @@
       };
       // Audio Initialization
       // ... (already defined globally)
+
+      var buttonDescriptions = {
+        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
+        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
+        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
+      };
+
+      var actionBtns = document.querySelectorAll('.action-btn');
+      actionBtns.forEach(function(btn) {
+        btn.addEventListener('pointerenter', function() {
+          if (!showCardInfo) return;
+          var action = this.getAttribute('data-action');
+          var desc = buttonDescriptions[action];
+          if (desc) {
+            var infoBox = document.getElementById('drag-ghost-info');
+            // Show title bigger and description below
+            var title = action.toUpperCase();
+            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
+            infoBox.style.display = 'block';
+            var rect = this.getBoundingClientRect();
+            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
+          }
+        });
+        btn.addEventListener('pointerleave', function() {
+          document.getElementById('drag-ghost-info').style.display = 'none';
+        });
+      });
 
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         showCardInfo = !showCardInfo;
