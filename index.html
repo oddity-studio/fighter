@@ -1036,6 +1036,18 @@
       letter-spacing: 0.05em;
     }
 
+    .punch-plus-desc {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 7px;
+      font-weight: 700;
+      color: #ffd700;
+      text-align: center;
+      margin-top: 4px;
+      padding: 2px 4px;
+      background: rgba(255, 215, 0, 0.15);
+      border-radius: 3px;
+    }
+
     #drag-ghost {
       position: fixed;
       pointer-events: none;
@@ -3811,7 +3823,8 @@
             '<div class="card-img"><img src="resources/cards/' + imgFile + '.webp" alt="' + c.name + '"></div>' +
             '<div class="card-name">' + c.name + '</div>' +
             '<div class="card-type">' + c.type + '</div>' +
-            '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>';
+            '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>' +
+            (c.moves.includes('PUNCH') ? '<div class="punch-plus-desc">BOOSTED. Deals more damage and can\'t be blocked.</div>' : '');
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
             dragCard = c;
@@ -4027,11 +4040,17 @@
 
       var showCardInfo = false;
       var moveDescriptions = {
-        'PUNCH': 'Light strike, instant cast. Interrupted with BLOCK',
-        'PUNCH+': 'Same as PUNCH but with more damage. Can\'t be blocked',
-        'SUPER': 'Instant kill, but longer cast. Interrupted with PUNCH',
-        'BLOCK': 'Negate light strike like PUNCH',
-        'TAUNT': 'Turns upcoming PUNCH into PUNCH+'
+        'PUNCH': 'Basic attack',
+        'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
+        'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
+        'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
+        'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
+        'CONT': 'Super continues'
+      };
+      var typeDescriptions = {
+        'ATTACK': 'Attacking BOOSTERS will turn the first PUNCH of the card into PUNCH+. Sequence only.',
+        'DEFENSE': 'Avoid Defending BOOSTERS. Sequence only.',
+        'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
       var typeDescriptions = {
         'ATTACK': 'Boost Slots of the Attacking Seq turns opening PUNCH into PUNCH+. Sequence only.',
