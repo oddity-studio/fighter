@@ -1451,8 +1451,8 @@
     <canvas id="waveform-canvas"></canvas>
     <div class="attacking-section">
       <div class="label-row">
-        <span class="intro-label" style="display:none">INTRO</span>
-        <span class="snippet-label">select a 30 second bit</span>
+        <span class="intro-label">INTRO</span>
+        <span class="snippet-label">attacking sequence</span>
       </div>
       <div class="waveform-container">
         <button class="play-btn play-btn-cyan" id="play-btn-1">
@@ -3030,7 +3030,6 @@
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
         // Change label from "select a 30 second bit" to "attacking"
-        document.querySelectorAll('.snippet-label')[0].textContent = 'attacking sequence';
         // Show cards and second waveform
         document.getElementById('info-box').style.display = '';
         document.querySelectorAll('.snippet-label')[1].style.display = '';
