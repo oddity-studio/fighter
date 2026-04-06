@@ -1587,6 +1587,16 @@
 
   <script src="lib/spine-webgl.js"></script>
   <script>
+  <script>
+    var startAudio = new Audio('resources/start.mp3');
+    var votingAudio = new Audio('resources/voting.mp3');
+    var koAudio = new Audio('resources/KO.mp3');
+    var flushAudio = new Audio('resources/flush.mp3');
+    var selectAudio = new Audio('resources/select.mp3');
+    var confirmAudio = new Audio('resources/confirm.wav');
+    var pickAudio = new Audio('resources/pick.wav');
+    var dropAudio = new Audio('resources/drop.wav');
+
     (function() {
       var delays    = [0, 0.20, 0.40, 0.60, 0.80, 0.10, 0.30, 0.50, 0.70, 0.90, 0.15, 0.35, 0.55, 0.75, 0.25, 0.45, 0.05, 0.65, 0.85, 0.12, 0.32, 0.52, 0.72, 0.92, 0.08, 0.28, 0.48, 0.68, 0.88, 0.18, 0.38, 0.58];
       var durations = [0.65, 0.85, 0.70, 0.95, 0.75, 0.80, 0.60, 0.90, 0.70, 0.85, 0.75, 0.65, 0.95, 0.80, 0.70, 0.90, 0.60, 0.80, 0.68, 0.88, 0.72, 0.92, 0.63, 0.83, 0.77, 0.67, 0.87, 0.73, 0.93, 0.62, 0.82, 0.78];
@@ -4087,43 +4097,12 @@
         'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
       // Audio Initialization
-      var startAudio = new Audio('resources/start.mp3');
-      var votingAudio = new Audio('resources/voting.mp3');
-      var koAudio = new Audio('resources/KO.mp3');
-      var flushAudio = new Audio('resources/flush.mp3');
-      var selectAudio = new Audio('resources/select.mp3');
-      var confirmAudio = new Audio('resources/confirm.wav');
-      var pickAudio = new Audio('resources/pick.wav');
-      var dropAudio = new Audio('resources/drop.wav');
+      // ... (already defined globally)
 
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         showCardInfo = !showCardInfo;
         this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
       });
-
-      var actionBtns = document.querySelectorAll('.action-btn');
-      actionBtns.forEach(function(btn) {
-        btn.addEventListener('pointerenter', function() {
-          if (!showCardInfo) return;
-          var action = this.getAttribute('data-action');
-          var desc = buttonDescriptions[action];
-          if (desc) {
-            var infoBox = document.getElementById('drag-ghost-info');
-            // Show title bigger and description below
-            var title = action.toUpperCase();
-            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
-                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
-            infoBox.style.display = 'block';
-            var rect = this.getBoundingClientRect();
-            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
-            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
-          }
-        });
-        btn.addEventListener('pointerleave', function() {
-          document.getElementById('drag-ghost-info').style.display = 'none';
-        });
-      });
-
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
