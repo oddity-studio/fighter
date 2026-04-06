@@ -3035,11 +3035,15 @@
 
       document.getElementById('start-btn').addEventListener('click', function() {
         console.log('Start button clicked');
+        confirmAudio.currentTime = 0;
+        confirmAudio.play().catch(function() {});
         startBattle();
       });
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
+        confirmAudio.currentTime = 0;
+        confirmAudio.play().catch(function() {});
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
@@ -4067,6 +4071,7 @@
       var koAudio = new Audio('resources/KO.mp3');
       var flushAudio = new Audio('resources/flush.mp3');
       var selectAudio = new Audio('resources/select.mp3');
+      var confirmAudio = new Audio('resources/confirm.wav');
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
