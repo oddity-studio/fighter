@@ -1454,31 +1454,35 @@
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
-    <div class="label-row">
-      <span class="intro-label" style="display:none">INTRO</span>
-      <span class="snippet-label">select a 30 second bit</span>
+    <div class="attacking-section">
+      <div class="label-row">
+        <span class="intro-label" style="display:none">INTRO</span>
+        <span class="snippet-label">select a 30 second bit</span>
+      </div>
+      <div class="waveform-container">
+        <button class="play-btn play-btn-cyan" id="play-btn-1">
+          <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+          <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <canvas id="waveform-zoom"></canvas>
+      </div>
+      <div id="move-seq-1" class="move-sequence"></div>
     </div>
-    <div class="waveform-container">
-      <button class="play-btn play-btn-cyan" id="play-btn-1">
-        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-        <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      </button>
-      <canvas id="waveform-zoom"></canvas>
-    </div>
-    <div id="move-seq-1" class="move-sequence"></div>
     <div id="info-box"></div>
     <button id="scroll-left-btn" class="scroll-arrow-btn" style="display:none">&#8249;</button>
     <button id="scroll-right-btn" class="scroll-arrow-btn" style="display:none">&#8250;</button>
-    <div id="move-seq-2" class="move-sequence"></div>
-    <div class="waveform-container">
-      <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
-        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-      </button>
-      <canvas id="waveform-beat2"></canvas>
-    </div>
-    <div class="label-row">
-      <span class="intro-label" style="display:none">INTRO</span>
-      <span class="snippet-label">defending sequence</span>
+    <div class="defending-section">
+      <div id="move-seq-2" class="move-sequence"></div>
+      <div class="waveform-container">
+        <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+        </button>
+        <canvas id="waveform-beat2"></canvas>
+      </div>
+      <div class="label-row">
+        <span class="intro-label" style="display:none">INTRO</span>
+        <span class="snippet-label">defending sequence</span>
+      </div>
     </div>
     <div id="mode-controls">
       <button id="confirm-btn">Confirm Beat</button>
