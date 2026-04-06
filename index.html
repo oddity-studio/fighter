@@ -3826,7 +3826,7 @@
             '<div class="card-name">' + c.name + '</div>' +
             '<div class="card-type">' + c.type + '</div>' +
             '<div class="card-moves">' + c.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }).map(function(m) { return '<span class="move-tag">' + m + '</span>'; }).join('') + '</div>' +
-            (c.moves.includes('PUNCH') ? '<div class="punch-plus-desc">BOOSTED. Deals more damage and can\'t be blocked.</div>' : '');
+            
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
             dragCard = c;
