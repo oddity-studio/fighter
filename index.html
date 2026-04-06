@@ -666,6 +666,9 @@
     #drag-ghost-info .info-type.ATTACK { color: #d8a0ff; }
     #drag-ghost-info .info-type.DEFENSE { color: #aaa; }
     #drag-ghost-info .info-type.SKILL { color: #ffd700; }
+    #drag-ghost-info .info-type.FYRE { color: #00ff00; }
+    #drag-ghost-info .info-type.MID { color: #ffff00; }
+    #drag-ghost-info .info-type.FLUSH { color: #ff0000; }
 
     #drag-ghost-info .info-move-item {
       margin-bottom: 4px;
@@ -4085,11 +4088,14 @@
           var desc = buttonDescriptions[action];
           if (desc) {
             var infoBox = document.getElementById('drag-ghost-info');
-            infoBox.innerHTML = '<div class="info-move-desc">' + desc + '</div>';
+            // Show title bigger and description below
+            var title = action.toUpperCase();
+            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
             infoBox.style.display = 'block';
             var rect = this.getBoundingClientRect();
             infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
-            infoBox.style.top = (rect.top - 60) + 'px';
+            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
           }
         });
         btn.addEventListener('pointerleave', function() {
