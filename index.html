@@ -4086,17 +4086,6 @@
         'DEFENSE': 'Avoid Defending BOOSTERS. Sequence only.',
         'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
-      var buttonDescriptions = {
-        'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
-        'mid': 'MID: Not a fan! Hitting this will reduce Player\'s attack damage',
-        'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
-      };
-
-      document.getElementById('info-toggle-btn').addEventListener('click', function() {
-        showCardInfo = !showCardInfo;
-        this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
-      });
-
       // Audio Initialization
       var startAudio = new Audio('resources/start.mp3');
       var votingAudio = new Audio('resources/voting.mp3');
@@ -4106,6 +4095,35 @@
       var confirmAudio = new Audio('resources/confirm.wav');
       var pickAudio = new Audio('resources/pick.wav');
       var dropAudio = new Audio('resources/drop.wav');
+
+      document.getElementById('info-toggle-btn').addEventListener('click', function() {
+        showCardInfo = !showCardInfo;
+        this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
+      });
+
+      var actionBtns = document.querySelectorAll('.action-btn');
+      actionBtns.forEach(function(btn) {
+        btn.addEventListener('pointerenter', function() {
+          if (!showCardInfo) return;
+          var action = this.getAttribute('data-action');
+          var desc = buttonDescriptions[action];
+          if (desc) {
+            var infoBox = document.getElementById('drag-ghost-info');
+            // Show title bigger and description below
+            var title = action.toUpperCase();
+            infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
+            infoBox.style.display = 'block';
+            var rect = this.getBoundingClientRect();
+            infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+            infoBox.style.top = (rect.top + rect.height + 10) + 'px';
+          }
+        });
+        btn.addEventListener('pointerleave', function() {
+          document.getElementById('drag-ghost-info').style.display = 'none';
+        });
+      });
+
 
       window.playLobbyMusic = function() {
         lobbyAudio.currentTime = 0;
