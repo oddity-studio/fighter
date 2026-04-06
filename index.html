@@ -1282,6 +1282,7 @@
     }
     @media (orientation: portrait) {
       #waveform-zoom { width: 90vw; }
+      #waveform-beat2 { width: 90vw; }
       .snippet-label { width: calc(90vw * 0.8); }
       .intro-label { width: calc(90vw * 0.2); }
       .move-sequence { width: 90vw; }
@@ -3587,7 +3588,8 @@
           var endSample = Math.min(startSample + sampleRange, len);
 
           var totalBars = 30;
-          var gap = 5 * dpr;
+          var isPortrait = window.innerHeight > window.innerWidth;
+          var gap = (isPortrait ? 2.5 : 5) * dpr;
           var barW = Math.max(2 * dpr, (w - gap * (totalBars - 1)) / totalBars);
           var step = Math.ceil(sampleRange / totalBars);
           var mid = h / 2;
