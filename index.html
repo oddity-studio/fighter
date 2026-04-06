@@ -1834,16 +1834,6 @@
           var parts = animLookup[key].split(':');
           return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
         }
-        // SUPER interrupted: use animation based on which tick was interrupted, continue for remaining
-        if (atkInterrupted && atkMove.match(/^SUPER[123]$/)) {
-          var anims = ['Hit', 'SuperInt', 'SuperInt2'];
-          return { atk: anims[atkTickInMove], def: moveAnimMap[defMove] || defMove };
-        }
-        if (defInterrupted && defMove.match(/^SUPER[123]$/)) {
-          var anims = ['Hit', 'SuperInt', 'SuperInt2'];
-          return { atk: moveAnimMap[atkMove] || atkMove, def: anims[defTickInMove] };
-        }
-        // Fallback
         return {
           atk: atkInterrupted ? 'Hit' : (rigAnimMap[atkMove] || atkMove),
           def: defInterrupted ? 'Hit' : (rigAnimMap[defMove] || defMove)
