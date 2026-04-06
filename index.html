@@ -745,6 +745,19 @@
       margin-bottom: -4px;
     }
 
+    .intro-label {
+      position: relative;
+      z-index: 1;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: -4px;
+      display: none;
+    }
+
     .play-btn {
       position: absolute;
       left: -60px;
@@ -1419,6 +1432,7 @@
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">select a 30 second bit</span>
+    <span class="intro-label">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -1431,6 +1445,7 @@
     <button id="scroll-left-btn" class="scroll-arrow-btn" style="display:none">&#8249;</button>
     <button id="scroll-right-btn" class="scroll-arrow-btn" style="display:none">&#8250;</button>
     <span class="snippet-label">defending sequence</span>
+    <span class="intro-label">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -2993,7 +3008,9 @@
         document.querySelectorAll('.snippet-label')[0].textContent = 'attacking sequence';
         // Show cards and second waveform
         document.getElementById('info-box').style.display = '';
-        document.querySelectorAll('.snippet-label')[1].style.display = '';
+        document.querySelectorAll('.snippet-label')[1].style.display = 'none';
+        document.querySelectorAll('.snippet-label')[0].style.display = 'none';
+        document.querySelectorAll('.intro-label').forEach(function(el) { el.style.display = ''; });
         document.querySelectorAll('.waveform-container')[1].style.display = '';
         document.getElementById('move-seq-2').style.display = '';
         document.getElementById('start-btn').style.display = '';
@@ -3691,7 +3708,28 @@
             e.preventDefault();
             box.scrollLeft += e.deltaY;
           }
+          updateIntroLabels();
         }, { passive: false });
+
+        function updateIntroLabels() {
+          var introLabels = document.querySelectorAll('.intro-label');
+          var snippetLabels = document.querySelectorAll('.snippet-label');
+          var scrollPos = box.scrollLeft;
+          var cardWidth = 130;
+          var tickPosition = Math.floor(scrollPos / cardWidth) + 1;
+          
+          if (tickPosition >= 8) {
+            introLabels[0].style.display = 'none';
+            introLabels[1].style.display = 'none';
+            snippetLabels[0].style.display = '';
+            snippetLabels[1].style.display = '';
+          } else {
+            introLabels[0].style.display = '';
+            introLabels[1].style.display = '';
+            snippetLabels[0].style.display = 'none';
+            snippetLabels[1].style.display = 'none';
+          }
+        }
 
         var cardJump = 130; // 120px card + 10px gap
 
@@ -3716,17 +3754,21 @@
 
         document.getElementById('scroll-left-btn').addEventListener('click', function() {
           smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
+          setTimeout(updateIntroLabels, 160);
         });
 
         document.getElementById('scroll-right-btn').addEventListener('click', function() {
           smoothScrollTo(box.scrollLeft + cardJump);
+          setTimeout(updateIntroLabels, 160);
         });
 
         document.addEventListener('keydown', function(e) {
           if (e.key === 'ArrowLeft') {
             smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
+            setTimeout(updateIntroLabels, 160);
           } else if (e.key === 'ArrowRight') {
             smoothScrollTo(box.scrollLeft + cardJump);
+            setTimeout(updateIntroLabels, 160);
           }
         });
 
