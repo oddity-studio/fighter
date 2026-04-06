@@ -734,33 +734,19 @@
     }
 
     .snippet-label {
-      position: fixed;
-      top: 10px;
-      z-index: 500;
+      position: relative;
+      display: inline-block;
+      z-index: 1;
       font-family: 'Exo 2', sans-serif;
-      font-size: 18px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      color: #0000ff;
-      background: #ffff00;
-      text-align: left;
-      padding: 5px;
-    }
-
-    .intro-label {
-      position: fixed;
-      top: 10px;
-      left: 200px;
-      z-index: 500;
-      font-family: 'Exo 2', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #00ff00;
-      background: #ff0000;
-      padding: 5px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: -4px;
+      width: calc(60vw * 0.667);
+      max-width: calc(700px * 0.667);
+      text-align: center;
     }
 
     .intro-label {
@@ -768,15 +754,13 @@
       display: inline-block;
       z-index: 1;
       font-family: 'Exo 2', sans-serif;
-      font-size: 18px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      color: #00ff00;
-      background: #ff0000;
+      color: rgba(255, 255, 255, 0.7);
       margin-bottom: -4px;
       margin-left: 8px;
-      padding: 10px;
       width: calc(60vw * 0.333);
       max-width: calc(700px * 0.333);
       text-align: center;
@@ -1457,7 +1441,7 @@
     <div id="vs-caption"><span>VS</span></div>
     <canvas id="waveform-canvas"></canvas>
     <span class="snippet-label">select a 30 second bit</span>
-    <span class="intro-label">INTRO</span>
+    <span class="intro-label" style="display:none">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-cyan" id="play-btn-1">
         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
@@ -1470,7 +1454,7 @@
     <button id="scroll-left-btn" class="scroll-arrow-btn" style="display:none">&#8249;</button>
     <button id="scroll-right-btn" class="scroll-arrow-btn" style="display:none">&#8250;</button>
     <span class="snippet-label">defending sequence</span>
-    <span class="intro-label">INTRO</span>
+    <span class="intro-label" style="display:none">INTRO</span>
     <div class="waveform-container">
       <button class="play-btn play-btn-pink" id="play-btn-2" style="display:none">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
