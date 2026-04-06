@@ -3066,18 +3066,8 @@
         document.getElementById('start-btn').addEventListener('click', function() {
           console.log('Start button clicked');
           if (window.confirmAudio) {
-            window.confirmAudio.currentTime = 0;
-            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
-          }
-          startBattle();
-        });
-
-        // Confirm Beat button - transitions to card placement mode
-        document.getElementById('confirm-btn').addEventListener('click', function() {
-          console.log('Confirm button clicked inside DOMContentLoaded listener');
-          if (window.confirmAudio) {
-            window.confirmAudio.currentTime = 0;
-            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            confirmAudio.currentTime = 0;
+            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
           }
           startBattle();
         });
@@ -3086,8 +3076,8 @@
         document.getElementById('confirm-btn').addEventListener('click', function() {
           console.log('Confirm button clicked');
           if (window.confirmAudio) {
-            window.confirmAudio.currentTime = 0;
-            window.confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            confirmAudio.currentTime = 0;
+            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
           }
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
@@ -3833,15 +3823,15 @@
           e.preventDefault();
           var step = e.deltaY > 0 ? cardJump : -cardJump;
           smoothScrollTo(box.scrollLeft + step);
-          window.selectAudio.currentTime = 0;
-          window.selectAudio.play().catch(function() {});
+          selectAudio.currentTime = 0;
+          selectAudio.play().catch(function() {});
         }, { passive: false });
 
         var cardJump = 130; // 120px card + 10px gap
 
         function smoothScrollTo(targetScroll) {
-          window.selectAudio.currentTime = 0;
-          window.selectAudio.play().catch(function() {});
+          selectAudio.currentTime = 0;
+          selectAudio.play().catch(function() {});
           var startScroll = box.scrollLeft;
           var distance = targetScroll - startScroll;
           var duration = 150;
@@ -3871,12 +3861,12 @@
         document.addEventListener('keydown', function(e) {
           if (e.key === 'ArrowLeft') {
             smoothScrollTo(Math.max(0, box.scrollLeft - cardJump));
-            window.selectAudio.currentTime = 0;
-            window.selectAudio.play().catch(function() {});
+            selectAudio.currentTime = 0;
+            selectAudio.play().catch(function() {});
           } else if (e.key === 'ArrowRight') {
             smoothScrollTo(box.scrollLeft + cardJump);
-            window.selectAudio.currentTime = 0;
-            window.selectAudio.play().catch(function() {});
+            selectAudio.currentTime = 0;
+            selectAudio.play().catch(function() {});
           }
         });
 
@@ -3913,8 +3903,8 @@
             
           el.addEventListener('pointerdown', function(e) {
             e.preventDefault();
-            window.pickAudio.currentTime = 0;
-            window.pickAudio.play().catch(function() {});
+            pickAudio.currentTime = 0;
+            pickAudio.play().catch(function() {});
             dragCard = c;
             dragEl = el;
             ghost.innerHTML = el.outerHTML;
@@ -4047,8 +4037,8 @@
           }
 
           if (dropped) {
-            window.dropAudio.currentTime = 0;
-            window.dropAudio.play().catch(function() {});
+            dropAudio.currentTime = 0;
+            dropAudio.play().catch(function() {});
             dragEl.remove();
           } else {
             dragEl.style.opacity = '1';
