@@ -698,6 +698,17 @@
       overflow: hidden;
     }
 
+    #fire-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      max-width: 1200px;
+      z-index: 150;
+      pointer-events: none;
+    }
+
     #vs-caption {
       display: none;
       position: relative;
@@ -1568,6 +1579,7 @@
   <div id="drag-ghost" style="display:none"></div>
   <div id="drag-ghost-info" style="display:none"></div>
   <div id="start-screen">
+    <video id="fire-video" src="resources/fire.mp4" autoplay loop muted playsinline></video>
     <img id="logo" src="resources/logo.webp" alt="">
     <img id="picker-hammer" class="picker-slide" src="resources/picker_hammer.webp" alt="">
     <img id="picker-maxx"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
@@ -2915,6 +2927,7 @@
       var countdownInterval;
 
       function startBattle() {
+        document.getElementById('fire-video').style.display = 'none';
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
