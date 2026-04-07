@@ -694,10 +694,12 @@
       justify-content: flex-start;
       padding-top: 10vh;
       gap: 23px;
-      background-image: url(resources/arena.webp), radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background: 
+        radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%),
+        url(resources/arena.webp);
+      background-size: cover, cover;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
       overflow: hidden;
     }
 
