@@ -728,6 +728,7 @@
       mix-blend-mode: screen;
       filter: hue-rotate(180deg) brightness(1.2) saturate(1.5);
       opacity: 0;
+      transition: bottom 0.3s ease-out, opacity 0.3s ease-out;
     }
 
     #hype-video.round2 {
@@ -2794,6 +2795,7 @@
                 window.p2PunchPlusDamageModifier += 1;
                 window.p2HueModifier = (window.p2HueModifier || 0) + 1;
                 window.p2BrightnessModifier = (window.p2BrightnessModifier || 0) + 1;
+                window.updateHypeVideo();
               }
             } else if (action === 'mid') {
               // -1 per click
@@ -2950,6 +2952,7 @@
 
       // Countdown timer — two 30s rounds
       var round = 1;
+      window.currentRound = 1;
       var countdown = 30;
       var countdownEl = document.getElementById('round-counter');
       var countdownInterval;
@@ -3085,6 +3088,7 @@
               }
             }, 100);
             round = 2;
+            window.currentRound = 2;
             countdown = 30;
             countdownEl.textContent = String(countdown).padStart(2, '0');
             setHealth('maxx', 100);
@@ -3092,6 +3096,9 @@
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
+            
+            // Reinitialize hype video for Round 2 with player2 modifier
+            window.initHypeVideo(2);
 
             // Show FIGHT at 7 seconds into round 2
             showRoundCaption('fight-overlay', 7000);
@@ -4396,9 +4403,10 @@
 
       window.initHypeVideo = function(round) {
         var hypeVideo = document.getElementById('hype-video');
-        hypeVideo.style.display = '';
-        hypeVideo.style.opacity = '0.7';
+        hypeVideo.style.opacity = '0.8';
         hypeVideo.classList.remove('round2');
+        // Reset position to start below screen
+        hypeVideo.style.bottom = '-100vh';
         if (round === 2) {
           hypeVideo.classList.add('round2');
         }
@@ -4408,11 +4416,12 @@
       window.updateHypeVideo = function() {
         var hypeVideo = document.getElementById('hype-video');
         if (!hypeVideo) return;
-        var modifier = window.p1PunchDamageModifier || 0;
+        var currentRound = window.currentRound || 1;
+        var modifier = currentRound === 1 ? (window.p1PunchDamageModifier || 0) : (window.p2PunchDamageModifier || 0);
         if (modifier > 100) modifier = 100;
         var offset = -100 + modifier;
         hypeVideo.style.bottom = offset + 'vh';
-        hypeVideo.style.opacity = modifier > 0 ? '0.7' : '0';
+        hypeVideo.style.opacity = modifier > 0 ? '0.8' : '0';
       };
 
       window.hideHypeVideo = function() {
