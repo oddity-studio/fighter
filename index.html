@@ -1615,8 +1615,10 @@
   <div>PICK A 30 SECOND BIT</div>
   <div style="font-size:0.7em">3 TALLEST BARS ARE YOUR POWER BOOSTERS</div>
 </div>
-    <canvas id="waveform-canvas"></canvas>
-    <div id="snippet-time-display" style="font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:#fff;text-shadow:0 0 4px #000;margin-top:8px;text-align:center;display:none;">0:00 / 0:00</div>
+    <div style="position:relative;display:inline-block;">
+      <canvas id="waveform-canvas"></canvas>
+      <div id="snippet-time-display" style="font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:#fff;text-shadow:0 0 4px #000, 0 2px 8px rgba(0,0,0,0.8);position:absolute;left:50%;transform:translate(-50%,0);top:45px;z-index:10;display:none;pointer-events:none;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:4px;">0:00 / 0:00</div>
+    </div>
     <div class="attacking-section">
       <div class="label-row">
         <span class="intro-label">INTRO</span>
@@ -3262,6 +3264,7 @@
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
           document.getElementById('waveform-canvas').style.display = 'none';
+          document.getElementById('snippet-time-display').style.display = 'none';
           document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });
           // Change label from "select a 30 second bit" to "attacking"
           // Show cards and second waveform
@@ -3297,6 +3300,7 @@
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
+        document.getElementById('snippet-time-display').style.display = 'none';
         document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });
         // Change label from "select a 30 second bit" to "attacking"
         // Show cards and second waveform
