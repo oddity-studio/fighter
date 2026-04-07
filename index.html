@@ -1298,10 +1298,21 @@
       #scroll-left-btn { left: 0; }
       #scroll-right-btn { right: 0; }
 
+      #logo { width: 90vw; }
       #start-screen { justify-content: center; padding-top: 10vh; }
       #mode-controls { padding: 18px; }
+      #confirm-btn { transform: scale(1); }
     }
     @media (orientation: portrait) {
+      @keyframes slide-in-maxx {
+        from { transform: translateX(-50vw); }
+        to   { transform: translateX(0); }
+      }
+      @keyframes slide-in-hammer {
+        from { transform: translateX(50vw) scaleX(-1); }
+        to   { transform: translateX(0)    scaleX(-1); }
+      }
+
       /* Let hud columns share available width and shrink to fit */
       #hud > div:first-child,
       #hud > div:last-child {
