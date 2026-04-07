@@ -1196,12 +1196,12 @@
 
     #picker-maxx {
       left: 0;
-      animation: slide-in-maxx 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+      animation: slide-in-maxx 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-maxx 3s ease-in-out 1s infinite;
     }
 
     #picker-hammer {
       right: 0;
-      animation: slide-in-hammer 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+      animation: slide-in-hammer 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-hammer 3s ease-in-out 1s infinite;
     }
 
     @keyframes slide-in-maxx {
@@ -1212,6 +1212,18 @@
     @keyframes slide-in-hammer {
       from { transform: translateX(80vw) scaleX(-1); }
       to   { transform: translateX(0)    scaleX(-1); }
+    }
+
+    @keyframes wiggle-maxx {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25%     { transform: translateX(-2px) rotate(-1deg); }
+      75%     { transform: translateX(2px) rotate(1deg); }
+    }
+
+    @keyframes wiggle-hammer {
+      0%, 100% { transform: translateX(0) scaleX(-1) rotate(0deg); }
+      25%     { transform: translateX(-2px) scaleX(-1) rotate(-1deg); }
+      75%     { transform: translateX(2px) scaleX(-1) rotate(1deg); }
     }
 
     #start-btn {
@@ -1313,6 +1325,18 @@
       @keyframes slide-in-hammer {
         from { transform: translateX(300vw) scaleX(-1); }
         to   { transform: translateX(140vw)   scaleX(-1); }
+      }
+
+      @keyframes wiggle-maxx {
+        0%, 100% { transform: translateX(-140vw) rotate(0deg); }
+        25%     { transform: translateX(calc(-140vw - 2px)) rotate(-1deg); }
+        75%     { transform: translateX(calc(-140vw + 2px)) rotate(1deg); }
+      }
+
+      @keyframes wiggle-hammer {
+        0%, 100% { transform: translateX(140vw) scaleX(-1) rotate(0deg); }
+        25%     { transform: translateX(calc(140vw - 2px)) scaleX(-1) rotate(-1deg); }
+        75%     { transform: translateX(calc(140vw + 2px)) scaleX(-1) rotate(1deg); }
       }
 
       /* Let hud columns share available width and shrink to fit */
