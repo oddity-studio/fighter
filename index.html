@@ -4473,10 +4473,10 @@
           playIcon.style.display = '';
           pauseIcon.style.display = 'none';
           var restoreInterval = setInterval(function() {
-            if (lobbyAudio.volume < 0.65) {
+            if (!audioMuted && lobbyAudio.volume < 0.65) {
               lobbyAudio.volume += 0.05;
             } else {
-              lobbyAudio.volume = 0.7;
+              lobbyAudio.volume = audioMuted ? 0 : 0.7;
               clearInterval(restoreInterval);
             }
           }, 100);
@@ -4488,10 +4488,10 @@
           playIcon.style.display = 'none';
           pauseIcon.style.display = '';
           var fadeInterval = setInterval(function() {
-            if (lobbyAudio.volume > 0.05) {
+            if (!audioMuted && lobbyAudio.volume > 0.05) {
               lobbyAudio.volume -= 0.05;
             } else {
-              lobbyAudio.volume = 0;
+              lobbyAudio.volume = audioMuted ? 0 : 0.7;
               clearInterval(fadeInterval);
             }
           }, 100);
