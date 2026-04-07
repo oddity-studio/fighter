@@ -1616,6 +1616,7 @@
   <div style="font-size:0.7em">3 TALLEST BARS ARE YOUR POWER BOOSTERS</div>
 </div>
     <canvas id="waveform-canvas"></canvas>
+    <div id="snippet-time-display" style="font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:#fff;text-shadow:0 0 4px #000;margin-top:8px;text-align:center;display:none;">0:00 / 0:00</div>
     <div class="attacking-section">
       <div class="label-row">
         <span class="intro-label">INTRO</span>
@@ -3722,11 +3723,13 @@
           dragging = true;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
+          updateDragGhostTime();
         });
         window.addEventListener('mousemove', function(e) {
           if (!dragging || snippetLocked) return;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
+          updateDragGhostTime();
         });
         window.addEventListener('mouseup', function() { dragging = false; });
 
@@ -3735,11 +3738,13 @@
           dragging = true;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
+          updateDragGhostTime();
         }, { passive: true });
         window.addEventListener('touchmove', function(e) {
           if (!dragging || snippetLocked) return;
           windowPos = Math.max(0, Math.min(1, getCanvasX(e)));
           drawWaveform(wfData);
+          updateDragGhostTime();
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
 
@@ -3785,6 +3790,21 @@
         window.getBeat1WindowPos = function() { return windowPos; };
         window.getBeat1Duration = function() { return wfDuration; };
         window.lockSnippet = function() { snippetLocked = true; wfCanvas.style.cursor = 'default'; };
+        
+        function formatTime(seconds) {
+          var mins = Math.floor(seconds / 60);
+          var secs = Math.floor(seconds % 60);
+          return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+        
+        window.updateDragGhostTime = function() {
+          var display = document.getElementById('snippet-time-display');
+          if (!display) return;
+          display.style.display = 'block';
+          var snippetStartSeconds = windowPos * (wfDuration - 30);
+          var totalSeconds = wfDuration;
+          display.textContent = formatTime(snippetStartSeconds) + ' / ' + formatTime(totalSeconds);
+        };
       })();
 
       (function() {
