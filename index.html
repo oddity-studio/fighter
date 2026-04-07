@@ -716,6 +716,26 @@
       opacity: 0.5;
     }
 
+    #hype-video {
+      position: fixed;
+      bottom: -100vh;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 2;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      filter: hue-rotate(180deg) brightness(1.2) saturate(1.5);
+      opacity: 0;
+      display: none;
+    }
+
+    #hype-video.round2 {
+      filter: hue-rotate(240deg) brightness(1.2) saturate(1.5);
+      transform: scaleX(-1);
+    }
+
     #vs-caption {
       display: none;
       position: relative;
@@ -1646,6 +1666,7 @@
   <video id="bg-video-a" class="bg-video" src="resources/arena_idle.webm" autoplay muted playsinline style="z-index:0"></video>
   <video id="bg-video-b" class="bg-video" muted playsinline style="z-index:-1"></video>
   <canvas id="game-canvas" style="display:none"></canvas>
+  <video id="hype-video" src="resources/hype.webm" autoplay loop muted playsinline></video>
 
   <div id="hud" style="display:none">
     <div>
@@ -2768,6 +2789,7 @@
                 window.p1PunchPlusDamageModifier += 1;
                 window.p1HueModifier = (window.p1HueModifier || 0) + 1;
                 window.p1BrightnessModifier = (window.p1BrightnessModifier || 0) + 1;
+                window.updateHypeVideo();
               } else {
                 window.p2PunchDamageModifier += 1;
                 window.p2PunchPlusDamageModifier += 1;
@@ -2938,6 +2960,9 @@
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
+        
+        // Initialize hype video for Round 1
+        window.initHypeVideo(1);
 
         // Fade out lobby music
         window.fadeLobbyMusic(3000);
@@ -4368,6 +4393,32 @@
             clearInterval(fadeInterval);
           }
         }, (duration || 2000) / 20);
+      };
+
+      window.initHypeVideo = function(round) {
+        var hypeVideo = document.getElementById('hype-video');
+        hypeVideo.style.display = '';
+        hypeVideo.style.opacity = '0.7';
+        hypeVideo.classList.remove('round2');
+        if (round === 2) {
+          hypeVideo.classList.add('round2');
+        }
+        window.updateHypeVideo();
+      };
+
+      window.updateHypeVideo = function() {
+        var hypeVideo = document.getElementById('hype-video');
+        if (!hypeVideo) return;
+        var modifier = window.p1PunchDamageModifier || 0;
+        if (modifier > 100) modifier = 100;
+        var offset = -100 + modifier;
+        hypeVideo.style.bottom = offset + 'vh';
+        hypeVideo.style.opacity = modifier > 0 ? '0.7' : '0';
+      };
+
+      window.hideHypeVideo = function() {
+        var hypeVideo = document.getElementById('hype-video');
+        if (hypeVideo) hypeVideo.style.display = 'none';
       };
 
       var audio1Playing = false;
