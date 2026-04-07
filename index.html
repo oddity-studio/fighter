@@ -2938,7 +2938,20 @@
 
         var dur = window.getBeat1Duration();
         audio1.currentTime = window.getBeat1WindowPos() * (dur - 30);
+        audio1.volume = 0;
         audio1.play();
+        audio1.addEventListener('canplay', function fadeIn() {
+          audio1.removeEventListener('canplay', fadeIn);
+          var vol = 0;
+          var fadeInInterval = setInterval(function() {
+            if (vol < 0.7) {
+              vol += 0.05;
+              audio1.volume = Math.min(vol, 0.7);
+            } else {
+              clearInterval(fadeInInterval);
+            }
+          }, 100);
+        });
 
         showRoundCaption('round1-overlay', 1000);
         startAudio.play().catch(function() {});
@@ -3016,8 +3029,17 @@
             audio1.volume = 1;
             var b2Start2 = window.getBeat2Start() / window.beat2Buffer.sampleRate;
             audio2.currentTime = b2Start2;
-            audio2.volume = 1;
+            audio2.volume = 0;
             audio2.play();
+            var vol2 = 0;
+            var fadeInInterval2 = setInterval(function() {
+              if (vol2 < 0.7) {
+                vol2 += 0.05;
+                audio2.volume = Math.min(vol2, 0.7);
+              } else {
+                clearInterval(fadeInInterval2);
+              }
+            }, 100);
             round = 2;
             countdown = 30;
             countdownEl.textContent = String(countdown).padStart(2, '0');
@@ -4370,7 +4392,17 @@
         audio1.pause();
         var startTime = window.getBeat2Start() / window.beat2Buffer.sampleRate;
         audio2.currentTime = startTime;
+        audio2.volume = 0;
         audio2.play();
+        var vol3 = 0;
+        var fadeInInterval3 = setInterval(function() {
+          if (vol3 < 0.7) {
+            vol3 += 0.05;
+            audio2.volume = Math.min(vol3, 0.7);
+          } else {
+            clearInterval(fadeInInterval3);
+          }
+        }, 100);
       });
 
       // AI opponent
