@@ -1776,6 +1776,11 @@
         document.querySelector('#' + player + '-health .health-bar-fill').style.width = health[player] + '%';
         if (health[player] === 0) {
           pendingVote = player === "maxx" ? "hammer" : "maxx";
+          // Fade out hype video when character dies
+          var hypeVideo = document.getElementById('hype-video');
+          if (hypeVideo) {
+            hypeVideo.style.opacity = '0';
+          }
         }
       }
 
