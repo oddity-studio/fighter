@@ -2804,11 +2804,13 @@
                 window.p1PunchPlusDamageModifier -= 1;
                 window.p1HueModifier = (window.p1HueModifier || 0) - 1;
                 window.p1BrightnessModifier = (window.p1BrightnessModifier || 0) - 1;
+                window.updateHypeVideo();
               } else {
                 window.p2PunchDamageModifier -= 1;
                 window.p2PunchPlusDamageModifier -= 1;
                 window.p2HueModifier = (window.p2HueModifier || 0) - 1;
                 window.p2BrightnessModifier = (window.p2BrightnessModifier || 0) - 1;
+                window.updateHypeVideo();
               }
             }
             // flush doesn't affect damage
