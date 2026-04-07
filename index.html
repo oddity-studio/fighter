@@ -699,14 +699,14 @@
     }
 
     #fire-video {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      position: fixed;
+      inset: 0;
       width: 100vw;
-      max-width: 1200px;
+      height: 100vh;
+      object-fit: cover;
       z-index: 150;
       pointer-events: none;
+      mix-blend-mode: screen;
     }
 
     #vs-caption {
