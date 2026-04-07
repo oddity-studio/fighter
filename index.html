@@ -2058,19 +2058,19 @@
             }
           }
  
-          // SUPER deals 100% damage on tick 1 after SUPER (2nd tick)
-          var prevP1 = 'none';
-          var prevP2 = 'none';
+          // SUPER deals 100% damage on tick 2 after SUPER (3rd tick)
+          var prev2P1 = 'none';
+          var prev2P2 = 'none';
           var p1SuperInterrupted = false;
           var p2SuperInterrupted = false;
           var p1SuperHitNextTick = false;
           var p2SuperHitNextTick = false;
-          if (t >= 1) {
-            var checkTick = t - 1;
+          if (t >= 2) {
+            var checkTick = t - 2;
             // Check result array (processed) not timeline for the SUPER position
             var timelineEntry = result[checkTick];
-            prevP1 = timelineEntry ? timelineEntry.p1.move : 'none';
-            prevP2 = timelineEntry ? timelineEntry.p2.move : 'none';
+            prev2P1 = timelineEntry ? timelineEntry.p1.move : 'none';
+            prev2P2 = timelineEntry ? timelineEntry.p2.move : 'none';
             
             // Check if SUPER was interrupted (changed to Idle) in result before this tick
             for (var check = t - 1; check > checkTick; check--) {
@@ -2095,12 +2095,12 @@
           // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted or hit next tick)
           var p1SuperHitNextTickNow = entry.p1.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p2.move === 'PUNCH';
           var p2SuperHitNextTickNow = entry.p2.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p1.move === 'PUNCH';
-          console.log('SUPER check t=' + t + ' prevP1=' + prevP1 + ' interrupted=' + p1SuperInterrupted + ' hitNext=' + p1SuperHitNextTick);
-          if ((!p1SuperInterrupted && !p1SuperHitNextTick && !p1SuperHitNextTickNow) && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prevP1 === 'SUPER') {
+          console.log('SUPER check t=' + t + ' prev2P1=' + prev2P1 + ' interrupted=' + p1SuperInterrupted + ' hitNext=' + p1SuperHitNextTick);
+          if ((!p1SuperInterrupted && !p1SuperHitNextTick && !p1SuperHitNextTickNow) && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
             console.log('-> Setting P1 damage to 100!');
           }
-          if ((!p2SuperInterrupted && !p2SuperHitNextTick && !p2SuperHitNextTickNow) && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prevP2 === 'SUPER') {
+          if ((!p2SuperInterrupted && !p2SuperHitNextTick && !p2SuperHitNextTickNow) && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 100;
             console.log('-> Setting P2 damage to 100!');
           }
