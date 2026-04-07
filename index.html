@@ -1230,6 +1230,35 @@
       100%    { transform: translate(0, 0) scaleX(-1); }
     }
 
+    @keyframes logo-zoom-in {
+      0%   { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+
+    @keyframes fade-in {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    #logo {
+      animation: logo-zoom-in 0.5s ease-out 1s both;
+    }
+
+    .select-bit-label {
+      opacity: 0;
+      animation: fade-in 0.4s ease-out 1.5s both;
+    }
+
+    .waveform-container {
+      opacity: 0;
+      animation: fade-in 0.4s ease-out 1.9s both;
+    }
+
+    #start-btn {
+      opacity: 0;
+      animation: fade-in 0.4s ease-out 2.3s both;
+    }
+
     #start-btn {
       position: relative;
       z-index: 1;
@@ -1320,6 +1349,25 @@
       #start-screen { justify-content: center; padding-top: 10vh; }
       #mode-controls { padding: 18px; }
       #confirm-btn { transform: scale(1); }
+
+      #logo {
+        animation: logo-zoom-in 0.5s ease-out 1s both;
+      }
+
+      .select-bit-label {
+        opacity: 0;
+        animation: fade-in 0.4s ease-out 1.5s both;
+      }
+
+      .waveform-container {
+        opacity: 0;
+        animation: fade-in 0.4s ease-out 1.9s both;
+      }
+
+      #start-btn {
+        opacity: 0;
+        animation: fade-in 0.4s ease-out 2.3s both;
+      }
     }
     @media (orientation: portrait) {
       @keyframes slide-in-maxx {
