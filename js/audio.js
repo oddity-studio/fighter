@@ -82,8 +82,8 @@
       });
 
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
-        showCardInfo = !showCardInfo;
-        this.style.background = showCardInfo ? 'rgba(255,255,255,0.2)' : '';
+        window.showCardInfo = !window.showCardInfo;
+        this.style.background = window.showCardInfo ? 'rgba(255,255,255,0.2)' : '';
       });
       
       function setupTooltips() {
@@ -97,7 +97,7 @@
         actionBtns.forEach(function(btn) {
           btn.addEventListener('pointerenter', function() {
             console.log('Pointer enter on:', this.getAttribute('data-action'));
-            if (!showCardInfo) return;
+            if (!window.showCardInfo) return;
             var action = this.getAttribute('data-action');
             var desc = buttonDescriptions[action];
             if (desc) {
