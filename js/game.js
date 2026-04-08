@@ -65,7 +65,59 @@
         window.addEventListener("resize", resize);
         setupButtons();
         updateRoundButtons();
+        setupHealthWaveforms();
         requestAnimationFrame(render);
+      }
+
+      function setupHealthWaveforms() {
+        var p1Canvas = document.getElementById('p1-waveform');
+        var p2Canvas = document.getElementById('p2-waveform');
+        if (!p1Canvas || !p2Canvas) return;
+        
+        p1Canvas.width = p1Canvas.offsetWidth * window.devicePixelRatio;
+        p1Canvas.height = p1Canvas.offsetHeight * window.devicePixelRatio;
+        p2Canvas.width = p2Canvas.offsetWidth * window.devicePixelRatio;
+        p2Canvas.height = p2Canvas.offsetHeight * window.devicePixelRatio;
+        
+        window.updateHealthWaveforms = function() {
+          var wfData = window.getBeat1Data && window.getBeat1Data();
+          if (!wfData) return;
+          
+          var p1Ctx = p1Canvas.getContext('2d');
+          var p2Ctx = p2Canvas.getContext('2d');
+          var dpr = window.devicePixelRatio || 1;
+          var w = p1Canvas.width;
+          var h = p1Canvas.height;
+          
+          // P1 - top half of waveform
+          p1Ctx.clearRect(0, 0, w, h);
+          var p1H = h * 0.8;
+          var p1Mid = h;
+          var barW = 4 * dpr;
+          var gap = 2 * dpr;
+          var bars = Math.floor(w / (barW + gap));
+          
+          for (var i = 0; i < bars; i++) {
+            var idx = Math.floor(i / bars * wfData.length);
+            var val = Math.abs(wfData[idx] || 0);
+            var barH = Math.max(2 * dpr, val * p1H * 2);
+            p1Ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
+            p1Ctx.fillRect(i * (barW + gap), p1Mid - barH, barW, barH);
+          }
+          
+          // P2 - bottom half
+          p2Ctx.clearRect(0, 0, w, h);
+          var p2H = h * 0.8;
+          var p2Mid = 0;
+          
+          for (var j = 0; j < bars; j++) {
+            var idx2 = Math.floor(j / bars * wfData.length);
+            var val2 = Math.abs(wfData[idx2] || 0);
+            var barH2 = Math.max(2 * dpr, val2 * p2H * 2);
+            p2Ctx.fillStyle = 'rgba(252, 108, 133, 0.6)';
+            p2Ctx.fillRect(j * (barW + gap), p2Mid, barW, barH2);
+          }
+        };
       }
 
       function setButtonsDisabled(disabled) {

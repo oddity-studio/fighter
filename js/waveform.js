@@ -247,6 +247,7 @@
           .then(function(audioBuffer) {
             wfData = audioBuffer.getChannelData(0);
             wfDuration = audioBuffer.duration;
+            window.wfData = wfData;
             window.beat1Buffer = audioBuffer;
             drawWaveform(wfData);
           });
@@ -333,6 +334,7 @@
         };
         window.getBeat1WindowPos = function() { return windowPos; };
         window.getBeat1Duration = function() { return wfDuration; };
+        window.getBeat1Data = function() { return wfData; };
         window.lockSnippet = function() { snippetLocked = true; wfCanvas.style.cursor = 'default'; };
         
         function formatTime(seconds) {

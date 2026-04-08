@@ -148,14 +148,14 @@
           ghost.style.left = e.clientX + 'px';
           ghost.style.top = e.clientY + 'px';
 
-          if (showCardInfo && dragCard) {
+          if (window.showCardInfo && dragCard) {
             var infoBox = document.getElementById('drag-ghost-info');
-            var typeDesc = typeDescriptions[dragCard.type] || '';
+            var typeDesc = window.typeDescriptions[dragCard.type] || '';
             var movesHtml = '';
             if (dragCard.moves) {
               var uniqueMoves = [...new Set(dragCard.moves.filter(function(m) { return m !== 'IDLE' && m !== 'CONT'; }))];
               uniqueMoves.forEach(function(m) {
-                var desc = moveDescriptions[m] || '';
+                var desc = window.moveDescriptions[m] || '';
                 movesHtml += '<div class="info-move-item"><span class="info-move-name">' + m + '</span><br><span class="info-move-desc">' + desc + '</span></div>';
               });
             }
