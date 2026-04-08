@@ -77,6 +77,8 @@
         window.updateHealthWaveforms = function() {
           var p1Data = window.wfData;    // Beat1.mp3
           var p2Data = window.b2Data;    // Beat2.mp3
+          var p1Duration = window.wfDuration;  // Beat1 duration
+          var p2Duration = window.b2Duration; // Beat2 duration
           
           // Resize canvases each frame in case layout changed
           var dpr = window.devicePixelRatio || 1;
@@ -96,31 +98,52 @@
           var gap = 2 * dpr;
           var barW = (w / bars) - gap;
           
-          // P1 - uses Beat1.mp3
+          // P1 - uses Beat1.mp3 with the exact 30-second window from waveform-zoom
           p1Ctx.clearRect(0, 0, w, h);
-          if (p1Data) {
+          if (p1Data && p1Duration) {
+            var p1WindowPos = window.getBeat1WindowPos ? window.getBeat1WindowPos() : 0;
+            var p1StartSample = p1WindowPos * (p1Duration - 30) / p1Duration * p1Data.length;
+            var p1SamplesPerBar = p1Data.length / 30;
+            
             var p1H = h * 0.8;
             var p1Mid = h;
             for (var i = 0; i < bars; i++) {
-              var idx = Math.floor(i / bars * p1Data.length);
-              var val = Math.abs(p1Data[idx] || 0);
-              var barH = Math.max(2 * dpr, val * p1H * 2);
+              var sampleStart = Math.floor(p1StartSample + i * p1SamplesPerBar);
+              var sampleEnd = Math.floor(sampleStart + p1SamplesPerBar);
+              var sum = 0;
+              var count = 0;
+              for (var s = sampleStart; s < sampleEnd && s < p1Data.length; s++) {
+                sum += p1Data[s] * p1Data[s];
+                count++;
+              }
+              var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+              var barH = Math.max(2 * dpr, rms * p1H * 3);
               p1Ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
               p1Ctx.fillRect(i * (barW + gap), p1Mid - barH, barW, barH);
             }
           }
           
-          // P2 - uses Beat2.mp3 (bottom-aligned like P1)
+          // P2 - uses Beat2.mp3 with the exact 30-second window from waveform-beat2
           p2Ctx.clearRect(0, 0, w, h);
-          if (p2Data) {
+          if (p2Data && p2Duration) {
+            var p2Start = window.getBeat2Start ? window.getBeat2Start() : 0;
+            var p2SamplesPerBar = p2Data.length / 30;
+            
             var p2H = h * 0.8;
             var p2Mid = h;
             for (var j = 0; j < bars; j++) {
-              var idx2 = Math.floor(j / bars * p2Data.length);
-              var val2 = Math.abs(p2Data[idx2] || 0);
-              var barH2 = Math.max(2 * dpr, val2 * p2H * 2);
+              var sampleStart = Math.floor(p2Start + j * p2SamplesPerBar);
+              var sampleEnd = Math.floor(sampleStart + p2SamplesPerBar);
+              var sum = 0;
+              var count = 0;
+              for (var s = sampleStart; s < sampleEnd && s < p2Data.length; s++) {
+                sum += p2Data[s] * p2Data[s];
+                count++;
+              }
+              var rms = count > 0 ? Math.sqrt(sum / count) : 0;
+              var barH = Math.max(2 * dpr, rms * p2H * 3);
               p2Ctx.fillStyle = 'rgba(252, 108, 133, 0.6)';
-              p2Ctx.fillRect(j * (barW + gap), p2Mid - barH2, barW, barH2);
+              p2Ctx.fillRect(j * (barW + gap), p2Mid - barH, barW, barH);
             }
           }
         };

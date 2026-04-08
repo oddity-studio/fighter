@@ -248,6 +248,7 @@
             wfData = audioBuffer.getChannelData(0);
             wfDuration = audioBuffer.duration;
             window.wfData = wfData;
+            window.wfDuration = wfDuration;
             window.beat1Buffer = audioBuffer;
             drawWaveform(wfData);
             if (window.updateHealthWaveforms) window.updateHealthWaveforms();
