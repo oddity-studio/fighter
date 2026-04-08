@@ -68,7 +68,7 @@
     }
 
     #maxx-health .health-bar-fill {
-      left: 0;
+      right: 0;
       background: linear-gradient(to bottom, #4cb8ff, #1a6aad);
     }
 
@@ -78,7 +78,7 @@
     }
 
     #hammer-health .health-bar-fill {
-      right: 0;
+      left: 0;
       background: linear-gradient(to bottom, #c84cff, #7a1aad);
     }
 
