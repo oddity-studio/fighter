@@ -4,6 +4,12 @@
       var lobbyAudio = new Audio('resources/sydosys.mp3');
       var confirmAudio = new Audio('resources/confirm.wav');
       var startAudio = new Audio('resources/start.mp3');
+      var koAudio = new Audio('resources/KO.mp3');
+      var winnerP1Audio = new Audio('resources/winnerP1.mp3');
+      var winnerP2Audio = new Audio('resources/winnerP2.mp3');
+      var flushAudio = new Audio('resources/flush.mp3');
+      var votingAudio = new Audio('resources/voting.mp3');
+      var hypeAudio = new Audio('resources/hype.webm');
       var audio1Playing = false;
 
       audio1.addEventListener('ended', function() {
@@ -383,5 +389,12 @@
       window.showCardInfo = showCardInfo;
       window.lobbyAudio = lobbyAudio;
       window.audio1 = audio1;
+      window.audio2 = audio2;
       window.startAudio = startAudio;
+      window.koAudio = koAudio;
+      window.winnerP1Audio = winnerP1Audio;
+      window.winnerP2Audio = winnerP2Audio;
+      window.flushAudio = flushAudio;
+      window.votingAudio = votingAudio;
+      window.hypeAudio = hypeAudio;
     })();
