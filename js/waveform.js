@@ -349,5 +349,4 @@
           display.textContent = formatTime(snippetStartSeconds) + ' / ' + formatTime(totalSeconds);
         };
       })();
-
-      (function() {
+    

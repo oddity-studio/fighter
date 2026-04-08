@@ -377,6 +377,3 @@
 
       init();
     })();
-  </script>
-</body>
-</html>

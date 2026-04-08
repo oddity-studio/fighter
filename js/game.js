@@ -1205,7 +1205,7 @@
       var beat1FadeStarted = false;
       var beat2FadeStarted = false;
 
-      // Countdown timer — two 30s rounds
+      // Countdown timer ï¿½ two 30s rounds
       var round = 1;
       window.currentRound = 1;
       var countdown = 30;
@@ -1412,7 +1412,7 @@
             var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
             hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
-            // Timer fully depleted — stop audio
+            // Timer fully depleted ï¿½ stop audio
             audio2.pause();
             audio2.volume = 1;
             countdownEl.textContent = '00';
@@ -1700,4 +1700,6 @@
         showDebugTimeline(fullTimeline.slice(0, 30), 1);
       };
 
-      (function() {
+      init();
+    })();
+  
