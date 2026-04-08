@@ -93,8 +93,8 @@
           var p1Ctx = p1Canvas.getContext('2d');
           var p2Ctx = p2Canvas.getContext('2d');
           var bars = 30;
-          var barW = (w - (bars - 1) * 2 * dpr) / bars;
           var gap = 2 * dpr;
+          var barW = (w / bars) - gap;
           
           // P1 - uses Beat1.mp3
           p1Ctx.clearRect(0, 0, w, h);
