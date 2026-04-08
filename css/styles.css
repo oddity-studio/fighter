@@ -54,20 +54,13 @@
       position: relative;
     }
 
-    .health-bar-fill {
-      position: absolute;
-      top: 0; left: 0;
-      height: 100%;
-      width: 100%;
-      transition: width 0.3s ease;
-    }
-
     #maxx-health {
       transform: skewX(30deg);
       border-color: #00e5ff;
     }
 
     #maxx-health .health-bar-fill {
+      left: 0;
       background: linear-gradient(to bottom, #4cb8ff, #1a6aad);
     }
 
@@ -77,6 +70,7 @@
     }
 
     #hammer-health .health-bar-fill {
+      right: 0;
       background: linear-gradient(to bottom, #c84cff, #7a1aad);
     }
 
