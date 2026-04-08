@@ -177,6 +177,7 @@
             window.beat2Buffer = audioBuffer;
             console.log('Setting window.b2Start:', window.b2Start);
             drawBeat2(window.b2Data, window.b2Start);
+            if (window.updateHealthWaveforms) window.updateHealthWaveforms();
           });
 
         window.beat2Placements = [];

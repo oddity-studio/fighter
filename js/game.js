@@ -75,8 +75,8 @@
         if (!p1Canvas || !p2Canvas) return;
         
         window.updateHealthWaveforms = function() {
-          var wfData = window.wfData;
-          if (!wfData) return;
+          var p1Data = window.wfData;    // Beat1.mp3
+          var p2Data = window.b2Data;    // Beat2.mp3
           
           // Resize canvases each frame in case layout changed
           var dpr = window.devicePixelRatio || 1;
@@ -92,34 +92,36 @@
           
           var p1Ctx = p1Canvas.getContext('2d');
           var p2Ctx = p2Canvas.getContext('2d');
-          
-          // P1 - top half of waveform
-          p1Ctx.clearRect(0, 0, w, h);
-          var p1H = h * 0.8;
-          var p1Mid = h;
           var barW = 4 * dpr;
           var gap = 2 * dpr;
           var bars = Math.floor(w / (barW + gap));
           
-          for (var i = 0; i < bars; i++) {
-            var idx = Math.floor(i / bars * wfData.length);
-            var val = Math.abs(wfData[idx] || 0);
-            var barH = Math.max(2 * dpr, val * p1H * 2);
-            p1Ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
-            p1Ctx.fillRect(i * (barW + gap), p1Mid - barH, barW, barH);
+          // P1 - uses Beat1.mp3
+          p1Ctx.clearRect(0, 0, w, h);
+          if (p1Data) {
+            var p1H = h * 0.8;
+            var p1Mid = h;
+            for (var i = 0; i < bars; i++) {
+              var idx = Math.floor(i / bars * p1Data.length);
+              var val = Math.abs(p1Data[idx] || 0);
+              var barH = Math.max(2 * dpr, val * p1H * 2);
+              p1Ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
+              p1Ctx.fillRect(i * (barW + gap), p1Mid - barH, barW, barH);
+            }
           }
           
-          // P2 - bottom half
+          // P2 - uses Beat2.mp3
           p2Ctx.clearRect(0, 0, w, h);
-          var p2H = h * 0.8;
-          var p2Mid = 0;
-          
-          for (var j = 0; j < bars; j++) {
-            var idx2 = Math.floor(j / bars * wfData.length);
-            var val2 = Math.abs(wfData[idx2] || 0);
-            var barH2 = Math.max(2 * dpr, val2 * p2H * 2);
-            p2Ctx.fillStyle = 'rgba(252, 108, 133, 0.6)';
-            p2Ctx.fillRect(j * (barW + gap), p2Mid, barW, barH2);
+          if (p2Data) {
+            var p2H = h * 0.8;
+            var p2Mid = 0;
+            for (var j = 0; j < bars; j++) {
+              var idx2 = Math.floor(j / bars * p2Data.length);
+              var val2 = Math.abs(p2Data[idx2] || 0);
+              var barH2 = Math.max(2 * dpr, val2 * p2H * 2);
+              p2Ctx.fillStyle = 'rgba(252, 108, 133, 0.6)';
+              p2Ctx.fillRect(j * (barW + gap), p2Mid, barW, barH2);
+            }
           }
         };
       }
