@@ -1,6 +1,4 @@
 (function() {
-        var audio1 = new Audio('resources/Beat1.mp3');
-        var audio2 = new Audio('resources/Beat2.mp3');
         var selectAudio = new Audio('resources/select.mp3');
         var pickAudio = new Audio('resources/pick.wav');
         var dropAudio = new Audio('resources/drop.wav');

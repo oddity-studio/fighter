@@ -1263,11 +1263,13 @@
         requestAnimationFrame(render);
       }
 
-      // Audio
-      var beat1 = new Audio('resources/Beat1.mp3');
-      var beat2 = new Audio('resources/Beat2.mp3');
-      beat1.loop = true;
-      beat2.loop = true;
+      // Audio - use shared audio objects from audio.js
+      if (window.audio1) {
+        window.audio1.loop = true;
+      }
+      if (window.audio2) {
+        window.audio2.loop = true;
+      }
 
       function fadeOutBeat(audio, duration) {
         var steps = 40;
