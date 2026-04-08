@@ -1,4 +1,17 @@
 (function() {
+        var audio1 = new Audio('resources/Beat1.mp3');
+        var audio2 = new Audio('resources/Beat2.mp3');
+        var selectAudio = new Audio('resources/Select.mp3');
+        var pickAudio = new Audio('resources/Pick.mp3');
+        var dropAudio = new Audio('resources/Drop.mp3');
+        var startAudio = new Audio('resources/Start.mp3');
+        var koAudio = new Audio('resources/KO.mp3');
+        var flushAudio = new Audio('resources/Flush.mp3');
+        var votingAudio = new Audio('resources/Voting.mp3');
+        var winnerP1Audio = new Audio('resources/winnerP1.mp3');
+        var winnerP2Audio = new Audio('resources/winnerP2.mp3');
+        var hypeAudio = new Audio('resources/hype.mp3');
+
         var cards = [
           { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH', 'IDLE'] },
           { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH', 'IDLE', 'IDLE'] },

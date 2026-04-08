@@ -2,6 +2,8 @@
       var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
       var lobbyAudio = new Audio('resources/sydosys.mp3');
+      var confirmAudio = new Audio('resources/Confirm.mp3');
+      var startAudio = new Audio('resources/Start.mp3');
       var audio1Playing = false;
 
       audio1.addEventListener('ended', function() {
@@ -376,6 +378,4 @@
         }
       });
       updateMode();
-
-      init();
     })();
