@@ -110,17 +110,17 @@
             }
           }
           
-          // P2 - uses Beat2.mp3
+          // P2 - uses Beat2.mp3 (bottom-aligned like P1)
           p2Ctx.clearRect(0, 0, w, h);
           if (p2Data) {
             var p2H = h * 0.8;
-            var p2Mid = 0;
+            var p2Mid = h;
             for (var j = 0; j < bars; j++) {
               var idx2 = Math.floor(j / bars * p2Data.length);
               var val2 = Math.abs(p2Data[idx2] || 0);
               var barH2 = Math.max(2 * dpr, val2 * p2H * 2);
               p2Ctx.fillStyle = 'rgba(252, 108, 133, 0.6)';
-              p2Ctx.fillRect(j * (barW + gap), p2Mid, barW, barH2);
+              p2Ctx.fillRect(j * (barW + gap), p2Mid - barH2, barW, barH2);
             }
           }
         };
