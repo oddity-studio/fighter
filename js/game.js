@@ -74,13 +74,18 @@
         var p2Canvas = document.getElementById('p2-waveform');
         if (!p1Canvas || !p2Canvas) return;
         
-        p1Canvas.width = p1Canvas.offsetWidth * window.devicePixelRatio;
-        p1Canvas.height = p1Canvas.offsetHeight * window.devicePixelRatio;
-        p2Canvas.width = p2Canvas.offsetWidth * window.devicePixelRatio;
-        p2Canvas.height = p2Canvas.offsetHeight * window.devicePixelRatio;
+        var setupCanvases = function() {
+          p1Canvas.width = p1Canvas.offsetWidth * window.devicePixelRatio;
+          p1Canvas.height = p1Canvas.offsetHeight * window.devicePixelRatio;
+          p2Canvas.width = p2Canvas.offsetWidth * window.devicePixelRatio;
+          p2Canvas.height = p2Canvas.offsetHeight * window.devicePixelRatio;
+        };
+        
+        setupCanvases();
+        window.addEventListener('resize', setupCanvases);
         
         window.updateHealthWaveforms = function() {
-          var wfData = window.getBeat1Data && window.getBeat1Data();
+          var wfData = window.wfData;
           if (!wfData) return;
           
           var p1Ctx = p1Canvas.getContext('2d');

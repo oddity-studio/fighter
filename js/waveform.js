@@ -250,6 +250,7 @@
             window.wfData = wfData;
             window.beat1Buffer = audioBuffer;
             drawWaveform(wfData);
+            if (window.updateHealthWaveforms) window.updateHealthWaveforms();
           });
 
         var dragging = false;
