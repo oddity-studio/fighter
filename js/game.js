@@ -86,6 +86,7 @@
         
         window.updateHealthWaveforms = function() {
           var wfData = window.wfData;
+          console.log('updateHealthWaveforms called, wfData:', wfData ? 'exists' : 'null', 'length:', wfData ? wfData.length : 0);
           if (!wfData) return;
           
           var p1Ctx = p1Canvas.getContext('2d');
