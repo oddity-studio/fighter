@@ -383,4 +383,5 @@
       window.showCardInfo = showCardInfo;
       window.lobbyAudio = lobbyAudio;
       window.audio1 = audio1;
+      window.startAudio = startAudio;
     })();
