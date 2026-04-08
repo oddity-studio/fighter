@@ -72,29 +72,26 @@
       function setupHealthWaveforms() {
         var p1Canvas = document.getElementById('p1-waveform');
         var p2Canvas = document.getElementById('p2-waveform');
-        console.log('setupHealthWaveforms: p1Canvas:', p1Canvas, 'p2Canvas:', p2Canvas);
         if (!p1Canvas || !p2Canvas) return;
-        
-        var setupCanvases = function() {
-          p1Canvas.width = p1Canvas.offsetWidth * window.devicePixelRatio;
-          p1Canvas.height = p1Canvas.offsetHeight * window.devicePixelRatio;
-          p2Canvas.width = p2Canvas.offsetWidth * window.devicePixelRatio;
-          p2Canvas.height = p2Canvas.offsetHeight * window.devicePixelRatio;
-        };
-        
-        setupCanvases();
-        window.addEventListener('resize', setupCanvases);
         
         window.updateHealthWaveforms = function() {
           var wfData = window.wfData;
-          console.log('updateHealthWaveforms called, wfData:', wfData ? 'exists' : 'null', 'length:', wfData ? wfData.length : 0);
           if (!wfData) return;
+          
+          // Resize canvases each frame in case layout changed
+          var dpr = window.devicePixelRatio || 1;
+          var w = p1Canvas.offsetWidth * dpr;
+          var h = p1Canvas.offsetHeight * dpr;
+          
+          if (w === 0 || h === 0) return; // Skip if not laid out yet
+          
+          if (p1Canvas.width !== w) p1Canvas.width = w;
+          if (p1Canvas.height !== h) p1Canvas.height = h;
+          if (p2Canvas.width !== w) p2Canvas.width = w;
+          if (p2Canvas.height !== h) p2Canvas.height = h;
           
           var p1Ctx = p1Canvas.getContext('2d');
           var p2Ctx = p2Canvas.getContext('2d');
-          var dpr = window.devicePixelRatio || 1;
-          var w = p1Canvas.width;
-          var h = p1Canvas.height;
           
           // P1 - top half of waveform
           p1Ctx.clearRect(0, 0, w, h);
@@ -1235,6 +1232,8 @@
         renderer.drawSkeleton(hammer.skeleton, true);
         renderer.drawSkeleton(maxx.skeleton, true);
         renderer.end();
+
+        if (window.updateHealthWaveforms) window.updateHealthWaveforms();
 
         requestAnimationFrame(render);
       }
