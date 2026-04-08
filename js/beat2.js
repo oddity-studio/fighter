@@ -1,3 +1,4 @@
+(function() {
         var b2Canvas = document.getElementById('waveform-beat2');
         var b2Ctx = b2Canvas.getContext('2d');
         var b2AudioCtx = new (window.AudioContext || window.webkitAudioContext)();

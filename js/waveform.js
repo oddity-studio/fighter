@@ -1,3 +1,4 @@
+(function() {
         var wfCanvas = document.getElementById('waveform-canvas');
         var wfCtx = wfCanvas.getContext('2d');
         var zmCanvas = document.getElementById('waveform-zoom');

@@ -1,4 +1,5 @@
 (function() {
+      var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
       var lobbyAudio = new Audio('resources/sydosys.mp3');
       var audio1Playing = false;
@@ -105,7 +106,6 @@
             var desc = buttonDescriptions[action];
             if (desc) {
               var infoBox = document.getElementById('drag-ghost-info');
-              // Show title bigger and description below
               var title = action.toUpperCase();
               infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
                                   '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
@@ -120,6 +120,7 @@
           });
         });
       }
+      window.setupTooltips = setupTooltips;
 
       setupTooltips();
 
