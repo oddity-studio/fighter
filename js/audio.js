@@ -37,16 +37,6 @@
 
       var showCardInfo = false;
       var moveDescriptions = {
-        'PUNCH': 'Basic light attack. BOOSTED: Deals more damage and can\'t be blocked',
-        'PUNCH+': '',
-        'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
-        'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
-        'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
-        'CONT': 'Super continues'
-      };
-      
-      // Card Tooltips
-      var moveDescriptions = {
         'PUNCH': 'Light attack, interrupted by BLOCK. PUNCH+ Can\'t be interrupted by BLOCK',
         'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
         'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
@@ -59,8 +49,6 @@
         'DEFENSE': 'Avoid opponent\'s BOOSTERS as those attacks can\'t be blocked',
         'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
       };
-      // Audio Initialization
-      // ... (already defined globally)
 
       var buttonDescriptions = {
         'fyre': 'FYRE: Show support! Hitting this will increase Player\'s attack damage',
@@ -397,4 +385,6 @@
       window.flushAudio = flushAudio;
       window.votingAudio = votingAudio;
       window.hypeAudio = hypeAudio;
+      window.moveDescriptions = moveDescriptions;
+      window.typeDescriptions = typeDescriptions;
     })();

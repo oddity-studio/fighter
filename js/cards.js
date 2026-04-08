@@ -11,6 +11,21 @@
         var winnerP2Audio = new Audio('resources/winnerP2.mp3');
         var hypeAudio = new Audio('resources/hype.webm');
 
+        var moveDescriptions = {
+          'PUNCH': 'Light attack, interrupted by BLOCK. PUNCH+ Can\'t be interrupted by BLOCK',
+          'PUNCH+': 'BOOSTED. Deals more damage and can\'t be blocked.',
+          'BLOCK': 'Instant cast. Negates light strikes, such as PUNCH',
+          'SUPER': '3 second cast. Instant kill. Interrupted with PUNCH',
+          'TAUNT': 'Turns upcoming PUNCH into PUNCH+',
+          'CONT': 'Super continues'
+        };
+        var typeDescriptions = {
+          'ATTACK': 'Start this card on your BOOSTER to turn its first PUNCH into PUNCH+',
+          'DEFENSE': 'Avoid opponent\'s BOOSTERS as those attacks can\'t be blocked',
+          'SKILL': 'Boost upcoming moves. Can be played in both Intros and Sequences.'
+        };
+        var showCardInfo = false;
+
         var cards = [
           { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH', 'IDLE'] },
           { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH', 'IDLE', 'IDLE'] },
@@ -293,5 +308,9 @@
             }
           }
         });
+
+        window.moveDescriptions = moveDescriptions;
+        window.typeDescriptions = typeDescriptions;
+        window.showCardInfo = showCardInfo;
       })();
     
