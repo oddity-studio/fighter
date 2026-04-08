@@ -378,4 +378,9 @@
         }
       });
       updateMode();
+
+      window.confirmAudio = confirmAudio;
+      window.showCardInfo = showCardInfo;
+      window.lobbyAudio = lobbyAudio;
+      window.audio1 = audio1;
     })();
