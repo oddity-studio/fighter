@@ -72,6 +72,7 @@
       function setupHealthWaveforms() {
         var p1Canvas = document.getElementById('p1-waveform');
         var p2Canvas = document.getElementById('p2-waveform');
+        console.log('setupHealthWaveforms: p1Canvas:', p1Canvas, 'p2Canvas:', p2Canvas);
         if (!p1Canvas || !p2Canvas) return;
         
         var setupCanvases = function() {
@@ -1275,6 +1276,8 @@
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
+        
+        setupHealthWaveforms();
         
         // Initialize hype video for Round 1
         window.initHypeVideo(1);
