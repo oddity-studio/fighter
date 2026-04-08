@@ -1,3 +1,4 @@
+(function() {
       var audio2 = new Audio('resources/Beat2.mp3');
       var lobbyAudio = new Audio('resources/sydosys.mp3');
       var audio1Playing = false;

@@ -281,7 +281,4 @@
           }
         });
       })();
-
-      var currentSource = null;
-
-      var audio1 = new Audio('resources/Beat1.mp3');
+    });

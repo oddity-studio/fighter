@@ -191,5 +191,4 @@
         };
         window.getBeat2Start = function() { return b2Start; };
       })();
-
-      (function() {
+    

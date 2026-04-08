@@ -685,7 +685,7 @@
       gap: 23px;
       background: 
         radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%),
-        url(resources/arena.webp);
+        url(../resources/arena.webp);
       background-size: cover, cover;
       background-position: center, center;
       background-repeat: no-repeat, no-repeat;
