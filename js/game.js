@@ -1654,40 +1654,6 @@
         });
       });
 
-      // Confirm Beat button - transitions to card placement mode
-      document.getElementById('confirm-btn').addEventListener('click', function() {
-        confirmAudio.currentTime = 0;
-        confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
-        // Hide logo and full waveform
-        document.getElementById('logo').style.display = 'none';
-        document.getElementById('character-select').style.display = 'none';
-        document.getElementById('waveform-canvas').style.display = 'none';
-        document.getElementById('snippet-time-display').style.display = 'none';
-        document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });
-        // Change label from "select a 30 second bit" to "attacking"
-        // Show cards and second waveform
-        document.getElementById('info-box').style.display = '';
-        document.querySelectorAll('.snippet-label')[1].style.display = '';
-        document.querySelectorAll('.snippet-label')[0].style.display = '';
-        document.querySelectorAll('.intro-label').forEach(function(el) { el.style.display = ''; });
-        document.querySelectorAll('.waveform-container')[1].style.display = '';
-        document.getElementById('move-seq-2').style.display = '';
-        document.getElementById('start-btn').style.display = '';
-        document.getElementById('scroll-left-btn').style.display = '';
-        document.getElementById('scroll-right-btn').style.display = '';
-        document.getElementById('mute-btn').style.display = '';
-        document.getElementById('info-toggle-btn').style.display = '';
-        // Hide confirm button after clicking
-        document.getElementById('confirm-btn').style.display = 'none';
-        // Play lobby music
-        window.playLobbyMusic();
-        // Force redraw using globals
-        if (window.resizeB2) window.resizeB2();
-        setTimeout(function() {
-          if (window.redrawBeat2) window.redrawBeat2();
-        }, 100);
-      });
-
       // Initially hide info-box, second waveform, and start button (pre-confirm state)
       document.getElementById('info-box').style.display = 'none';
       document.querySelectorAll('.snippet-label')[1].style.display = 'none';
