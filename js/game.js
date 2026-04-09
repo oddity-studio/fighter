@@ -1220,6 +1220,11 @@
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        if (!player1 || !player2) {
+          requestAnimationFrame(render);
+          return;
+        }
+
         var w = canvas.width;
         var h = canvas.height;
 
