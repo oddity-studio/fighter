@@ -913,7 +913,7 @@
       filter: drop-shadow(0 0 16px rgba(252, 108, 133, 0.8));
     }
 
-    #waveform-zoom {
+    #waveform-beat1 {
       position: relative;
       z-index: 1;
       width: 60vw;
@@ -1404,7 +1404,7 @@
       }
     }
     @media (orientation: portrait) {
-      #waveform-zoom { width: 90vw; height: 120px; }
+      #waveform-beat1 { width: 90vw; height: 120px; }
       #waveform-beat2 { width: 90vw; height: 120px; }
       .snippet-label { width: calc(80vw * 0.8); }
       .intro-label { width: calc(80vw * 0.2); }

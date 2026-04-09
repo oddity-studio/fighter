@@ -91,7 +91,7 @@
         });
 
         var wfCanvas = document.getElementById('waveform-canvas');
-        var zmCanvas = document.getElementById('waveform-zoom');
+        var b1Canvas = document.getElementById('waveform-beat1');
         var b2Canvas = document.getElementById('waveform-beat2');
         var ghost = document.getElementById('drag-ghost');
         var dragCard = null;
@@ -164,7 +164,7 @@
             infoBox.style.top = (e.clientY + 120) + 'px';
           }
 
-          var zmRect = zmCanvas.getBoundingClientRect();
+          var b1Rect = b1Canvas.getBoundingClientRect();
           var b2Rect = b2Canvas.getBoundingClientRect();
           window.dragPreview = null;
 
@@ -179,7 +179,7 @@
               var pEnd = p.tick + p.time;
               return snappedTick < pEnd && snappedTick + dragCard.time > p.tick;
             });
-            window.dragPreview = { canvas: 'zoom', bar: visualBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
+            window.dragPreview = { canvas: 'beat1', bar: visualBar, time: dragCard.time, type: dragCard.type, name: dragCard.name, overlap: overlaps };
             window.redrawWaveforms();
           } else if (e.clientX >= b2Rect.left && e.clientX <= b2Rect.right &&
                      e.clientY >= b2Rect.top && e.clientY <= b2Rect.bottom) {
@@ -212,7 +212,7 @@
           window.redrawWaveforms();
           window.redrawBeat2();
 
-          var zmRect = zmCanvas.getBoundingClientRect();
+          var b1Rect = b1Canvas.getBoundingClientRect();
           var b2Rect = b2Canvas.getBoundingClientRect();
 
           var dropped = false;
@@ -272,9 +272,9 @@
           box.appendChild(createCardEl(c));
         }
 
-        zmCanvas.addEventListener('click', function(e) {
+        b1Canvas.addEventListener('click', function(e) {
           if (window.beat1Placements.length === 0) return;
-          var rect = zmCanvas.getBoundingClientRect();
+          var rect = b1Canvas.getBoundingClientRect();
           var localPos = (e.clientX - rect.left) / rect.width;
           var clickTick = Math.round(localPos * 30) + 1;
 

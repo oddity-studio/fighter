@@ -95,7 +95,7 @@
           var gap = 2 * dpr;
           var barW = (w / bars) - gap;
           
-          // P1 - uses Beat1.mp3 with the exact 30-second window from waveform-zoom
+          // P1 - uses Beat1.mp3 with the exact 30-second window from waveform-beat1
           p1Ctx.clearRect(0, 0, w, h);
           if (p1Data && p1Duration) {
             var p1WindowPos = window.getBeat1WindowPos ? window.getBeat1WindowPos() : 0;
