@@ -58,8 +58,16 @@
           return;
         }
 
-        player2 = createSkeleton("HammerRigBox", "Idle");
-        player1 = createSkeleton("MaxxRigBox", "Idle");
+        var p1Char = window.player1Character || 'Maxx';
+        var p2Char = window.player2Character || 'Hammer';
+
+        player2 = createSkeleton(p2Char + "RigBox", "Idle");
+        player1 = createSkeleton(p1Char + "RigBox", "Idle");
+
+        var p1Label = document.getElementById('player1-label');
+        var p2Label = document.getElementById('player2-label');
+        if (p1Label) p1Label.textContent = p1Char;
+        if (p2Label) p2Label.textContent = p2Char;
 
         resize();
         window.addEventListener("resize", resize);
@@ -1089,7 +1097,7 @@
               }
 
               var winner = btn.getAttribute("data-player");
-              var winnerName = winner === 'player1' ? 'MAXX' : 'HAMMER';
+              var winnerName = winner === 'player1' ? window.player1Character : window.player2Character;
 
               var wo = document.getElementById('winner-overlay');
               wo.querySelector('span').textContent = winnerName + ' WINS';
@@ -1574,6 +1582,27 @@
 
       window.addEventListener('DOMContentLoaded', function() {
         setupTooltips();
+
+        window.player1Character = 'Maxx';
+        window.player2Character = 'Hammer';
+
+        var p1Select = document.getElementById('player1-char-select');
+        var p2Select = document.getElementById('player2-char-select');
+        var p1Picker = document.getElementById('picker-player1');
+        var p2Picker = document.getElementById('picker-player2');
+
+        function updatePickerImages() {
+          var p1Char = p1Select.value;
+          var p2Char = p2Select.value;
+          window.player1Character = p1Char;
+          window.player2Character = p2Char;
+          p1Picker.src = 'resources/picker_' + p1Char.toLowerCase() + '.webp';
+          p2Picker.src = 'resources/picker_' + p2Char.toLowerCase() + '.webp';
+        }
+
+        p1Select.addEventListener('change', updatePickerImages);
+        p2Select.addEventListener('change', updatePickerImages);
+
         document.getElementById('start-btn').addEventListener('click', function() {
           if (window.confirmAudio) {
             confirmAudio.currentTime = 0;
@@ -1590,6 +1619,7 @@
           }
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
+          document.getElementById('character-select').style.display = 'none';
           document.getElementById('waveform-canvas').style.display = 'none';
           document.getElementById('snippet-time-display').style.display = 'none';
           document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });
@@ -1625,6 +1655,7 @@
         confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
+        document.getElementById('character-select').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
         document.getElementById('snippet-time-display').style.display = 'none';
         document.querySelectorAll('.select-bit-label').forEach(function(el) { el.style.display = 'none'; });

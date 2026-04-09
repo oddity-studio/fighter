@@ -20,6 +20,22 @@
     <img id="picker-player2" class="picker-slide" src="resources/picker_hammer.webp" alt="">
     <img id="picker-player1"   class="picker-slide" src="resources/picker_maxx.webp"   alt="">
     <div id="vs-caption"><span>VS</span></div>
+    <div id="character-select">
+      <div class="char-select-row">
+        <label>PLAYER 1</label>
+        <select id="player1-char-select">
+          <option value="Maxx">Maxx</option>
+          <option value="Hammer">Hammer</option>
+        </select>
+      </div>
+      <div class="char-select-row">
+        <label>PLAYER 2</label>
+        <select id="player2-char-select">
+          <option value="Hammer">Hammer</option>
+          <option value="Maxx">Maxx</option>
+        </select>
+      </div>
+    </div>
     <div class="select-bit-label">
   <div>PICK A 30 SECOND BIT</div>
   <div style="font-size:0.7em">3 TALLEST BARS ARE YOUR POWER BOOSTERS</div>
@@ -87,7 +103,7 @@
     <div>
       <div id="player1-health" class="health-bar">
         <div class="health-bar-fill"></div>
-        <div class="player-label">MAXX</div>
+        <div class="player-label" id="player1-label">MAXX</div>
         <canvas id="p1-waveform" class="health-waveform"></canvas>
       </div>
       <div class="round-bar"><div class="round-bar-fill"></div></div>
@@ -108,7 +124,7 @@
     <div>
       <div id="player2-health" class="health-bar">
         <div class="health-bar-fill"></div>
-        <div class="player-label">HAMMER</div>
+        <div class="player-label" id="player2-label">HAMMER</div>
         <canvas id="p2-waveform" class="health-waveform"></canvas>
       </div>
       <div class="round-bar"><div class="round-bar-fill"></div></div>
