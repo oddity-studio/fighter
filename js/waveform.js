@@ -296,8 +296,6 @@
         }, { passive: true });
         window.addEventListener('touchend', function() { dragging = false; });
 
-      var moveDurations = { PUNCH: 1, 'PUNCH+': 1, BLOCK: 1, SUPER: 1, TAUNT: 1, TAUNT_DEFAULT: 1, CONT: 1 };
-
         window.beat1Placements = [];
         window.redrawWaveforms = function() { drawWaveform(wfData); updateMoveSeq('move-seq-1', window.beat1Placements); if (window.debugEnabled) { window.updateDebugTimeline(); } };
 
