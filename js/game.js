@@ -215,42 +215,6 @@
 
       var moveAnimMap = { PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', TAUNT_DEFAULT: 'Taunt', CONT: 'SuperInt' };
 
-      var animLookup = {
-        'PUNCH:Idle':    'PUNCH:HIT',
-        'PUNCH:TAUNT':   'PUNCH:HIT',
-        'PUNCH:TAUNT_DEFAULT': 'PUNCH:HIT',
-        'PUNCH:SUPER':   'PUNCH:HIT',
-        'PUNCH:PUNCH':   'PARRY:PARRY',
-        'PUNCH+:Idle':   'PUNCH+:HIT',
-        'PUNCH+:Block':  'PUNCH+:HIT',
-        'PUNCH+:PUNCH':  'PUNCH+:HIT',
-        'PUNCH+:TAUNT':  'PUNCH+:HIT',
-        'PUNCH+:TAUNT_DEFAULT': 'PUNCH+:HIT',
-        'PUNCH+:SUPER':  'PUNCH+:HIT',
-        'PUNCH+:PUNCH+': 'PARRY:PARRY',
-        'BLOCK:Idle':    'BLOCK:IDLE',
-        'BLOCK:TAUNT':   'BLOCK:TAUNT',
-        'BLOCK:TAUNT_DEFAULT': 'BLOCK:TAUNT',
-        'BLOCK:PUNCH':   'DEFLECT:PUNCH',
-        'BLOCK:PUNCH+':  'HIT:PUNCH+',
-        'BLOCK:SUPER':   'DOWN:SUPER',
-        'SUPER:Idle':    'SUPER:HIT',
-        'SUPER:Block':   'SUPER:DOWN',
-        'SUPER:TAUNT':   'SUPER:DOWN',
-        'SUPER:TAUNT_DEFAULT': 'SUPER:DOWN',
-        'CONT:Idle':     'CONT:HIT',
-        'CONT:Block':    'CONT:HIT',
-        'CONT:TAUNT':    'CONT:HIT',
-        'CONT:TAUNT_DEFAULT': 'CONT:HIT',
-        'CONT:PUNCH':    'CONT:HIT',
-        'TAUNT:PUNCH':   'TAUNT:HIT',
-        'TAUNT:SUPER':   'TAUNT:HIT',
-        'TAUNT_DEFAULT:PUNCH': 'TAUNT:HIT',
-        'TAUNT_DEFAULT:SUPER': 'TAUNT:HIT',
-        'Idle:PUNCH':    'HIT:PUNCH',
-        'Idle:PUNCH+':   'HIT:PUNCH+'
-      };
-
       var rigAnimMap = {
         PUNCH: 'Punch', 'PUNCH+': 'Punch+', BLOCK: 'Block', SUPER: 'Super', TAUNT: 'Taunt', TAUNT_DEFAULT: 'Taunt', CONT: 'SuperInt',
         HIT: 'Hit', PARRY: 'Parry', DEFLECT: 'Deflect', DOWN: 'Down', IDLE: 'Idle',
@@ -289,18 +253,6 @@
         });
         
         return ticks;
-      }
-
-      function getCombatAnims(atkMove, defMove, atkInterrupted, defInterrupted, atkTickInMove, defTickInMove) {
-        var key = atkMove + ':' + defMove;
-        if (animLookup[key]) {
-          var parts = animLookup[key].split(':');
-          return { atk: rigAnimMap[parts[0]] || parts[0], def: rigAnimMap[parts[1]] || parts[1] };
-        }
-        return {
-          atk: atkInterrupted ? 'Hit' : (rigAnimMap[atkMove] || atkMove),
-          def: defInterrupted ? 'Hit' : (rigAnimMap[defMove] || defMove)
-        };
       }
 
       function getSortedCards(placements) {
