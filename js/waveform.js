@@ -301,26 +301,34 @@
 
         window.updateMoveSeq = function(elId, placements) {
           var el = document.getElementById(elId);
-          var sorted = placements.slice().sort(function(a, b) { return a.tick - b.tick; });
           var moves = [];
-          var prevMove = null;
-          sorted.forEach(function(p) {
-            if (p.moves) {
-              p.moves.forEach(function(m, idx) {
-
-                if (m === 'PUNCH' && p.onSpike && idx === 0) {
-                  moves.push('PUNCH+');
-                  prevMove = 'PUNCH+';
-                } else if (m === 'PUNCH' && prevMove === 'TAUNT') {
-                  moves.push('PUNCH+');
-                  prevMove = 'PUNCH+';
-                } else if (m !== 'IDLE' && m !== 'CONT') {
-                  moves.push(m);
-                  prevMove = m;
-                }
-              });
-            }
-          });
+          
+          if (elId === 'move-seq-1' && window.currentCombat) {
+            moves = window.currentCombat.map(function(tick) {
+              return tick.atkMove;
+            }).filter(function(m) {
+              return m && m !== 'Idle' && m !== 'CONT';
+            });
+          } else {
+            var sorted = placements.slice().sort(function(a, b) { return a.tick - b.tick; });
+            var prevMove = null;
+            sorted.forEach(function(p) {
+              if (p.moves) {
+                p.moves.forEach(function(m, idx) {
+                  if (m === 'PUNCH' && p.onSpike && idx === 0) {
+                    moves.push('PUNCH+');
+                    prevMove = 'PUNCH+';
+                  } else if (m === 'PUNCH' && prevMove === 'TAUNT') {
+                    moves.push('PUNCH+');
+                    prevMove = 'PUNCH+';
+                  } else if (m !== 'IDLE' && m !== 'CONT') {
+                    moves.push(m);
+                    prevMove = m;
+                  }
+                });
+              }
+            });
+          }
 
           el.innerHTML = moves.map(function(m) {
             var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';

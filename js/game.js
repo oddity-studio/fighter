@@ -303,20 +303,6 @@
         };
       }
 
-      function buildTimedSequence(cards) {
-        var events = [];
-        cards.forEach(function(c) {
-          var moves = c.moves || [];
-          moves.forEach(function(m, idx) {
-            var move = m;
-            if (m === 'PUNCH' && c.onSpike && idx === 0) move = 'PUNCH+';
-            events.push({ move: move, duration: moveDurations[move] || 1 });
-          });
-          events.push({ move: 'Idle', duration: c.downtime || 1 });
-        });
-        return events;
-      }
-
       function getSortedCards(placements) {
         return placements.slice().sort(function(a, b) { return a.tick - b.tick; });
       }
@@ -1414,6 +1400,7 @@
           }
           
           var combat = processCombat(atkTicks, defTicks, 1);
+          window.currentCombat = combat;
           playCombat(player1, player2, combat, 1);
         }, 0);
         countdownInterval = setInterval(function() {
