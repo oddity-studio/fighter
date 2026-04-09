@@ -1,11 +1,11 @@
     (function () {
       var canvas = document.getElementById("game-canvas");
       var gl, renderer, assetManager, skeletonRenderer;
-      var hammer, maxx;
+      var player1, player2;
       var lastFrameTime = Date.now() / 1000;
       var animating = false;
       var pendingVote = null;
-      var health = { maxx: 100, hammer: 100 };
+      var health = { player1: 100, player2: 100 };
       var hudScale = 1, charScale = 1;
 
       var timersEnded = false;
@@ -23,7 +23,7 @@
         health[player] = Math.max(0, value);
         document.querySelector('#' + player + '-health .health-bar-fill').style.width = health[player] + '%';
         if (health[player] === 0) {
-          pendingVote = player === "maxx" ? "hammer" : "maxx";
+          pendingVote = player === "player1" ? "player2" : "player1";
           // Fade out hype video when character dies
           var hypeVideo = document.getElementById('hype-video');
           if (hypeVideo) {
@@ -58,8 +58,8 @@
           return;
         }
 
-        hammer = createSkeleton("HammerRigBox", "Idle");
-        maxx = createSkeleton("MaxxRigBox", "Idle");
+        player2 = createSkeleton("HammerRigBox", "Idle");
+        player1 = createSkeleton("MaxxRigBox", "Idle");
 
         resize();
         window.addEventListener("resize", resize);
@@ -872,21 +872,21 @@
           var damageDelay = (r.atkAnim === 'Punch' || r.atkAnim === 'Punch+' || r.defAnim === 'Punch' || r.defAnim === 'Punch+') ? 200 : 0;
           setTimeout(function() {
             if (r.atkDamage > 0 || r.defDamage > 0) {
-              var atkTarget = roundNum === 1 ? 'hammer' : 'maxx';
-              var defTarget = roundNum === 1 ? 'maxx' : 'hammer';
+              var atkTarget = roundNum === 1 ? 'player2' : 'player1';
+              var defTarget = roundNum === 1 ? 'player1' : 'player2';
 
               // Apply punch damage modifier based on attacker
               var atkDamage = r.atkDamage;
               var defDamage = r.defDamage;
               
               if (roundNum === 1) {
-                // maxx is attacking
+                // player1 is attacking
                 if (r.atkAnim === 'Punch') atkDamage += window.p1PunchDamageModifier;
                 if (r.atkAnim === 'Punch+') atkDamage += window.p1PunchPlusDamageModifier;
                 if (r.defAnim === 'Punch') defDamage += window.p2PunchDamageModifier;
                 if (r.defAnim === 'Punch+') defDamage += window.p2PunchPlusDamageModifier;
               } else {
-                // hammer is attacking
+                // player2 is attacking
                 if (r.atkAnim === 'Punch') atkDamage += window.p2PunchDamageModifier;
                 if (r.atkAnim === 'Punch+') atkDamage += window.p2PunchPlusDamageModifier;
                 if (r.defAnim === 'Punch') defDamage += window.p1PunchDamageModifier;
@@ -897,14 +897,14 @@
                 var newH = Math.max(0, health[atkTarget] - atkDamage);
                 setHealth(atkTarget, newH);
                 // Mess up audio when specific player takes damage
-                // Round 1: only when maxx (player1) loses health (atkTarget === 'maxx')
-                // Round 2: only when hammer (player2) loses health (atkTarget === 'hammer')
-                if (roundNum === 1 && atkTarget === 'maxx') {
+                // Round 1: only when player1 (player1) loses health (atkTarget === 'player1')
+                // Round 2: only when player2 (player2) loses health (atkTarget === 'player2')
+                if (roundNum === 1 && atkTarget === 'player1') {
                   audio1.volume = 0.1;
                   if (newH > 0) {
                     setTimeout(function() { audio1.volume = 1; }, 500);
                   }
-                } else if (roundNum === 2 && atkTarget === 'hammer') {
+                } else if (roundNum === 2 && atkTarget === 'player2') {
                   audio2.volume = 0.1;
                   if (newH > 0) {
                     setTimeout(function() { audio2.volume = 1; }, 500);
@@ -912,8 +912,8 @@
                 }
                 if (newH <= 0) {
                   clearInterval(combatInterval);
-                  var loser = atkTarget === 'maxx' ? maxx : hammer;
-                  var winner = atkTarget === 'maxx' ? hammer : maxx;
+                  var loser = atkTarget === 'player1' ? player1 : player2;
+                  var winner = atkTarget === 'player1' ? player2 : player1;
                   loser.state.setAnimation(0, 'Down', false);
                   winner.state.setAnimation(0, 'Idle', true);
                   // Show K.O. when health reaches 0
@@ -929,12 +929,12 @@
               if (defDamage > 0) {
                 var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
-                if (roundNum === 1 && defTarget === 'maxx') {
+                if (roundNum === 1 && defTarget === 'player1') {
                   audio1.volume = 0.1;
                   if (newH2 > 0) {
                     setTimeout(function() { audio1.volume = 1; }, 500);
                   }
-                } else if (roundNum === 2 && defTarget === 'hammer') {
+                } else if (roundNum === 2 && defTarget === 'player2') {
                   audio2.volume = 0.1;
                   if (newH2 > 0) {
                     setTimeout(function() { audio2.volume = 1; }, 500);
@@ -942,8 +942,8 @@
                 }
                 if (newH2 <= 0) {
                   clearInterval(combatInterval);
-                  var loser2 = defTarget === 'maxx' ? maxx : hammer;
-                  var winner2 = defTarget === 'maxx' ? hammer : maxx;
+                  var loser2 = defTarget === 'player1' ? player1 : player2;
+                  var winner2 = defTarget === 'player1' ? player2 : player1;
                   loser2.state.setAnimation(0, 'Down', false);
                   winner2.state.setAnimation(0, 'Idle', true);
                   // Show K.O. when health reaches 0
@@ -991,8 +991,8 @@
           var toast = document.createElement('span');
           toast.className = 'flush-toast';
           toast.textContent = text;
-          toast.style.color = player === 'maxx' ? '#00e5ff' : '#fc6c85';
-          toast.style.textShadow = '0 0 8px ' + (player === 'maxx' ? '#007aad' : '#7a1a3a');
+          toast.style.color = player === 'player1' ? '#00e5ff' : '#fc6c85';
+          toast.style.textShadow = '0 0 8px ' + (player === 'player1' ? '#007aad' : '#7a1a3a');
           document.getElementById('flush-toast-container').appendChild(toast);
           toast.addEventListener('animationend', function() { toast.remove(); });
         }
@@ -1010,19 +1010,19 @@
 
         document.querySelectorAll('.action-btn[data-action="flush"]').forEach(function(btn) {
           btn.addEventListener("click", function() {
-            if (btn.getAttribute("data-player") === "maxx") {
+            if (btn.getAttribute("data-player") === "player1") {
               if (round === 1) {
                 countdown = Math.max(0, countdown - 1);
                 countdownEl.textContent = String(countdown).padStart(2, '0');
-                advanceBarFill(document.querySelector('#maxx-health ~ .round-bar .round-bar-fill'), 1);
-                spawnToast('-1s FLUSH', 'maxx');
+                advanceBarFill(document.querySelector('#player1-health ~ .round-bar .round-bar-fill'), 1);
+                spawnToast('-1s FLUSH', 'player1');
               }
             } else {
               if (round === 2) {
                 countdown = Math.max(0, countdown - 1);
                 countdownEl.textContent = String(countdown).padStart(2, '0');
-                advanceBarFill(document.querySelector('#hammer-health ~ .round-bar .round-bar-fill'), 1);
-                spawnToast('-1s FLUSH', 'hammer');
+                advanceBarFill(document.querySelector('#player2-health ~ .round-bar .round-bar-fill'), 1);
+                spawnToast('-1s FLUSH', 'player2');
               }
             }
           });
@@ -1053,9 +1053,9 @@
             });
             
             var winnerPlayer = btn.getAttribute("data-player");
-            var loserPlayer = winnerPlayer === 'maxx' ? 'hammer' : 'maxx';
-            var winnerChar = winnerPlayer === 'maxx' ? maxx : hammer;
-            var loserChar = loserPlayer === 'maxx' ? maxx : hammer;
+            var loserPlayer = winnerPlayer === 'player1' ? 'player2' : 'player1';
+            var winnerChar = winnerPlayer === 'player1' ? player1 : player2;
+            var loserChar = loserPlayer === 'player1' ? player1 : player2;
             
             // Winner does Taunt, Loser does Flush (unless already Down)
             var loserCurrentAnim = loserChar.state.getCurrent(0);
@@ -1080,7 +1080,7 @@
               flash.style.transition = 'opacity 1s ease-out';
               flash.style.opacity = 0;
 
-              if (btn.getAttribute("data-player") === "maxx") {
+              if (btn.getAttribute("data-player") === "player1") {
                 switchBackground("resources/arena_p1win.webm", true);
                 (new Audio('resources/winnerP1.mp3')).play().catch(function() {});
               } else {
@@ -1089,7 +1089,7 @@
               }
 
               var winner = btn.getAttribute("data-player");
-              var winnerName = winner === 'maxx' ? 'MAXX' : 'HAMMER';
+              var winnerName = winner === 'player1' ? 'MAXX' : 'HAMMER';
 
               var wo = document.getElementById('winner-overlay');
               wo.querySelector('span').textContent = winnerName + ' WINS';
@@ -1114,7 +1114,7 @@
             // Update damage modifier based on button type
             var player = btn.getAttribute('data-player');
             var action = btn.getAttribute('data-action');
-            var isP1 = player === 'maxx';
+            var isP1 = player === 'player1';
             
             if (action === 'fyre') {
               // +1 per click
@@ -1152,7 +1152,7 @@
         });
 
         function syncVoteWidth() {
-          ['maxx', 'hammer'].forEach(function(player) {
+          ['player1', 'player2'].forEach(function(player) {
             var btns = ['fyre', 'mid', 'flush'].map(function(action) {
               return document.querySelector('.action-btn[data-player="' + player + '"][data-action="' + action + '"]');
             });
@@ -1172,8 +1172,8 @@
         document.querySelectorAll('.action-btn[data-player]').forEach(function(btn) {
           var player = btn.getAttribute('data-player');
           var active = round === 0
-            || (round === 1 && player === 'maxx')
-            || (round === 2 && player === 'hammer');
+            || (round === 1 && player === 'player1')
+            || (round === 2 && player === 'player2');
           btn.classList.toggle('inactive', !active);
         });
       }
@@ -1232,30 +1232,30 @@
         var charSpacing = 150 * charScale;
 
         // Maxx on the left (facing right)
-        maxx.skeleton.x = w / 2 - charSpacing;
-        maxx.skeleton.y = groundY;
-        maxx.skeleton.scaleX = charScale;
-        maxx.skeleton.scaleY = charScale;
-        maxx.state.update(delta);
-        maxx.state.apply(maxx.skeleton);
-        maxx.skeleton.updateWorldTransform();
+        player1.skeleton.x = w / 2 - charSpacing;
+        player1.skeleton.y = groundY;
+        player1.skeleton.scaleX = charScale;
+        player1.skeleton.scaleY = charScale;
+        player1.state.update(delta);
+        player1.state.apply(player1.skeleton);
+        player1.skeleton.updateWorldTransform();
 
         // Hammer on the right (flipped to face left)
-        hammer.skeleton.x = w / 2 + charSpacing;
-        hammer.skeleton.y = groundY;
-        hammer.skeleton.scaleX = -charScale;
-        hammer.skeleton.scaleY = charScale;
-        hammer.state.update(delta);
-        hammer.state.apply(hammer.skeleton);
-        hammer.skeleton.updateWorldTransform();
+        player2.skeleton.x = w / 2 + charSpacing;
+        player2.skeleton.y = groundY;
+        player2.skeleton.scaleX = -charScale;
+        player2.skeleton.scaleY = charScale;
+        player2.state.update(delta);
+        player2.state.apply(player2.skeleton);
+        player2.skeleton.updateWorldTransform();
 
         renderer.camera.position.x = w / 2;
         renderer.camera.position.y = h / 2;
         renderer.camera.setViewport(w, h);
 
         renderer.begin();
-        renderer.drawSkeleton(hammer.skeleton, true);
-        renderer.drawSkeleton(maxx.skeleton, true);
+        renderer.drawSkeleton(player2.skeleton, true);
+        renderer.drawSkeleton(player1.skeleton, true);
         renderer.end();
 
         if (window.updateHealthWaveforms) window.updateHealthWaveforms();
@@ -1382,8 +1382,8 @@
         showDebugTimeline(fullTimeline.slice(0, 30), 1, true, false);
 
         // 10s intro: both players idle
-        maxx.state.setAnimation(0, 'Idle', true);
-        hammer.state.setAnimation(0, 'Idle', true);
+        player1.state.setAnimation(0, 'Idle', true);
+        player2.state.setAnimation(0, 'Idle', true);
 
         // After 10s intro, play sequences
         setTimeout(function() {
@@ -1401,7 +1401,7 @@
           }
           
           var combat = processCombat(atkTicks, defTicks, 1);
-          playCombat(maxx, hammer, combat, 1);
+          playCombat(player1, player2, combat, 1);
         }, 0);
         countdownInterval = setInterval(function() {
         countdown--;
@@ -1433,8 +1433,8 @@
             window.currentRound = 2;
             countdown = 30;
             countdownEl.textContent = String(countdown).padStart(2, '0');
-            setHealth('maxx', 100);
-            setHealth('hammer', 100);
+            setHealth('player1', 100);
+            setHealth('player2', 100);
             document.getElementById('round-label').textContent = 'ROUND 2';
             updateRoundButtons();
             showRoundCaption('round2-overlay', 0);
@@ -1450,7 +1450,7 @@
             var defCards2 = getSortedCards(window.beat2Placements);
             var defTicks2 = generateTicks(defCards2);
             
-            // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
+            // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is player2/player2)
             if (atkTicks2[2]) atkTicks2[2].move = 'TAUNT_DEFAULT';
             if (atkTicks2[3]) atkTicks2[3].move = 'IDLE';
             
@@ -1475,8 +1475,8 @@
             showDebugTimeline(fullTimeline2.slice(0, 30), 2, true, false);
 
             // 10s intro: both players idle
-            hammer.state.setAnimation(0, 'Idle', true);
-            maxx.state.setAnimation(0, 'Idle', true);
+            player2.state.setAnimation(0, 'Idle', true);
+            player1.state.setAnimation(0, 'Idle', true);
 
             // After 10s intro, play sequences
             setTimeout(function() {
@@ -1484,7 +1484,7 @@
               var defCards = getSortedCards(window.beat2Placements);
               var defTicks = generateTicks(defCards);
               
-              // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is hammer/player2)
+              // Attacker does Taunt on tick 3, then Idle on tick 4 (round 2 - attacker is player2/player2)
               if (atkTicks[2]) atkTicks[2].move = 'TAUNT_DEFAULT';
               if (atkTicks[3]) atkTicks[3].move = 'IDLE';
               
@@ -1494,10 +1494,10 @@
               }
               
               var combat = processCombat(atkTicks, defTicks, 2);
-              playCombat(hammer, maxx, combat, 2);
+              playCombat(player2, player1, combat, 2);
             }, 0);
-            var hammerFill = document.querySelector('#hammer-health ~ .round-bar .round-bar-fill');
-            hammerFill.style.animation = 'round-bar-reveal 30s linear forwards';
+            var player2Fill = document.querySelector('#player2-health ~ .round-bar .round-bar-fill');
+            player2Fill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
             // Timer fully depleted � stop audio
             audio2.pause();
@@ -1512,8 +1512,8 @@
               var el = document.querySelector('.action-btn[data-player="' + player + '"][data-action="' + action + '"] .btn-counter');
               return parseInt((el && el.textContent.replace('x', '')) || '0') || 0;
             }
-            var totalFlush = getCount('maxx', 'flush') + getCount('hammer', 'flush');
-            var flushBros = getCount('maxx', 'flush') >= 20 && getCount('hammer', 'flush') >= 20 && getCount('maxx', 'fyre') < 5 && getCount('hammer', 'fyre') < 5;
+            var totalFlush = getCount('player1', 'flush') + getCount('player2', 'flush');
+            var flushBros = getCount('player1', 'flush') >= 20 && getCount('player2', 'flush') >= 20 && getCount('player1', 'fyre') < 5 && getCount('player2', 'fyre') < 5;
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
@@ -1529,14 +1529,14 @@
               btn.classList.add('vote-visible');
             });
             // Set all characters to Idle unless they're dead (DOWN animation)
-            var p1Dead = maxx.state.getCurrent(0) && maxx.state.getCurrent(0).animation.name === 'Down';
-            var p2Dead = hammer.state.getCurrent(0) && hammer.state.getCurrent(0).animation.name === 'Down';
-            if (!p1Dead) maxx.state.setAnimation(0, 'Idle', true);
-            if (!p2Dead) hammer.state.setAnimation(0, 'Idle', true);
+            var p1Dead = player1.state.getCurrent(0) && player1.state.getCurrent(0).animation.name === 'Down';
+            var p2Dead = player2.state.getCurrent(0) && player2.state.getCurrent(0).animation.name === 'Down';
+            if (!p1Dead) player1.state.setAnimation(0, 'Idle', true);
+            if (!p2Dead) player2.state.setAnimation(0, 'Idle', true);
             // Play Flush AFTER Idle for Flush Brothers (unless already Down)
             if (flushBros) {
-              if (!p1Dead) setTimeout(function() { playAnimationThenIdle(maxx, 'Flush'); }, 100);
-              if (!p2Dead) setTimeout(function() { playAnimationThenIdle(hammer, 'Flush'); }, 100);
+              if (!p1Dead) setTimeout(function() { playAnimationThenIdle(player1, 'Flush'); }, 100);
+              if (!p2Dead) setTimeout(function() { playAnimationThenIdle(player2, 'Flush'); }, 100);
             }
             // Update debug timeline to show Idle for remaining ticks
             var p1List = document.getElementById('debug-p1-list');

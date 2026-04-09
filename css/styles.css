@@ -62,22 +62,22 @@
       transition: width 0.3s ease;
     }
 
-    #maxx-health {
+    #player1-health {
       transform: skewX(30deg);
       border-color: #00e5ff;
     }
 
-    #maxx-health .health-bar-fill {
+    #player1-health .health-bar-fill {
       right: 0;
       background: linear-gradient(to bottom, #4cb8ff, #1a6aad);
     }
 
-    #hammer-health {
+    #player2-health {
       transform: skewX(-30deg);
       border-color: #fc6c85;
     }
 
-    #hammer-health .health-bar-fill {
+    #player2-health .health-bar-fill {
       left: 0;
       background: linear-gradient(to bottom, #c84cff, #7a1aad);
     }
@@ -92,13 +92,13 @@
       pointer-events: none;
     }
 
-    #maxx-health .player-label {
+    #player1-health .player-label {
       left: 28px;
       transform: translateY(-50%) skewX(-30deg) scaleY(1.2);
       transform-origin: left center;
     }
 
-    #hammer-health .player-label {
+    #player2-health .player-label {
       right: 28px;
       transform: translateY(-50%) skewX(30deg) scaleY(1.2);
       transform-origin: right center;
@@ -133,11 +133,11 @@
       animation: waveform 0.7s ease-in-out infinite alternate;
     }
 
-    #maxx-health .waveform-bar {
+    #player1-health .waveform-bar {
       background: rgba(0, 229, 255, 0.55);
     }
 
-    #hammer-health .waveform-bar {
+    #player2-health .waveform-bar {
       background: rgba(255, 100, 130, 0.55);
     }
 
@@ -153,22 +153,22 @@
       pointer-events: auto;
     }
 
-    #maxx-health ~ .action-buttons {
+    #player1-health ~ .action-buttons {
       transform: skewX(-30deg);
     }
 
-    #maxx-health ~ .action-buttons .action-btn span,
-    #maxx-health ~ .action-buttons .action-btn svg.btn-icon {
+    #player1-health ~ .action-buttons .action-btn span,
+    #player1-health ~ .action-buttons .action-btn svg.btn-icon {
       display: inline-block;
       transform: skewX(30deg);
     }
 
-    #hammer-health ~ .action-buttons {
+    #player2-health ~ .action-buttons {
       transform: skewX(30deg);
     }
 
-    #hammer-health ~ .action-buttons .action-btn span,
-    #hammer-health ~ .action-buttons .action-btn svg.btn-icon {
+    #player2-health ~ .action-buttons .action-btn span,
+    #player2-health ~ .action-buttons .action-btn svg.btn-icon {
       display: inline-block;
       transform: skewX(-30deg);
     }
@@ -221,11 +221,11 @@
       line-height: 1;
     }
 
-    #maxx-health ~ .action-buttons .btn-counter {
+    #player1-health ~ .action-buttons .btn-counter {
       color: #00e5ff;
     }
 
-    #hammer-health ~ .action-buttons .btn-counter {
+    #player2-health ~ .action-buttons .btn-counter {
       color: #ff4d6d;
     }
 
@@ -234,10 +234,10 @@
       border-color: #3a7a3a;
       box-shadow: 0 0 8px rgba(60, 160, 60, 0.5);
     }
-    #maxx-health ~ .action-buttons .action-btn[data-action="fyre"]:hover {
+    #player1-health ~ .action-buttons .action-btn[data-action="fyre"]:hover {
       background: linear-gradient(to left, rgba(60, 160, 60, 0.5) 0%, #1b1725 75%);
     }
-    #hammer-health ~ .action-buttons .action-btn[data-action="fyre"]:hover {
+    #player2-health ~ .action-buttons .action-btn[data-action="fyre"]:hover {
       background: linear-gradient(to left, rgba(60, 160, 60, 0.5) 0%, #1b1725 75%);
     }
 
@@ -246,10 +246,10 @@
       border-color: #7a7a00;
       box-shadow: 0 0 8px rgba(200, 200, 0, 0.5);
     }
-    #maxx-health ~ .action-buttons .action-btn[data-action="mid"]:hover {
+    #player1-health ~ .action-buttons .action-btn[data-action="mid"]:hover {
       background: linear-gradient(to left, rgba(200, 200, 0, 0.45) 0%, #1b1725 75%);
     }
-    #hammer-health ~ .action-buttons .action-btn[data-action="mid"]:hover {
+    #player2-health ~ .action-buttons .action-btn[data-action="mid"]:hover {
       background: linear-gradient(to left, rgba(200, 200, 0, 0.45) 0%, #1b1725 75%);
     }
 
@@ -258,10 +258,10 @@
       border-color: #7a1a1a;
       box-shadow: 0 0 8px rgba(200, 50, 50, 0.5);
     }
-    #maxx-health ~ .action-buttons .action-btn[data-action="flush"]:hover {
+    #player1-health ~ .action-buttons .action-btn[data-action="flush"]:hover {
       background: linear-gradient(to left, rgba(200, 50, 50, 0.5) 0%, #1b1725 75%);
     }
-    #hammer-health ~ .action-buttons .action-btn[data-action="flush"]:hover {
+    #player2-health ~ .action-buttons .action-btn[data-action="flush"]:hover {
       background: linear-gradient(to left, rgba(200, 50, 50, 0.5) 0%, #1b1725 75%);
     }
 
@@ -352,28 +352,28 @@
       animation: spark-sweep2 1.5s 0.6s ease-in-out infinite;
     }
 
-    .vote-btn[data-player="maxx"].vote-visible {
+    .vote-btn[data-player="player1"].vote-visible {
       animation: vote-appear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
                  electric-glow-cyan 0.9s ease-in-out infinite;
     }
 
-    .vote-btn[data-player="hammer"].vote-visible {
+    .vote-btn[data-player="player2"].vote-visible {
       animation: vote-appear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
                  electric-glow-watermelon 0.9s ease-in-out infinite;
     }
 
-    .vote-btn[data-player="maxx"]:hover {
+    .vote-btn[data-player="player1"]:hover {
       color: #22e8e8;
       border-color: #0891b2;
       background: linear-gradient(to left, rgba(6, 182, 212, 0.5) 0%, #1b1725 75%);
       box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
     }
 
-    .vote-btn[data-player="hammer"] {
+    .vote-btn[data-player="player2"] {
       justify-content: flex-end;
     }
 
-    .vote-btn[data-player="hammer"]:hover {
+    .vote-btn[data-player="player2"]:hover {
       color: #ff6b8a;
       border-color: #c0304a;
       background: linear-gradient(to right, rgba(255, 80, 110, 0.5) 0%, #1b1725 75%);
@@ -385,19 +385,19 @@
       width: 100%;
     }
 
-    #maxx-health ~ .vote-row {
+    #player1-health ~ .vote-row {
       transform: skewX(-30deg) translateX(-30px);
     }
 
-    #maxx-health ~ .vote-row .vote-btn {
+    #player1-health ~ .vote-row .vote-btn {
       justify-content: flex-end;
     }
 
-    #hammer-health ~ .vote-row {
+    #player2-health ~ .vote-row {
       transform: skewX(30deg) translateX(30px);
     }
 
-    #hammer-health ~ .vote-row .vote-btn {
+    #player2-health ~ .vote-row .vote-btn {
       justify-content: flex-start;
     }
 
@@ -570,11 +570,11 @@
       overflow: hidden;
     }
 
-    #maxx-health ~ .round-bar {
+    #player1-health ~ .round-bar {
       transform: skewX(30deg) translateX(20px);
     }
 
-    #hammer-health ~ .round-bar {
+    #player2-health ~ .round-bar {
       transform: skewX(-30deg) translateX(-20px);
     }
 
@@ -585,13 +585,13 @@
       width: 0%;
     }
 
-    #maxx-health ~ .round-bar .round-bar-fill {
+    #player1-health ~ .round-bar .round-bar-fill {
       left: 0;
       background: linear-gradient(to right, #007aad, #00e5ff);
       animation: round-bar-reveal 30s linear forwards;
     }
 
-    #hammer-health ~ .round-bar .round-bar-fill {
+    #player2-health ~ .round-bar .round-bar-fill {
       right: 0;
       background: linear-gradient(to left, #7a1a3a, #fc6c85);
     }
@@ -1223,27 +1223,27 @@
       z-index: 0;
     }
 
-    #picker-maxx {
+    #picker-player1 {
       left: 0;
-      animation: slide-in-maxx 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-maxx 3s ease-in-out 1.5s infinite;
+      animation: slide-in-player1 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-player1 3s ease-in-out 1.5s infinite;
     }
 
-    #picker-hammer {
+    #picker-player2 {
       right: 0;
-      animation: slide-in-hammer 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-hammer 2.7s ease-in-out 1.5s infinite;
+      animation: slide-in-player2 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both, wiggle-player2 2.7s ease-in-out 1.5s infinite;
     }
 
-    @keyframes slide-in-maxx {
+    @keyframes slide-in-player1 {
       from { transform: translateX(-80vw); }
       to   { transform: translateX(0); }
     }
 
-    @keyframes slide-in-hammer {
+    @keyframes slide-in-player2 {
       from { transform: translateX(80vw) scaleX(-1); }
       to   { transform: translateX(0)    scaleX(-1); }
     }
 
-    @keyframes wiggle-maxx {
+    @keyframes wiggle-player1 {
       0%      { transform: translate(0, 0); }
       25%     { transform: translate(-3px, 4px); }
       50%     { transform: translate(4px, -2px); }
@@ -1251,7 +1251,7 @@
       100%    { transform: translate(0, 0); }
     }
 
-    @keyframes wiggle-hammer {
+    @keyframes wiggle-player2 {
       0%      { transform: translate(0, 0) scaleX(-1); }
       25%     { transform: translate(3px, -3px) scaleX(-1); }
       50%     { transform: translate(-4px, 2px) scaleX(-1); }
@@ -1394,16 +1394,16 @@
       }
     }
     @media (orientation: portrait) {
-      @keyframes slide-in-maxx {
+@keyframes slide-in-player1 {
         from { transform: translateX(-300vw); }
         to   { transform: translateX(-140vw); }
       }
-      @keyframes slide-in-hammer {
+@keyframes slide-in-player2 {
         from { transform: translateX(300vw) scaleX(-1); }
         to   { transform: translateX(140vw)   scaleX(-1); }
       }
 
-      @keyframes wiggle-maxx {
+@keyframes wiggle-player1 {
         0%      { transform: translate(-140vw, 0); }
         25%     { transform: translate(calc(-140vw - 3px), 4px); }
         50%     { transform: translate(calc(-140vw + 4px), -2px); }
@@ -1411,7 +1411,7 @@
         100%    { transform: translate(-140vw, 0); }
       }
 
-      @keyframes wiggle-hammer {
+@keyframes wiggle-player2 {
         0%      { transform: translate(140vw, 0) scaleX(-1); }
         25%     { transform: translate(calc(140vw + 3px), -3px) scaleX(-1); }
         50%     { transform: translate(calc(140vw - 4px), 2px) scaleX(-1); }
@@ -1429,18 +1429,18 @@
         width: 100%;
         height: 55px;
       }
-      #maxx-health {
+      #player1-health {
         width: 120%;
         margin-left: -5vw;
       }
-      #maxx-health .player-label {
+      #player1-health .player-label {
         left: 48px;
       }
-      #hammer-health {
+      #player2-health {
         width: 120%;
         margin-left: calc(-20% + 5vw);
       }
-      #hammer-health .player-label {
+      #player2-health .player-label {
         right: 48px;
       }
       #round-label {
@@ -1450,10 +1450,10 @@
       .round-bar {
         height: 8px;
       }
-      #maxx-health ~ .round-bar {
+      #player1-health ~ .round-bar {
         transform: skewX(30deg) translateX(25px);
       }
-      #hammer-health ~ .round-bar {
+      #player2-health ~ .round-bar {
         transform: skewX(-30deg) translateX(-25px);
       }
       .action-buttons {
@@ -1490,7 +1490,7 @@
         font-size: 30px;
       }
       /* Side-mounted vertical action buttons */
-      #maxx-health ~ .action-buttons:not(.vote-row) {
+      #player1-health ~ .action-buttons:not(.vote-row) {
         position: fixed;
         left: -5vw;
         top: 70%;
@@ -1499,7 +1499,7 @@
         width: auto;
         gap: 6px;
       }
-      #hammer-health ~ .action-buttons:not(.vote-row) {
+      #player2-health ~ .action-buttons:not(.vote-row) {
         position: fixed;
         right: -5vw;
         top: 70%;
@@ -1509,32 +1509,32 @@
         gap: 6px;
       }
       /* Row layout + 30deg slant per button */
-      #maxx-health ~ .action-buttons:not(.vote-row) .action-btn {
+      #player1-health ~ .action-buttons:not(.vote-row) .action-btn {
         flex-direction: row;
         align-items: center;
         padding: 16px 18px 14px 42px;
         transform: skewX(-30deg);
       }
-      #hammer-health ~ .action-buttons:not(.vote-row) .action-btn {
+      #player2-health ~ .action-buttons:not(.vote-row) .action-btn {
         flex-direction: row;
         align-items: center;
         padding: 16px 42px 14px 18px;
         transform: skewX(30deg);
       }
       /* Counter-skew content so text reads upright */
-      #maxx-health ~ .action-buttons:not(.vote-row) .action-btn span,
-      #maxx-health ~ .action-buttons:not(.vote-row) .action-btn svg.btn-icon {
+      #player1-health ~ .action-buttons:not(.vote-row) .action-btn span,
+      #player1-health ~ .action-buttons:not(.vote-row) .action-btn svg.btn-icon {
         transform: skewX(30deg);
       }
-      #hammer-health ~ .action-buttons:not(.vote-row) .action-btn span,
-      #hammer-health ~ .action-buttons:not(.vote-row) .action-btn svg.btn-icon {
+      #player2-health ~ .action-buttons:not(.vote-row) .action-btn span,
+      #player2-health ~ .action-buttons:not(.vote-row) .action-btn svg.btn-icon {
         transform: skewX(-30deg);
       }
       /* Maxx (left side): icon on the left (towards screen edge) */
-      #maxx-health ~ .action-buttons:not(.vote-row) .btn-icon {
+      #player1-health ~ .action-buttons:not(.vote-row) .btn-icon {
         order: -1;
       }
-      #maxx-health ~ .action-buttons:not(.vote-row) .btn-text {
+      #player1-health ~ .action-buttons:not(.vote-row) .btn-text {
         flex: 1;
         flex-direction: column;
         align-items: flex-end;
@@ -1542,10 +1542,10 @@
         text-align: right;
       }
       /* Hammer (right side): icon on the right (towards screen edge) */
-      #hammer-health ~ .action-buttons:not(.vote-row) .btn-icon {
+      #player2-health ~ .action-buttons:not(.vote-row) .btn-icon {
         order: 1;
       }
-      #hammer-health ~ .action-buttons:not(.vote-row) .btn-text {
+      #player2-health ~ .action-buttons:not(.vote-row) .btn-text {
         flex: 1;
         flex-direction: column;
         align-items: flex-start;
@@ -1553,7 +1553,7 @@
         text-align: left;
       }
       /* Vote buttons - skewed, tucked to their screen edge, as wide as health bars */
-      #maxx-health ~ .vote-row {
+      #player1-health ~ .vote-row {
         position: fixed;
         bottom: 40px;
         left: -5vw;
@@ -1563,7 +1563,7 @@
         justify-content: flex-end;
         margin-top: 0;
       }
-      #hammer-health ~ .vote-row {
+      #player2-health ~ .vote-row {
         position: fixed;
         bottom: 40px;
         right: -5vw;
@@ -1573,16 +1573,16 @@
         justify-content: flex-start;
         margin-top: 0;
       }
-      #maxx-health ~ .vote-row .vote-btn,
-      #hammer-health ~ .vote-row .vote-btn {
+      #player1-health ~ .vote-row .vote-btn,
+      #player2-health ~ .vote-row .vote-btn {
         width: 100%;
       }
       /* Counter-skew span so text reads upright (can't counter-skew the button itself — vote-appear animation uses transform) */
-      #maxx-health ~ .vote-row .vote-btn span {
+      #player1-health ~ .vote-row .vote-btn span {
         display: inline-block;
         transform: skewX(30deg);
       }
-      #hammer-health ~ .vote-row .vote-btn span {
+      #player2-health ~ .vote-row .vote-btn span {
         display: inline-block;
         transform: skewX(-30deg);
       }
