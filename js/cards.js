@@ -168,9 +168,9 @@
           var b2Rect = b2Canvas.getBoundingClientRect();
           window.dragPreview = null;
 
-          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
-              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
-            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+          if (e.clientX >= b1Rect.left && e.clientX <= b1Rect.right &&
+              e.clientY >= b1Rect.top && e.clientY <= b1Rect.bottom) {
+            var localPos = (e.clientX - b1Rect.left) / b1Rect.width;
             var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
             var visualBar = (snappedTick - 1) / 30;
             var restricted = snappedTick < 8 && dragCard.type !== 'SKILL';
@@ -217,9 +217,9 @@
 
           var dropped = false;
 
-          if (e.clientX >= zmRect.left && e.clientX <= zmRect.right &&
-              e.clientY >= zmRect.top && e.clientY <= zmRect.bottom) {
-            var localPos = (e.clientX - zmRect.left) / zmRect.width;
+          if (e.clientX >= b1Rect.left && e.clientX <= b1Rect.right &&
+              e.clientY >= b1Rect.top && e.clientY <= b1Rect.bottom) {
+            var localPos = (e.clientX - b1Rect.left) / b1Rect.width;
             var snappedTick = Math.max(1, Math.min(30, Math.round(localPos * 30) + 1));
             var restricted = snappedTick < 8 && dragCard.type !== 'SKILL';
             var overflows = snappedTick + dragCard.time > 31;
