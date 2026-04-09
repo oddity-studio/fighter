@@ -57,10 +57,8 @@
       };
 
       var actionBtns = document.querySelectorAll('.action-btn');
-      console.log('Found action buttons:', actionBtns.length);
       actionBtns.forEach(function(btn) {
         btn.addEventListener('pointerenter', function() {
-          console.log('Pointer enter on:', this.getAttribute('data-action'));
           if (!showCardInfo) return;
           var action = this.getAttribute('data-action');
           var desc = buttonDescriptions[action];
@@ -93,10 +91,8 @@
           'flush': 'FLUSH: This hurts my ears! Hitting this speeds up the timer.'
         };
         var actionBtns = document.querySelectorAll('.action-btn');
-        console.log('Found action buttons:', actionBtns.length);
         actionBtns.forEach(function(btn) {
           btn.addEventListener('pointerenter', function() {
-            console.log('Pointer enter on:', this.getAttribute('data-action'));
             if (!window.showCardInfo) return;
             var action = this.getAttribute('data-action');
             var desc = buttonDescriptions[action];

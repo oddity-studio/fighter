@@ -381,7 +381,7 @@
         var result = [];
         
         for (var t = 0; t < timeline.length; t++) {
-          console.log('applyCombatRules tick', t);
+
           var entry = timeline[t];
           var newEntry = { 
             tick: entry.tick || (t + 1),
@@ -448,7 +448,7 @@
             
             // Check if SUPER was interrupted (changed to Idle) in result before this tick
             for (var check = t - 1; check > checkTick; check--) {
-              console.log('Checking result[' + check + ']:', result[check]);
+
               if (result[check] && result[check].p1.move === 'Idle' && result[check].p1.anim === 'Hit') {
                 p1SuperInterrupted = true;
               }
@@ -463,20 +463,20 @@
                 p2SuperHitNextTick = true;
               }
             }
-            console.log('After check: p1SuperInterrupted=' + p1SuperInterrupted + ' p1SuperHitNextTick=' + p1SuperHitNextTick);
+
           }
           
           // If this is 2 ticks after SUPER, deal 100% damage (unless SUPER was interrupted or hit next tick)
           var p1SuperHitNextTickNow = entry.p1.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p2.move === 'PUNCH';
           var p2SuperHitNextTickNow = entry.p2.move === 'SUPER' && timeline[t + 1] && timeline[t + 1].p1.move === 'PUNCH';
-          console.log('SUPER check t=' + t + ' prev2P1=' + prev2P1 + ' interrupted=' + p1SuperInterrupted + ' hitNext=' + p1SuperHitNextTick);
+
           if ((!p1SuperInterrupted && !p1SuperHitNextTick && !p1SuperHitNextTickNow) && (entry.p1.move === 'Idle' || entry.p1.move === 'IDLE' || entry.p1.move === 'CONT') && prev2P1 === 'SUPER') {
             newEntry.p1.damage = 100;
-            console.log('-> Setting P1 damage to 100!');
+
           }
           if ((!p2SuperInterrupted && !p2SuperHitNextTick && !p2SuperHitNextTickNow) && (entry.p2.move === 'Idle' || entry.p2.move === 'IDLE' || entry.p2.move === 'CONT') && prev2P2 === 'SUPER') {
             newEntry.p2.damage = 100;
-            console.log('-> Setting P2 damage to 100!');
+
           }
           
           // If SUPER was hit on next tick, change animation to SuperInt (on the SUPER tick itself)
@@ -1575,20 +1575,18 @@
       window.addEventListener('DOMContentLoaded', function() {
         setupTooltips();
         document.getElementById('start-btn').addEventListener('click', function() {
-          console.log('Start button clicked');
           if (window.confirmAudio) {
             confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
           }
           startBattle();
         });
 
         // Confirm Beat button - transitions to card placement mode
         document.getElementById('confirm-btn').addEventListener('click', function() {
-          console.log('Confirm button clicked');
           if (window.confirmAudio) {
             confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+            confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
           }
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
@@ -1623,9 +1621,8 @@
 
       // Confirm Beat button - transitions to card placement mode
       document.getElementById('confirm-btn').addEventListener('click', function() {
-        console.log('Confirm button clicked');
         confirmAudio.currentTime = 0;
-        confirmAudio.play().catch(function(e) { console.error("Audio playback failed:", e); });
+        confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
         // Hide logo and full waveform
         document.getElementById('logo').style.display = 'none';
         document.getElementById('waveform-canvas').style.display = 'none';
@@ -1663,7 +1660,6 @@
       document.getElementById('start-btn').style.display = 'none';
 
       document.getElementById('debug-btn').addEventListener('click', function() {
-        console.log('Debug button clicked');
         var debugBoxes = document.getElementById('debug-boxes');
         var isVisible = debugBoxes.style.display !== 'none';
         

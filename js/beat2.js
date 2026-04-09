@@ -6,13 +6,11 @@
         function resizeB2() {
           b2Canvas.width = b2Canvas.offsetWidth * (window.devicePixelRatio || 1);
           b2Canvas.height = b2Canvas.offsetHeight * (window.devicePixelRatio || 1);
-          console.log('resizeB2 called, width:', b2Canvas.width, 'height:', b2Canvas.height);
         }
         window.resizeB2 = resizeB2;
         resizeB2();
         window.addEventListener('resize', function() { 
           resizeB2(); 
-          console.log('resize, using window.b2Data:', window.b2Data ? 'exists' : 'null');
           drawBeat2(window.b2Data, b2Start); 
         });
 
@@ -169,20 +167,17 @@
           .then(function(r) { return r.arrayBuffer(); })
           .then(function(buf) { return window.sharedAudioCtx.decodeAudioData(buf); })
           .then(function(audioBuffer) {
-            console.log('Beat2 audio loaded!');
             window.b2Data = audioBuffer.getChannelData(0);
             window.b2Duration = audioBuffer.duration;
             var maxStart = window.b2Data.length - Math.floor(30 / window.b2Duration * window.b2Data.length);
             window.b2Start = Math.floor(Math.random() * maxStart);
             window.beat2Buffer = audioBuffer;
-            console.log('Setting window.b2Start:', window.b2Start);
             drawBeat2(window.b2Data, window.b2Start);
             if (window.updateHealthWaveforms) window.updateHealthWaveforms();
           });
 
         window.beat2Placements = [];
         window.redrawBeat2 = function() { 
-          console.log('redrawBeat2 called, b2Data:', window.b2Data ? 'exists' : 'null', 'b2Duration:', window.b2Duration);
           var useData = window.b2Data;
           var useDuration = window.b2Duration;
           if (useData && useDuration) {

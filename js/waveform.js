@@ -308,7 +308,7 @@
           sorted.forEach(function(p) {
             if (p.moves) {
               p.moves.forEach(function(m, idx) {
-                console.log('move:', m, 'prevMove:', prevMove, 'onSpike:', p.onSpike, 'idx:', idx);
+
                 if (m === 'PUNCH' && p.onSpike && idx === 0) {
                   moves.push('PUNCH+');
                   prevMove = 'PUNCH+';
@@ -322,7 +322,7 @@
               });
             }
           });
-          console.log('final moves:', moves);
+
           el.innerHTML = moves.map(function(m) {
             var cls = m === 'PUNCH+' ? 'move-seq-item move-plus' : 'move-seq-item';
             return '<span class="' + cls + '">' + m + '</span>';
