@@ -58,17 +58,6 @@
           return;
         }
 
-        var p1Char = window.player1Character || 'Maxx';
-        var p2Char = window.player2Character || 'Hammer';
-
-        player2 = createSkeleton(p2Char + "RigBox", "Idle");
-        player1 = createSkeleton(p1Char + "RigBox", "Idle");
-
-        var p1Label = document.getElementById('player1-label');
-        var p2Label = document.getElementById('player2-label');
-        if (p1Label) p1Label.textContent = p1Char;
-        if (p2Label) p2Label.textContent = p2Char;
-
         resize();
         window.addEventListener("resize", resize);
         setupButtons();
@@ -1310,6 +1299,17 @@
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-canvas').style.display = '';
         document.getElementById('hud').style.display = '';
+        
+        var p1Char = window.player1Character || 'Maxx';
+        var p2Char = window.player2Character || 'Hammer';
+
+        player2 = createSkeleton(p2Char + "RigBox", "Idle");
+        player1 = createSkeleton(p1Char + "RigBox", "Idle");
+
+        var p1Label = document.getElementById('player1-label');
+        var p2Label = document.getElementById('player2-label');
+        if (p1Label) p1Label.textContent = p1Char;
+        if (p2Label) p2Label.textContent = p2Char;
         
         setupHealthWaveforms();
         
