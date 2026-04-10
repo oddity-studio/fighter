@@ -8,9 +8,6 @@
       var koAudio = new Audio('resources/KO.mp3');
       var winnerP1Audio = new Audio('resources/winnerP1.mp3');
       var winnerP2Audio = new Audio('resources/winnerP2.mp3');
-      var flushAudio = new Audio('resources/flush.mp3');
-      var votingAudio = new Audio('resources/voting.mp3');
-      var hypeAudio = new Audio('resources/hype.webm');
 
       var audio1 = new Audio('resources/Beat1.mp3');
       var audio2 = new Audio('resources/Beat2.mp3');
@@ -413,34 +410,6 @@
         }, (duration || 2000) / 20);
       };
 
-      window.initHypeVideo = function(round) {
-        var hypeVideo = document.getElementById('hype-video');
-        hypeVideo.style.opacity = '0.8';
-        hypeVideo.classList.remove('round2');
-        hypeVideo.style.bottom = '-100vh';
-        if (round === 2) {
-          hypeVideo.classList.add('round2');
-        }
-        window.updateHypeVideo();
-      };
-
-      window.updateHypeVideo = function() {
-        var hypeVideo = document.getElementById('hype-video');
-        if (!hypeVideo) return;
-        var currentRound = window.currentRound || 1;
-        var modifier = currentRound === 1 ? (window.p1PunchDamageModifier || 0) : (window.p2PunchDamageModifier || 0);
-        var percent = modifier * 5;
-        if (percent > 100) percent = 100;
-        var offset = -100 + percent;
-        hypeVideo.style.bottom = offset + 'vh';
-        hypeVideo.style.opacity = percent > 0 ? '0.8' : '0';
-      };
-
-      window.hideHypeVideo = function() {
-        var hypeVideo = document.getElementById('hype-video');
-        if (hypeVideo) hypeVideo.style.display = 'none';
-      };
-
       document.getElementById('play-btn-1').addEventListener('click', function() {
         var btn = this;
         var playIcon = btn.querySelector('.play-icon');
@@ -635,5 +604,4 @@
       window.winnerP2Audio = winnerP2Audio;
       window.flushAudio = flushAudio;
       window.votingAudio = votingAudio;
-      window.hypeAudio = hypeAudio;
     })();

@@ -278,6 +278,37 @@
       window.p1PunchPlusDamageModifier = 0;
       window.p2PunchDamageModifier = 0;
       window.p2PunchPlusDamageModifier = 0;
+
+      // ===== HYPE VIDEO =====
+      window.initHypeVideo = function(round) {
+        var hypeVideo = document.getElementById('hype-video');
+        if (!hypeVideo) return;
+        hypeVideo.style.opacity = '0.8';
+        hypeVideo.classList.remove('round2');
+        hypeVideo.style.bottom = '-100vh';
+        if (round === 2) {
+          hypeVideo.classList.add('round2');
+        }
+        window.updateHypeVideo();
+      };
+
+      window.updateHypeVideo = function() {
+        var hypeVideo = document.getElementById('hype-video');
+        if (!hypeVideo) return;
+        var currentRound = window.currentRound || 1;
+        var modifier = currentRound === 1 ? (window.p1PunchDamageModifier || 0) : (window.p2PunchDamageModifier || 0);
+        var percent = modifier * 5;
+        if (percent > 100) percent = 100;
+        var offset = -100 + percent;
+        hypeVideo.style.bottom = offset + 'vh';
+        hypeVideo.style.opacity = percent > 0 ? '0.8' : '0';
+      };
+
+      window.hideHypeVideo = function() {
+        var hypeVideo = document.getElementById('hype-video');
+        if (hypeVideo) hypeVideo.style.display = 'none';
+      };
+
       var combatRules = [
         // BLOCK vs PUNCH -> Defender deflects, attacker idles but keeps punch anim
         [['PUNCH', 'BLOCK'], { atkMove: 'Idle', atkAnim: 'Punch', defAnim: 'Deflect' }],
@@ -1017,10 +1048,10 @@
 
               if (btn.getAttribute("data-player") === "player1") {
                 switchBackground("resources/arena_p1win.webm", true);
-                (new Audio('resources/winnerP1.mp3')).play().catch(function() {});
+                if (window.winnerP1Audio) window.winnerP1Audio.play().catch(function() {});
               } else {
                 switchBackground("resources/arena_p2win.webm", true);
-                (new Audio('resources/winnerP2.mp3')).play().catch(function() {});
+                if (window.winnerP2Audio) window.winnerP2Audio.play().catch(function() {});
               }
 
               var winner = btn.getAttribute("data-player");
