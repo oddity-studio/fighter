@@ -198,18 +198,18 @@
         }, 100);
       });
 
-      // AI opponent
+      // AI opponent - use same card definitions as human side
       var allCards = [
-        { name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'] },
-        { name: 'Triple Hit', type: 'ATTACK', time: 5, uptime: 3, downtime: 2, moves: ['PUNCH', 'PUNCH', 'PUNCH'] },
-        { name: 'Sucker Punch', type: 'ATTACK', time: 3, uptime: 2, downtime: 1, moves: ['BLOCK', 'PUNCH'] },
-        { name: 'Power Glove', type: 'ATTACK', time: 5, uptime: 3, downtime: 2, moves: ['SUPER'] },
-        { name: 'Doom', type: 'ATTACK', time: 8, uptime: 5, downtime: 3, moves: ['PUNCH', 'PUNCH', 'SUPER'] },
-        { name: 'Deflect', type: 'DEFENSE', time: 2, uptime: 1, downtime: 1, moves: ['BLOCK'] },
-        { name: 'Turtle', type: 'DEFENSE', time: 5, uptime: 3, downtime: 2, moves: ['BLOCK', 'PUNCH', 'BLOCK'] },
-        { name: 'Smartass', type: 'DEFENSE', time: 5, uptime: 3, downtime: 2, moves: ['BLOCK', 'TAUNT'] },
-        { name: 'Wait For It', type: 'DEFENSE', time: 8, uptime: 5, downtime: 3, moves: ['BLOCK', 'BLOCK', 'SUPER'] },
-        { name: 'Boost Morale', type: 'SKILL', time: 3, uptime: 2, downtime: 1, moves: ['TAUNT'] }
+        { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH', 'IDLE'] },
+        { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH', 'IDLE', 'IDLE'] },
+        { name: 'Sucker Punch',   type: 'ATTACK',  time: 3, moves: ['BLOCK', 'PUNCH', 'IDLE'] },
+        { name: 'Power Glove',    type: 'ATTACK',  time: 5, moves: ['SUPER', 'CONT', 'CONT', 'IDLE', 'CONT'] },
+        { name: 'Doom',           type: 'ATTACK',  time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
+        { name: 'Deflect',        type: 'DEFENSE', time: 2, moves: ['BLOCK', 'IDLE'] },
+        { name: 'Turtle',         type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK', 'IDLE', 'CONT'] },
+        { name: 'Smartass',       type: 'DEFENSE', time: 5, moves: ['BLOCK', 'TAUNT', 'CONT', 'IDLE'] },
+        { name: 'Wait For It',    type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
+        { name: 'Boost Morale',   type: 'SKILL',   time: 3, moves: ['TAUNT', 'IDLE', 'IDLE'] }
       ];
 
       function scoreAttackSequence(cards) {
@@ -283,21 +283,26 @@
       var hitCards = [];
       // First 7 ticks are Idle
       for (var k = 0; k < 7; k++) {
-        hitCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: k + 1 });
+        hitCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, moves: ['IDLE'], tick: k + 1 });
       }
-      // Remaining ticks are Hit
-      for (var i = 0; i < 14; i++) {
-        hitCards.push({ name: 'Hit', type: 'ATTACK', time: 2, uptime: 1, downtime: 1, moves: ['PUNCH'], tick: (i + 7) * 2 + 1 });
+      // Remaining ticks (8-30 = 23 ticks) fill with Hit cards
+      var hitCardTemplate = allCards.find(function(c) { return c.name === 'Hit'; });
+      var nextTick = 8;
+      while (nextTick <= 30) {
+        var card = Object.assign({}, hitCardTemplate);
+        card.tick = nextTick;
+        hitCards.push(card);
+        nextTick += card.time;
       }
 
       var idleCards = [];
       // First 7 ticks are Idle for both
       for (var j = 0; j < 7; j++) {
-        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: j + 1 });
+        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, moves: ['IDLE'], tick: j + 1 });
       }
       // Start actual idles from tick 8
       for (var k = 7; k < 30; k++) {
-        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, uptime: 0, downtime: 1, moves: ['Idle'], tick: k + 1 });
+        idleCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, moves: ['IDLE'], tick: k + 1 });
       }
       window.idleAtkCards = idleCards.slice();
       window.idleDefCards = idleCards.slice();
