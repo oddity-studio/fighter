@@ -343,6 +343,31 @@
       });
 
       // ===== BUTTON TOOLTIPS =====
+      function setupTooltips() {
+        var actionBtns = document.querySelectorAll('.action-btn');
+        actionBtns.forEach(function(btn) {
+          btn.addEventListener('pointerenter', function() {
+            if (!window.showCardInfo) return;
+            var action = this.getAttribute('data-action');
+            var desc = buttonDescriptions[action];
+            if (desc) {
+              var infoBox = document.getElementById('drag-ghost-info');
+              var title = action.toUpperCase();
+              infoBox.innerHTML = '<div class="info-type ' + title + '" style="font-size:16px;">' + title + '</div>' +
+                                  '<div class="info-move-desc" style="margin-top:4px;">' + desc.split(': ')[1] + '</div>';
+              infoBox.style.display = 'block';
+              var rect = this.getBoundingClientRect();
+              infoBox.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+              infoBox.style.top = (rect.top + rect.height + 10) + 'px';
+            }
+          });
+          btn.addEventListener('pointerleave', function() {
+            document.getElementById('drag-ghost-info').style.display = 'none';
+          });
+        });
+      }
+      window.setupTooltips = setupTooltips;
+
       document.getElementById('info-toggle-btn').addEventListener('click', function() {
         window.showCardInfo = !window.showCardInfo;
         this.style.background = window.showCardInfo ? 'rgba(255,255,255,0.2)' : '';
