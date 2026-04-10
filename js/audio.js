@@ -198,19 +198,8 @@
         }, 100);
       });
 
-      // AI opponent - use same card definitions as human side
-      var allCards = [
-        { name: 'Hit',            type: 'ATTACK',  time: 2, moves: ['PUNCH', 'IDLE'] },
-        { name: 'Triple Hit',     type: 'ATTACK',  time: 5, moves: ['PUNCH', 'PUNCH', 'PUNCH', 'IDLE', 'IDLE'] },
-        { name: 'Sucker Punch',   type: 'ATTACK',  time: 3, moves: ['BLOCK', 'PUNCH', 'IDLE'] },
-        { name: 'Power Glove',    type: 'ATTACK',  time: 5, moves: ['SUPER', 'CONT', 'CONT', 'IDLE', 'CONT'] },
-        { name: 'Doom',           type: 'ATTACK',  time: 8, moves: ['PUNCH', 'PUNCH', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
-        { name: 'Deflect',        type: 'DEFENSE', time: 2, moves: ['BLOCK', 'IDLE'] },
-        { name: 'Turtle',         type: 'DEFENSE', time: 5, moves: ['BLOCK', 'PUNCH', 'BLOCK', 'IDLE', 'CONT'] },
-        { name: 'Smartass',       type: 'DEFENSE', time: 5, moves: ['BLOCK', 'TAUNT', 'CONT', 'IDLE'] },
-        { name: 'Wait For It',    type: 'DEFENSE', time: 8, moves: ['BLOCK', 'BLOCK', 'SUPER', 'CONT', 'CONT', 'IDLE', 'CONT', 'CONT'] },
-        { name: 'Boost Morale',   type: 'SKILL',   time: 3, moves: ['TAUNT', 'IDLE', 'IDLE'] }
-      ];
+      // AI opponent - use shared card definitions from cards.js
+      // Wait for window.cards to be defined (cards.js loads first)
 
       function scoreAttackSequence(cards) {
         var moves = [];
@@ -256,12 +245,12 @@
       }
 
       function generateAttacking() {
-        var attackPool = allCards.filter(function(c) { return c.type === 'ATTACK' || c.type === 'SKILL'; });
+        var attackPool = window.cards.filter(function(c) { return c.type === 'ATTACK' || c.type === 'SKILL'; });
         return generateSequence(attackPool, scoreAttackSequence);
       }
 
       function generateDefending() {
-        var defendPool = allCards.filter(function(c) { return c.type === 'DEFENSE'; });
+        var defendPool = window.cards.filter(function(c) { return c.type === 'DEFENSE'; });
         return generateSequence(defendPool, scoreDefendSequence);
       }
 
@@ -286,7 +275,7 @@
         hitCards.push({ name: 'Idle', type: 'DEFENSE', time: 1, moves: ['IDLE'], tick: k + 1 });
       }
       // Remaining ticks (8-30 = 23 ticks) fill with Hit cards
-      var hitCardTemplate = allCards.find(function(c) { return c.name === 'Hit'; });
+      var hitCardTemplate = window.cards.find(function(c) { return c.name === 'Hit'; });
       var nextTick = 8;
       while (nextTick <= 30) {
         var card = Object.assign({}, hitCardTemplate);

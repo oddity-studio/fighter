@@ -310,5 +310,6 @@
         window.moveDescriptions = moveDescriptions;
         window.typeDescriptions = typeDescriptions;
         window.showCardInfo = showCardInfo;
+        window.cards = cards;
       })();
     
