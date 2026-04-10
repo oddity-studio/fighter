@@ -835,14 +835,14 @@
                 // Round 1: only when player1 (player1) loses health (atkTarget === 'player1')
                 // Round 2: only when player2 (player2) loses health (atkTarget === 'player2')
                 if (roundNum === 1 && atkTarget === 'player1') {
-                  audio1.volume = 0.1;
+                  window.audio1.volume = 0.1;
                   if (newH > 0) {
-                    setTimeout(function() { audio1.volume = 1; }, 500);
+                    setTimeout(function() { window.audio1.volume = 1; }, 500);
                   }
                 } else if (roundNum === 2 && atkTarget === 'player2') {
-                  audio2.volume = 0.1;
+                  window.audio2.volume = 0.1;
                   if (newH > 0) {
-                    setTimeout(function() { audio2.volume = 1; }, 500);
+                    setTimeout(function() { window.audio2.volume = 1; }, 500);
                   }
                 }
                 if (newH <= 0) {
@@ -853,7 +853,7 @@
                   winner.state.setAnimation(0, 'Idle', true);
                   // Show K.O. when health reaches 0
                   var ko = document.getElementById('ko-overlay');
-                  koAudio.play().catch(function() {});
+                  window.koAudio.play().catch(function() {});
                   ko.classList.add('visible');
                   setTimeout(function() { ko.classList.add('blink-out'); }, 1500);
                   setTimeout(function() { ko.classList.remove('visible', 'blink-out'); }, 1800);
@@ -865,14 +865,14 @@
                 var newH2 = Math.max(0, health[defTarget] - defDamage);
                 setHealth(defTarget, newH2);
                 if (roundNum === 1 && defTarget === 'player1') {
-                  audio1.volume = 0.1;
+                  window.audio1.volume = 0.1;
                   if (newH2 > 0) {
-                    setTimeout(function() { audio1.volume = 1; }, 500);
+                    setTimeout(function() { window.audio1.volume = 1; }, 500);
                   }
                 } else if (roundNum === 2 && defTarget === 'player2') {
-                  audio2.volume = 0.1;
+                  window.audio2.volume = 0.1;
                   if (newH2 > 0) {
-                    setTimeout(function() { audio2.volume = 1; }, 500);
+                    setTimeout(function() { window.audio2.volume = 1; }, 500);
                   }
                 }
                 if (newH2 <= 0) {
@@ -883,7 +883,7 @@
                   winner2.state.setAnimation(0, 'Idle', true);
                   // Show K.O. when health reaches 0
                   var ko = document.getElementById('ko-overlay');
-                  koAudio.play().catch(function() {});
+                  window.koAudio.play().catch(function() {});
                   ko.classList.add('visible');
                   setTimeout(function() { ko.classList.add('blink-out'); }, 1500);
                   setTimeout(function() { ko.classList.remove('visible', 'blink-out'); }, 1800);
@@ -1006,7 +1006,7 @@
             }
             
             clearInterval(countdownInterval);
-            (round === 1 ? audio1 : audio2).pause();
+            (round === 1 ? window.audio1 : window.audio2).pause();
             setTimeout(function() {
               var flash = document.getElementById('flash');
               flash.style.transition = 'none';
@@ -1204,10 +1204,10 @@
       }
 
       // Audio - use shared audio objects from audio.js
-      if (window.audio1) {
+if (window.audio1) {
         window.audio1.loop = true;
       }
-      if (window.audio2) {
+if (window.audio2) {
         window.audio2.loop = true;
       }
 
@@ -1277,16 +1277,16 @@
         window.dispatchEvent(new Event('resize'));
 
         var dur = window.getBeat1Duration();
-        audio1.currentTime = window.getBeat1WindowPos() * (dur - 30);
-        audio1.volume = 0;
-        audio1.play();
-        audio1.addEventListener('canplay', function fadeIn() {
-          audio1.removeEventListener('canplay', fadeIn);
+        window.audio1.currentTime = window.getBeat1WindowPos() * (dur - 30);
+        window.audio1.volume = 0;
+        window.audio1.play();
+        window.audio1.addEventListener('canplay', function fadeIn() {
+          window.audio1.removeEventListener('canplay', fadeIn);
           var vol = 0;
           var fadeInInterval = setInterval(function() {
             if (vol < 0.7) {
               vol += 0.05;
-              audio1.volume = Math.min(vol, 0.7);
+              window.audio1.volume = Math.min(vol, 0.7);
             } else {
               clearInterval(fadeInInterval);
             }
@@ -1294,7 +1294,7 @@
         });
 
         showRoundCaption('round1-overlay', 1000);
-        startAudio.play().catch(function() {});
+        window.startAudio.play().catch(function() {});
 
         // Show FIGHT at 7 seconds
         showRoundCaption('fight-overlay', 7000);
@@ -1360,23 +1360,23 @@
         if (countdown <= 2 && countdown > 0) {
           if (round === 2 && !beat2FadeStarted) {
             beat2FadeStarted = true;
-            audio2.volume = 0.2;
+            window.audio2.volume = 0.2;
           }
         }
         if (countdown <= 0) {
           if (round === 1) {
             if (window.currentCombatInterval) clearInterval(window.currentCombatInterval);
-            audio1.pause();
-            audio1.volume = 1;
+            window.audio1.pause();
+            window.audio1.volume = 1;
             var b2Start2 = window.getBeat2Start() / window.beat2Buffer.sampleRate;
-            audio2.currentTime = b2Start2;
-            audio2.volume = 0;
-            audio2.play();
+            window.audio2.currentTime = b2Start2;
+            window.audio2.volume = 0;
+            window.audio2.play();
             var vol2 = 0;
             var fadeInInterval2 = setInterval(function() {
               if (vol2 < 0.7) {
                 vol2 += 0.05;
-                audio2.volume = Math.min(vol2, 0.7);
+                window.audio2.volume = Math.min(vol2, 0.7);
               } else {
                 clearInterval(fadeInInterval2);
               }
@@ -1452,8 +1452,8 @@
             player2Fill.style.animation = 'round-bar-reveal 30s linear forwards';
           } else {
             // Timer fully depleted � stop audio
-            audio2.pause();
-            audio2.volume = 1;
+            window.audio2.pause();
+            window.audio2.volume = 1;
             countdownEl.textContent = '00';
             clearInterval(countdownInterval);
             if (window.currentCombatInterval) clearInterval(window.currentCombatInterval);
@@ -1469,11 +1469,11 @@
             if (flushBros) {
               document.getElementById('round-label').textContent = 'FLUSH BROTHERS';
               showRoundCaption('flush-brothers-overlay', 0);
-              flushAudio.play().catch(function() {});
+              window.flushAudio.play().catch(function() {});
             } else {
               document.getElementById('round-label').textContent = 'VOTE NOW';
               showRoundCaption('vote-overlay', 0);
-              votingAudio.play().catch(function() {});
+              window.votingAudio.play().catch(function() {});
             }
             // Show both vote buttons at end of round 2
             document.querySelectorAll('.vote-btn').forEach(function(btn) {
@@ -1525,7 +1525,7 @@
       }
 
       window.addEventListener('DOMContentLoaded', function() {
-        setupTooltips();
+        window.setupTooltips();
 
         window.player1Character = 'Maxx';
         window.player2Character = 'Hammer';
@@ -1549,8 +1549,8 @@
 
         document.getElementById('start-btn').addEventListener('click', function() {
           if (window.confirmAudio) {
-            confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
+            window.confirmAudio.currentTime = 0;
+            window.confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
           }
           startBattle();
         });
@@ -1558,8 +1558,8 @@
         // Confirm Beat button - transitions to card placement mode
         document.getElementById('confirm-btn').addEventListener('click', function() {
           if (window.confirmAudio) {
-            confirmAudio.currentTime = 0;
-            confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
+            window.confirmAudio.currentTime = 0;
+            window.confirmAudio.play().catch(function(e) { /* Audio playback failed */ });
           }
           // Hide logo and full waveform
           document.getElementById('logo').style.display = 'none';
